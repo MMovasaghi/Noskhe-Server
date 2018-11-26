@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Report";
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>نسخه - نتیجه پرداخت</title>
+    <link href="https://cdn.rtlcss.com/bootstrap/v4.0.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+        @if (ViewBag.IsSuccess == true)
+        {
+            <div class="alert alert-success">
+                <h2>تراکنش با موفقیت انجام شد</h2>
+                <hr />
+                <p>کد پیگیری شما : @ViewBag.RefID</p>
+            </div>
+        }
+        else if (ViewBag.IsSuccess == false)
+        {
+            if (ViewBag.IsStatusNOK == true)
+            {
+                <div class="alert alert-danger">
+                    <h2>تراکنش با شکست مواجه شد</h2>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <h2>تراکنش با شکست مواجه شد</h2>
+                    <hr />
+                    <p>توضیحات : @ViewBag.Description</p>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                <h2>درخواست اشتباه</h2>
+            </div>
+        }
+    </div>
+</body>
+</html>

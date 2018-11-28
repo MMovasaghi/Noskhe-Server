@@ -350,7 +350,7 @@ namespace NoskheAPI_Beta.Controllers
                     
                 return outputs.ToArray();
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 // un-satisfying result
                 return BadRequest(new Descriptive {

@@ -30,5 +30,6 @@ namespace NoskheAPI_Beta.Models
         public Account Account { get; set; }
         public Score Score { get; set; }
         public List<Settle> Settles { get; set; }
+        public PharmacyToken PharmacyToken { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NoskheAPI_Beta.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialCreation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -108,6 +108,31 @@ namespace NoskheAPI_Beta.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Medicines", x => x.MedicineId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerTokens",
+                columns: table => new
+                {
+                    CustomerTokenId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Token = table.Column<string>(nullable: true),
+                    IsValid = table.Column<bool>(nullable: false),
+                    TokenRefreshRequests = table.Column<uint>(nullable: false),
+                    LoginRequests = table.Column<uint>(nullable: false),
+                    ValidFrom = table.Column<DateTime>(nullable: false),
+                    ValidTo = table.Column<DateTime>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerTokens", x => x.CustomerTokenId);
+                    table.ForeignKey(
+                        name: "FK_CustomerTokens_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -355,6 +380,31 @@ namespace NoskheAPI_Beta.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PharmacyTokens",
+                columns: table => new
+                {
+                    PharmacyTokenId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Token = table.Column<string>(nullable: true),
+                    IsValid = table.Column<bool>(nullable: false),
+                    TokenRefreshRequests = table.Column<uint>(nullable: false),
+                    LoginRequests = table.Column<uint>(nullable: false),
+                    ValidFrom = table.Column<DateTime>(nullable: false),
+                    ValidTo = table.Column<DateTime>(nullable: false),
+                    PharmacyId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PharmacyTokens", x => x.PharmacyTokenId);
+                    table.ForeignKey(
+                        name: "FK_PharmacyTokens_Pharmacies_PharmacyId",
+                        column: x => x.PharmacyId,
+                        principalTable: "Pharmacies",
+                        principalColumn: "PharmacyId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Scores",
                 columns: table => new
                 {
@@ -461,6 +511,12 @@ namespace NoskheAPI_Beta.Migrations
                 column: "ShoppingCartId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomerTokens_CustomerId",
+                table: "CustomerTokens",
+                column: "CustomerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicineShoppingCarts_ShoppingCartId",
                 table: "MedicineShoppingCarts",
                 column: "ShoppingCartId");
@@ -497,6 +553,12 @@ namespace NoskheAPI_Beta.Migrations
                 name: "IX_Pharmacies_ManagerId",
                 table: "Pharmacies",
                 column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PharmacyTokens_PharmacyId",
+                table: "PharmacyTokens",
+                column: "PharmacyId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PrescriptionItems_PrescriptionId",
@@ -541,6 +603,9 @@ namespace NoskheAPI_Beta.Migrations
                 name: "CosmeticShoppingCarts");
 
             migrationBuilder.DropTable(
+                name: "CustomerTokens");
+
+            migrationBuilder.DropTable(
                 name: "MedicineShoppingCarts");
 
             migrationBuilder.DropTable(
@@ -548,6 +613,9 @@ namespace NoskheAPI_Beta.Migrations
 
             migrationBuilder.DropTable(
                 name: "Occurrences");
+
+            migrationBuilder.DropTable(
+                name: "PharmacyTokens");
 
             migrationBuilder.DropTable(
                 name: "PrescriptionItems");

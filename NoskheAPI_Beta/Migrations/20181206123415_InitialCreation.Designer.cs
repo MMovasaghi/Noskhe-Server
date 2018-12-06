@@ -9,14 +9,14 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20180915215643_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20181206123415_InitialCreation")]
+    partial class InitialCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846");
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024");
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.Account", b =>
                 {
@@ -140,6 +140,33 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerToken", b =>
+                {
+                    b.Property<int>("CustomerTokenId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CustomerId");
+
+                    b.Property<bool>("IsValid");
+
+                    b.Property<uint>("LoginRequests");
+
+                    b.Property<string>("Token");
+
+                    b.Property<uint>("TokenRefreshRequests");
+
+                    b.Property<DateTime>("ValidFrom");
+
+                    b.Property<DateTime>("ValidTo");
+
+                    b.HasKey("CustomerTokenId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("CustomerTokens");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.Manager", b =>
@@ -346,6 +373,33 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("Pharmacies");
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>
+                {
+                    b.Property<int>("PharmacyTokenId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("IsValid");
+
+                    b.Property<uint>("LoginRequests");
+
+                    b.Property<int>("PharmacyId");
+
+                    b.Property<string>("Token");
+
+                    b.Property<uint>("TokenRefreshRequests");
+
+                    b.Property<DateTime>("ValidFrom");
+
+                    b.Property<DateTime>("ValidTo");
+
+                    b.HasKey("PharmacyTokenId");
+
+                    b.HasIndex("PharmacyId")
+                        .IsUnique();
+
+                    b.ToTable("PharmacyTokens");
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.Prescription", b =>
                 {
                     b.Property<int>("PrescriptionId")
@@ -506,6 +560,14 @@ namespace NoskheAPI_Beta.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerToken", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithOne("CustomerToken")
+                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerToken", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.MedicineShoppingCart", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Medicine", "Medicine")
@@ -558,6 +620,14 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasOne("NoskheAPI_Beta.Models.Manager", "Manager")
                         .WithMany("Pharmacies")
                         .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
+                        .WithOne("PharmacyToken")
+                        .HasForeignKey("NoskheAPI_Beta.Models.PharmacyToken", "PharmacyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

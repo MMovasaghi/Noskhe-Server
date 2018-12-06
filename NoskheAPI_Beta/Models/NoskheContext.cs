@@ -54,5 +54,7 @@ namespace NoskheAPI_Beta.Models
         public DbSet<Occurrence> Occurrences { get; set; }
         public DbSet<Settle> Settles { get; set; }
         public DbSet<TextMessage> TextMessages { get; set; }
+        public DbSet<CustomerToken> CustomerTokens { get; set; }
+        public DbSet<PharmacyToken> PharmacyTokens { get; set; }
     }
 }

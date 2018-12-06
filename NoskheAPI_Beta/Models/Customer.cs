@@ -23,5 +23,6 @@ namespace NoskheAPI_Beta.Models
         */
         public List<ShoppingCart> ShoppingCarts { get; set; }
         public TextMessage TextMessage { get; set; }
+        public CustomerToken CustomerToken { get; set; }
     }
 }

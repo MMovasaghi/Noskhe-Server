@@ -8,9 +8,14 @@ using NoskheAPI_Beta.Models.Response;
 using NoskheAPI_Beta.Classes.Communication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
+using NoskheAPI_Beta.Services;
+using Microsoft.Extensions.Options;
+using NoskheAPI_Beta.Classes;
 
 namespace NoskheAPI_Beta.Controllers
 {
+    [Authorize]
     [Route("desktop-api/[controller]")]
     [ApiController]
     public class PharmacyController : ControllerBase
@@ -18,62 +23,62 @@ namespace NoskheAPI_Beta.Controllers
         /*
             GET : get-database-status
             └──── Parameter(s): none
-            └─────── Output(s): single 'Descriptive' model
+            └─────── Output(s): single 'ResponseTemplate' model
             └──────── Error(s): DATABASE_FAILURE
             └───── Description: Checks whether the server can receive any data from database file or not.
             -----------------------------------------------------------------------------------------------------
             GET : get-server-status
             └──── Parameter(s): none
-            └─────── Output(s): single 'Descriptive' model
+            └─────── Output(s): single 'ResponseTemplate' model
             └──────── Error(s): none
             └───── Description: Checks whether the server communicates properly to it's clients.
             -----------------------------------------------------------------------------------------------------
             GET : get-details
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): single 'Pharmacy' model, single 'Descriptive' model
+            └─────── Output(s): single 'Pharmacy' model, single 'ResponseTemplate' model
             └──────── Error(s): NO_PHARMACIES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Returns pharmacy details which can be used to show in profile.
             -----------------------------------------------------------------------------------------------------
             GET : get-orders
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): multiple 'Order' models, single 'Descriptive' model
+            └─────── Output(s): multiple 'Order' models, single 'ResponseTemplate' model
             └──────── Error(s): BAD_START_TIME_FORMAT, BAD_END_TIME_FORMAT, START_TIME_IS_GREATER_THAN_END_TIME, NO_RESPONSES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Returns a list of orders which are linked to the pharmacy.
             -----------------------------------------------------------------------------------------------------
             GET : get-score
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): single 'Score' model, single 'Descriptive' model
+            └─────── Output(s): single 'Score' model, single 'ResponseTemplate' model
             └──────── Error(s): NO_SCORES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Returns pharmacy score details.
             -----------------------------------------------------------------------------------------------------
             GET : get-settles
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): multiple 'Settle' models, single 'Descriptive' model
+            └─────── Output(s): multiple 'Settle' models, single 'ResponseTemplate' model
             └──────── Error(s): NO_SETTLES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Gets a list of settles in which the pharmacy has submitted earlier.
             -----------------------------------------------------------------------------------------------------
             POST : set-settle
             └──── Parameter(s): single 'Settle' model
-            └─────── Output(s): single 'Descriptive' model
+            └─────── Output(s): single 'ResponseTemplate' model
             └──────── Error(s): NO_PHARMACIES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Sets a settle for the pharmacy which has requested.
             -----------------------------------------------------------------------------------------------------
             GET : get-top-five
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): multiple 'Score' models, single 'Descriptive' model
+            └─────── Output(s): multiple 'Score' models, single 'ResponseTemplate' model
             └──────── Error(s): DATABASE_FAILURE
             └───── Description: Returns the top five pharmacy based on their score given during their activity.
             -----------------------------------------------------------------------------------------------------
             POST : authenticate
             └──── Parameter(s): credential string[] (credential[0]: email, credential[1]: password)
-            └─────── Output(s): single 'Descriptive' model
+            └─────── Output(s): single 'ResponseTemplate' model
             └──────── Error(s): VERIFICATION_FAILED, DATABASE_FAILURE
             └───── Description: Checks whether the pharmacy client entered the right password or not.
                                 Therefore, the application can redirect the client to pharmacy main page.
             -----------------------------------------------------------------------------------------------------
             PUT : change-status
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): single 'Descriptive' model
+            └─────── Output(s): single 'ResponseTemplate' model
             └──────── Error(s): NO_PHARMACIES_MATCHED_THE_UPI, DATABASE_FAILURE
             └───── Description: Used to change the status of the pharmacy to ON/OFF. Basically, ON means
                                 it will receive new orders from customers and OFF means the pharamcy service
@@ -81,7 +86,7 @@ namespace NoskheAPI_Beta.Controllers
             -----------------------------------------------------------------------------------------------------
             GET : get-weekly-number-of-orders
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): multiple 'float' values, single 'Descriptive' model
+            └─────── Output(s): multiple 'float' values, single 'ResponseTemplate' model
             └──────── Error(s): NO_PHARMACIES_MATCHED_THE_UPI, DATA_IS_NOT_AVAILABE, DATABASE_FAILURE
             └───── Description: Returns the daily number of orders in the recent week which a pharmacy has.
                                 It is an array of 8 floats. The first 7 items are the number of orders of week days.
@@ -89,7 +94,7 @@ namespace NoskheAPI_Beta.Controllers
             -----------------------------------------------------------------------------------------------------
             GET : get-weekly-packing-average-time            
             └──── Parameter(s): 'upi' string
-            └─────── Output(s): multiple 'float' values, single 'Descriptive' model
+            └─────── Output(s): multiple 'float' values, single 'ResponseTemplate' model
             └──────── Error(s): NO_PHARMACIES_MATCHED_THE_UPI, DATA_IS_NOT_AVAILABE, DATABASE_FAILURE
             └───── Description: Returns packing average time during the recent week, which is an array
                                 of 8 floats. The first 7 items are the time for the week days.
@@ -104,7 +109,13 @@ namespace NoskheAPI_Beta.Controllers
 
         private static NoskheContext db = new NoskheContext();
 
-
+        private IPharmacyService _pharmacyService;
+        private readonly AppSettings _appSettings;
+        public PharmacyController(IPharmacyService pharmacyService, IOptions<AppSettings> appSettings)
+        {
+            _pharmacyService = pharmacyService;
+            _appSettings = appSettings.Value;
+        }
         public PharmacyController(IHubContext<NotificationHub> a)
         {
             HubContext = a;
@@ -121,14 +132,14 @@ namespace NoskheAPI_Beta.Controllers
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_ERROR"
+                    Error = "DATABASE_ERROR"
                 });
             }
 
             // satisfying result
-            return Ok(new Descriptive {
+            return Ok(new ResponseTemplate {
                 Success = true
             });
         }
@@ -141,10 +152,10 @@ namespace NoskheAPI_Beta.Controllers
                 var response = db.Pharmacies.Where(q => q.Email == email).FirstOrDefault();
                 if (response == null)
                 {    // un-satisfying result
-                    return BadRequest(new Descriptive
+                    return BadRequest(new ResponseTemplate
                     {
                         Success = false,
-                        Message = "NO_PHARMACIES_MATCHED_THE_EMAIL"
+                        Error = "NO_PHARMACIES_MATCHED_THE_EMAIL"
                     });
                 }
 
@@ -153,10 +164,10 @@ namespace NoskheAPI_Beta.Controllers
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive
+                return BadRequest(new ResponseTemplate
                 {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -172,7 +183,7 @@ namespace NoskheAPI_Beta.Controllers
         public ActionResult GetServerStatus()
         {
             // satisfying result
-            return Ok(new Descriptive {
+            return Ok(new ResponseTemplate {
                 Success = true
             }); // Otherwise the connection is not established and 'Success' cannot be reached by the client. ('false' is meaningless)
         }
@@ -185,9 +196,9 @@ namespace NoskheAPI_Beta.Controllers
                 var search = db.Pharmacies.Where(q => q.UPI == upi).FirstOrDefault();
                 if(search == null)
                     // un-satisfying result
-                    return BadRequest(new Descriptive {
+                    return BadRequest(new ResponseTemplate {
                         Success = false,
-                        Message = "NO_PHARMACIES_MATCHED_THE_UPI"
+                        Error = "NO_PHARMACIES_MATCHED_THE_UPI"
                     });
                 
                 return new Models.Minimals.Output.Pharmacy {
@@ -205,9 +216,9 @@ namespace NoskheAPI_Beta.Controllers
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -248,9 +259,9 @@ namespace NoskheAPI_Beta.Controllers
                             catch
                             {
                                 // un-satisfying result
-                                return BadRequest(new Descriptive {
+                                return BadRequest(new ResponseTemplate {
                                     Success = false,
-                                    Message = "BAD_START_TIME_FORMAT"
+                                    Error = "BAD_START_TIME_FORMAT"
                                 });
                             }
                         
@@ -273,18 +284,18 @@ namespace NoskheAPI_Beta.Controllers
                             catch
                             {
                                 // un-satisfying result
-                                return BadRequest(new Descriptive {
+                                return BadRequest(new ResponseTemplate {
                                     Success = false,
-                                    Message = "BAD_END_TIME_FORMAT"
+                                    Error = "BAD_END_TIME_FORMAT"
                                 });
                             }
                     }
 
                     if(startTime >= endTime)
                         // un-satisfying result
-                        return BadRequest(new Descriptive {
+                        return BadRequest(new ResponseTemplate {
                             Success = false,
-                            Message = "START_TIME_IS_GREATER_THAN_END_TIME"
+                            Error = "START_TIME_IS_GREATER_THAN_END_TIME"
                         });
 
                     foreach (var response in responses)
@@ -361,17 +372,17 @@ namespace NoskheAPI_Beta.Controllers
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "NO_RESPONSES_MATCHED_THE_UPI"
+                    Error = "NO_RESPONSES_MATCHED_THE_UPI"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -385,9 +396,9 @@ namespace NoskheAPI_Beta.Controllers
                 var search = db.Scores.Where(q => q.Pharmacy.UPI == upi).FirstOrDefault();
                 if(search == null)
                     // un-satisfying result
-                    return BadRequest(new Descriptive {
+                    return BadRequest(new ResponseTemplate {
                         Success = false,
-                        Message = "NO_SCORES_MATCHED_THE_UPI"
+                        Error = "NO_SCORES_MATCHED_THE_UPI"
                     });
                 
                 return new Models.Minimals.Output.Score {
@@ -400,9 +411,9 @@ namespace NoskheAPI_Beta.Controllers
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -421,17 +432,17 @@ namespace NoskheAPI_Beta.Controllers
                 if(responses != null) return responses.ToArray();
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "NO_SETTLES_MATCHED_THE_UPI"
+                    Error = "NO_SETTLES_MATCHED_THE_UPI"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -459,23 +470,23 @@ namespace NoskheAPI_Beta.Controllers
                     db.SaveChanges();
 
                     // satisfying result
-                    return Ok(new Descriptive {
+                    return Ok(new ResponseTemplate {
                         Success = true
                     });
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "NO_PHARMACIES_MATCHED_THE_UPI"
+                    Error = "NO_PHARMACIES_MATCHED_THE_UPI"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -500,14 +511,15 @@ namespace NoskheAPI_Beta.Controllers
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
 
         // POST: desktop-api/pharmacy/authenticate
+        [AllowAnonymous]
         [HttpPost("Authenticate")]
         public ActionResult Authenticate([FromBody] string[] credential)
         {
@@ -517,23 +529,23 @@ namespace NoskheAPI_Beta.Controllers
                 if(response != null)
                 {
                     // satisfying result
-                    return Ok(new Descriptive {
+                    return Ok(new ResponseTemplate {
                         Success = true
                     });
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "VERIFICATION_FAILED"
+                    Error = "VERIFICATION_FAILED"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -553,7 +565,7 @@ namespace NoskheAPI_Beta.Controllers
                         db.SaveChanges();
 
                         // satisfying result
-                        return Ok(new Descriptive {
+                        return Ok(new ResponseTemplate {
                             Success = true
                         });
                     }
@@ -563,24 +575,24 @@ namespace NoskheAPI_Beta.Controllers
                         db.SaveChanges();
 
                         // satisfying result
-                        return Ok(new Descriptive {
+                        return Ok(new ResponseTemplate {
                             Success = true
                         });
                     }
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "NO_PHARMACIES_MATCHED_THE_UPI"
+                    Error = "NO_PHARMACIES_MATCHED_THE_UPI"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -654,24 +666,24 @@ namespace NoskheAPI_Beta.Controllers
                 if(db.Pharmacies.Where(q => q.UPI == upi).FirstOrDefault() == null)
                 {
                     // un-satisfying result
-                    return BadRequest(new Descriptive {
+                    return BadRequest(new ResponseTemplate {
                         Success = false,
-                        Message = "NO_PHARMACIES_MATCHED_THE_UPI"
+                        Error = "NO_PHARMACIES_MATCHED_THE_UPI"
                     });
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATA_IS_NOT_AVAILABE"
+                    Error = "DATA_IS_NOT_AVAILABE"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -843,24 +855,24 @@ namespace NoskheAPI_Beta.Controllers
                 if(db.Pharmacies.Where(q => q.UPI == upi).FirstOrDefault() == null)
                 {
                     // un-satisfying result
-                    return BadRequest(new Descriptive {
+                    return BadRequest(new ResponseTemplate {
                         Success = false,
-                        Message = "NO_PHARMACIES_MATCHED_THE_UPI"
+                        Error = "NO_PHARMACIES_MATCHED_THE_UPI"
                     });
                 }
 
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATA_IS_NOT_AVAILABE"
+                    Error = "DATA_IS_NOT_AVAILABE"
                 });
             }
             catch
             {
                 // un-satisfying result
-                return BadRequest(new Descriptive {
+                return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Message = "DATABASE_FAILURE"
+                    Error = "DATABASE_FAILURE"
                 });
             }
         }
@@ -868,7 +880,7 @@ namespace NoskheAPI_Beta.Controllers
         private IHubContext<NotificationHub> HubContext { get; set; }
 
         [HttpGet("signalr")]
-        public async Task<ActionResult> signalr(string identifier, string message)
+        public async Task<ActionResult> signalr(string identifier, string Error)
         {
             try
             {
@@ -876,10 +888,10 @@ namespace NoskheAPI_Beta.Controllers
             }
             catch
             {
-                return BadRequest(new Descriptive { Success = false, Message = "UNABLE_TO_SEND_NOTIFICATION" });
+                return BadRequest(new ResponseTemplate { Success = false, Error = "UNABLE_TO_SEND_NOTIFICATION" });
             }
 
-            return Ok(new Descriptive { Success = true });
+            return Ok(new ResponseTemplate { Success = true });
         }
     }
 }

@@ -95,7 +95,7 @@ namespace NoskheAPI_Beta.Services
 
                     return new TokenTemplate {
                         Token = newCustomerToken.Token,
-                        ExpirationTime = DateTimeOffset.Parse(newCustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                        Expires = DateTimeOffset.Parse(newCustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
                     };
                 }
                 throw new DuplicateCustomerException(ErrorCodes.DuplicateCustomerExceptionMsg);
@@ -242,7 +242,7 @@ namespace NoskheAPI_Beta.Services
 
                         return new TokenTemplate {
                             Token = existingCustomer.CustomerToken.Token,
-                            ExpirationTime = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                            Expires = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
                         };
                     }
                 }

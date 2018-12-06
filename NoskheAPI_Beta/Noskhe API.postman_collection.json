@@ -1,758 +1,709 @@
 {
 	"info": {
-		"_postman_id": "86823945-4e5b-4185-9527-d13ea4b354cb",
-		"name": "Noskhe API",
-		"description": "Exploring the Noskhe API features and explaining it's functions",
+		"_postman_id": "aef74d7c-1d02-4ca5-acd2-b06b54b1e6e0",
+		"name": "NoskheDocumentation",
+		"description": "Noskhe API documentation\nWritten by: AmirMohammadBiuki",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Android Client",
+			"name": "Customer",
 			"item": [
 				{
-					"name": "ورود",
-					"item": [
-						{
-							"name": "از طریق ایمیل و پسورد",
-							"item": [
-								{
-									"name": "احراز هویت توسط ایمیل و پسورد مشتری",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											},
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "[\"CustomerE@1.com\", \"CustomerP1\"]"
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/authenticate",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"authenticate"
-											]
-										},
-										"description": "با ارسال آرایه ای از ایمیل و پسورد مشتری"
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "c4009803-2b59-4a18-9bb5-c31dc696b987",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "67aed20e-0310-4ba8-a423-62fe3dadb9b5",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"_postman_isSubFolder": true
+					"name": "Add New Customer",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
 						},
-						{
-							"name": "از طریق شماره تلفن همراه",
-							"item": [
-								{
-									"name": "احراز هویت توسط شماره تلفن همراه مشتری",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "CustomerPh1"
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/authenticate-by-phone",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"authenticate-by-phone"
-											]
-										},
-										"description": "با ارسال شماره تلفن مشتری *\n\ndbug: HttpsConnectionAdapter[1]\n      Failed to authenticate HTTPS connection.\nSystem.IO.IOException: Authentication failed because the remote party has closed the transport stream.\n   at System.Net.Security.SslState.StartReadFrame(Byte[] buffer, Int32 readBytes, AsyncProtocolRequest asyncRequest)\n   at System.Net.Security.SslState.PartialFrameCallback(AsyncProtocolRequest asyncRequest)\n--- End of stack trace from previous location where exception was thrown ---\n   at System.Net.Security.SslState.ThrowIfExceptional()\n   at System.Net.Security.SslState.InternalEndProcessAuthentication(LazyAsyncResult lazyResult)\n   at System.Net.Security.SslState.EndProcessAuthentication(IAsyncResult result)\n   at System.Net.Security.SslStream.EndAuthenticateAsServer(IAsyncResult asyncResult)\n   at System.Net.Security.SslStream.<>c.<AuthenticateAsServerAsync>b__51_1(IAsyncResult iar)\n   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)\n--- End of stack trace from previous location where exception was thrown ---\n   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionAdapter.InnerOnConnectionAsync(ConnectionAdapterContext context)"
-									},
-									"response": []
-								},
-								{
-									"name": "ارسال پیامک کد تایید به شماره تلفن همراه مشتری",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/send-sms-authentication-code",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"send-sms-authentication-code"
-											]
-										},
-										"description": "از طریق ارسال شماره تلفن همراه مشتری انحام میشود *"
-									},
-									"response": []
-								},
-								{
-									"name": "بررسی صحیح بودن کد تایید مشتری",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/verify-sms-authentication-code",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"verify-sms-authentication-code"
-											]
-										},
-										"description": "با ارسال آرایه ای از شماره تلفن همراه و کد تایید مشتری انحام میشود"
-									},
-									"response": []
-								}
+						"method": "GET",
+						"header": [
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/new-customer",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
 							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "0b317f18-0474-467c-aab1-97fcf4e07c11",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "e5da39cd-27f3-4e21-89a6-a1c0eca523c0",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"_postman_isSubFolder": true
+							"path": [
+								"mobile-api",
+								"customer",
+								"new-customer"
+							]
 						}
-					],
-					"_postman_isSubFolder": true
+					},
+					"response": []
 				},
 				{
-					"name": "ثبت نام",
-					"item": [
-						{
-							"name": "ثبت نام مشتری جدید",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "android-api-key",
-										"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "android-api/customer/add-new",
-									"host": [
-										"android-api"
-									],
-									"path": [
-										"customer",
-										"add-new"
-									]
-								},
-								"description": "با ارسال اطلاعات مشتری در قالب آبجکت انجام میشود"
-							},
-							"response": []
+					"name": "Login With Email And Pass",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/login",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"login"
+							]
 						}
-					],
-					"_postman_isSubFolder": true
+					},
+					"response": []
 				},
 				{
-					"name": "کالاها",
-					"item": [
-						{
-							"name": "دریافت تمام آرایشی و بهداشتی ها",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "android-api-key",
-										"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "https://localhost:5001/android-api/customer/get-cosmetics",
-									"protocol": "https",
-									"host": [
-										"localhost"
-									],
-									"port": "5001",
-									"path": [
-										"android-api",
-										"customer",
-										"get-cosmetics"
-									]
-								}
-							},
-							"response": []
+					"name": "Login With Phone Number",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
 						},
-						{
-							"name": "دریافت تمامی دارو های آزاد",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "android-api-key",
-										"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "https://localhost:5001/android-api/customer/get-medicines",
-									"protocol": "https",
-									"host": [
-										"localhost"
-									],
-									"port": "5001",
-									"path": [
-										"android-api",
-										"customer",
-										"get-medicines"
-									]
-								}
-							},
-							"response": []
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/login-by-phone",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"login-by-phone"
+							]
 						}
-					],
-					"_postman_isSubFolder": true
+					},
+					"response": []
 				},
 				{
-					"name": "پرداخت ها",
-					"item": [
-						{
-							"name": "ایجاد درگاه پرداخت جدید",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "android-api-key",
-										"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "https://localhost:5001/android-api/customer/create-new-payment-gateway?uoi=OrderUOI_1",
-									"protocol": "https",
-									"host": [
-										"localhost"
-									],
-									"port": "5001",
-									"path": [
-										"android-api",
-										"customer",
-										"create-new-payment-gateway"
-									],
-									"query": [
-										{
-											"key": "uoi",
-											"value": "OrderUOI_1"
-										}
-									]
-								},
-								"description": "از طریق ارسال مشخصه یکتای سفارش مشتری صورت میگیرد"
+					"name": "Get Profile Information",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
 							},
-							"response": []
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-profile",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-profile"
+							]
 						}
-					],
-					"_postman_isSubFolder": true
+					},
+					"response": []
 				},
 				{
-					"name": "مشتری",
-					"item": [
-						{
-							"name": "سبد کالا",
-							"item": [
+					"name": "Edit Existing Customer Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"name": "دریافت سبدهای کالای مشتری",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-shopping-carts?email=CustomerE@1.com",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-shopping-carts"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "CustomerE@1.com"
-												}
-											]
-										},
-										"description": "از طریق ایمیل مشتری انحام میشود"
-									},
-									"response": []
-								},
-								{
-									"name": "دریافت آرایشی و بهداشتی های یک سبد کالا",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-cosmetics-by-usci?usci=ShoppingCartUSCI_001",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-cosmetics-by-usci"
-											],
-											"query": [
-												{
-													"key": "usci",
-													"value": "ShoppingCartUSCI_001"
-												}
-											]
-										},
-										"description": "از طریق مشخصه یکتای سبد کالا انجام میشود"
-									},
-									"response": []
-								},
-								{
-									"name": "دریافت تمام آیدی های آرایشی و بهداشتی یک سبد کالا",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-list-of-cosmetic-ids?usci=ShoppingCartUSCI_001",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-list-of-cosmetic-ids"
-											],
-											"query": [
-												{
-													"key": "usci",
-													"value": "ShoppingCartUSCI_001"
-												}
-											]
-										},
-										"description": "از طریق مشخصه یکتای سبد کالا انجام میشود"
-									},
-									"response": []
-								},
-								{
-									"name": "دریافت داروهای آزاد یک سبد کالا",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-medicines-by-usci?usci=ShoppingCartUSCI_001",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-medicines-by-usci"
-											],
-											"query": [
-												{
-													"key": "usci",
-													"value": "ShoppingCartUSCI_001"
-												}
-											]
-										},
-										"description": "از طریق مشخصه یکتای سبد کالا انجام میشود"
-									},
-									"response": []
-								},
-								{
-									"name": "دریافت تمام آیدی های دارو های آزاد یک سبد کالا",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-list-of-medicine-ids?usci=ShoppingCartUSCI_001",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-list-of-medicine-ids"
-											],
-											"query": [
-												{
-													"key": "usci",
-													"value": "ShoppingCartUSCI_001"
-												}
-											]
-										},
-										"description": "از طریق مشخصه یکتای سبد کالا انجام میشود"
-									},
-									"response": []
-								},
-								{
-									"name": "افزودن سبد کالای جدید",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/add-new-shopping-cart",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"add-new-shopping-cart"
-											]
-										},
-										"description": "از طریق ارسال سبد کالا در قالب آبجکت صورت میگیرد"
-									},
-									"response": []
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
 								}
-							],
-							"_postman_isSubFolder": true
+							]
 						},
-						{
-							"name": "سفارش",
-							"item": [
-								{
-									"name": "دریافت سفارشات مشتری",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-orders?email=CustomerE@1.com",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-orders"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "CustomerE@1.com"
-												}
-											]
-										},
-										"description": "از طریق ایمیل مشتری انحام میشود"
-									},
-									"response": []
-								}
-							],
-							"_postman_isSubFolder": true
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
 						},
-						{
-							"name": "پروفایل",
-							"item": [
-								{
-									"name": "دریافت اطلاعات مشتری",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/get-details?email=CustomerE@1.com",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"get-details"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "CustomerE@1.com"
-												}
-											]
-										},
-										"description": "از طریق ایمیل مشتری انحام میشود"
-									},
-									"response": [
-										{
-											"name": "مثال ۱",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "android-api-key",
-														"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-														"type": "text"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": ""
-												},
-												"url": {
-													"raw": "https://localhost:5001/android-api/customer/get-shopping-carts?email=CustomerE@1.com",
-													"protocol": "https",
-													"host": [
-														"localhost"
-													],
-													"port": "5001",
-													"path": [
-														"android-api",
-														"customer",
-														"get-shopping-carts"
-													],
-													"query": [
-														{
-															"key": "email",
-															"value": "CustomerE@1.com"
-														}
-													]
-												}
-											},
-											"_postman_previewlanguage": null,
-											"header": null,
-											"cookie": [],
-											"body": ""
-										}
-									]
-								},
-								{
-									"name": "ویرایش اطلاعات مشتری فعلی",
-									"request": {
-										"method": "PUT",
-										"header": [
-											{
-												"key": "android-api-key",
-												"value": "J76Y2U3UO8IDUWQDHWQKIDP2UIDS",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "https://localhost:5001/android-api/customer/edit-existing",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "5001",
-											"path": [
-												"android-api",
-												"customer",
-												"edit-existing"
-											]
-										},
-										"description": "از طریق ارسال اطلاعات ویرایش شده مشتری فعلی در قالب آبجکت انجام میشود"
-									},
-									"response": []
-								}
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/edit-profile",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
 							],
-							"_postman_isSubFolder": true
+							"path": [
+								"mobile-api",
+								"customer",
+								"edit-profile"
+							]
 						}
-					],
-					"_postman_isSubFolder": true
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Shopping Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/add-shopping-cart",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"add-shopping-cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer Shopping Carts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-shopping-carts",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-shopping-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Medicines Of A Shopping Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-shopping-cart-medicines",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-shopping-cart-medicines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cosmetics Of A Shopping Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-shopping-cart-cosmetics",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-shopping-cart-cosmetics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer Orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-orders",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Sms For Forget Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/request-forget-password",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"request-forget-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Sms Code For Forget Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/verify-forget-password",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"verify-forget-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payment Url For Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+								"type": "text"
+							},
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/new-payment",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"new-payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Medicines",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-medicines",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-medicines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Cosmetics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "mobile-api-key",
+								"value": "5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://198.143.180.164/mobile-api/customer/get-cosmetics",
+							"protocol": "http",
+							"host": [
+								"198",
+								"143",
+								"180",
+								"164"
+							],
+							"path": [
+								"mobile-api",
+								"customer",
+								"get-cosmetics"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
-	]
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+				"type": "string"
+			}
+		]
+	}
 }

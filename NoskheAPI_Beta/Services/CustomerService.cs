@@ -24,23 +24,25 @@ namespace NoskheAPI_Beta.Services
     public interface ICustomerService
     {
         // 1- usci generators are wrong because of concurrency
-        Models.Minimals.Output.Customer GetDetails();
-        IEnumerable<Models.Minimals.Output.ShoppingCart> GetShoppingCarts();
-        IEnumerable<Models.Minimals.Output.Order> GetOrders();
-        IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmetics();
-        IEnumerable<Models.Minimals.Output.Cosmetic> GetShoppingCartCosmetics(string usci);
-        IEnumerable<Models.Minimals.Output.Medicine> GetMedicines();
-        IEnumerable<Models.Minimals.Output.Medicine> GetShoppingCartMedicines(string usci);
-        TokenTemplate Authenticate(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
-        bool AuthenticateByPhone(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings);
-        bool SendSMS();
-        bool VerifySMSAuthenticationCode();
+        // 2- dar EditExistingCustomer baraye taghyeer email va phone va password che eghdamati konim?
+        Models.Minimals.Output.Customer GetProfileInformation();
+        IEnumerable<Models.Minimals.Output.ShoppingCart> GetCustomerShoppingCarts();
+        IEnumerable<Models.Minimals.Output.Order> GetCustomerOrders();
+        IEnumerable<Models.Minimals.Output.Cosmetic> GetAllCosmetics();
+        IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(string usci);
+        IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines();
+        IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(string usci);
+        TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
+        bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings);
+        bool RequestSmsForForgetPassword();
+        bool VerifySmsCodeForForgetPassword();
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
-        bool EditExistingCustomer(Models.Android.EditExistingTemplate ee);
+        bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
         ResponseTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
-        Task<string> CreateNewPaymentGateway(string uoi, HostString hostIp);
+        Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp);
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
+        void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
     {
@@ -104,17 +106,15 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
         public ResponseTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc)
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
 
-                var foundCustomer = db.Customers.Where(q => q.Email == ansc.ShoppingCartObj.Email).FirstOrDefault();
-                if(foundCustomer == null)
-                    throw new NoCustomersFoundException(ErrorCodes.NoCustomersFoundExceptionMsg);
+                var foundCustomer = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
 
                 var customerShoppingCart =
                     new Models.ShoppingCart {
@@ -201,12 +201,11 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public TokenTemplate Authenticate(Models.Android.AuthenticateTemplate at, AppSettings appSettings)
+        public TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings)
         {
-            // agar user/pass dorost bud va valid bud vali timesh tamum bud tokene jadid tolid mikonim
+            // agar email/pass dorost bud va valid bud vali timesh tamum bud tokene jadid tolid mikonim
             try
             {
                 var existingCustomer = db.Customers.Where(q => (q.Email == at.Email && q.Password == at.Password)).FirstOrDefault();
@@ -252,10 +251,9 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public bool AuthenticateByPhone(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings)
+        public bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings)
         {
             try
             {
@@ -283,14 +281,14 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public async Task<string> CreateNewPaymentGateway(string uoi, HostString hostIp)
+        public async Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp)
         {
             try
             {
-                var response = db.Orders.Where(q => q.UOI == uoi).FirstOrDefault();
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var response = db.Orders.Where(q => q.OrderId == id).FirstOrDefault();
 
                 if (response != null)
                 {
@@ -311,46 +309,41 @@ namespace NoskheAPI_Beta.Services
                 }
                 throw new NoOrdersMatchedByUOIException(ErrorCodes.NoOrdersMatchedByUOIExceptionMsg);
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public bool EditExistingCustomer(Models.Android.EditExistingTemplate ee)
+        public bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee)
         {
             try
             {
-                var foundCustomer = db.Customers.Where(q => (q.Email == ee.CustomerObj.Email && q.Phone == ee.CustomerObj.Phone)).FirstOrDefault();
-                if(foundCustomer != null)
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var foundCustomer = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
+                foundCustomer.FirstName = ee.CustomerObj.FirstName;
+                foundCustomer.LastName = ee.CustomerObj.LastName;
+                foundCustomer.Gender = ee.CustomerObj.Gender;
+                foundCustomer.Birthday = ee.CustomerObj.Birthday;
+                foundCustomer.Email = ee.CustomerObj.Email;
+                foundCustomer.Password = SHA256_Algorithm.Compute(ee.CustomerObj.Password);
+                foundCustomer.Phone = ee.CustomerObj.Phone;
+                if(ee.CustomerObj.ProfilePictureUrl != foundCustomer.ProfilePictureUrl)
                 {
-                    foundCustomer.FirstName = ee.CustomerObj.FirstName;
-                    foundCustomer.LastName = ee.CustomerObj.LastName;
-                    foundCustomer.Gender = ee.CustomerObj.Gender;
-                    foundCustomer.Birthday = ee.CustomerObj.Birthday;
-                    foundCustomer.Email = ee.CustomerObj.Email;
-                    foundCustomer.Password = SHA256_Algorithm.Compute(ee.CustomerObj.Password);
-                    foundCustomer.Phone = ee.CustomerObj.Phone;
-                    if(ee.CustomerObj.ProfilePictureUrl != foundCustomer.ProfilePictureUrl)
-                    {
-                        foundCustomer.ProfilePictureUrl = ee.CustomerObj.ProfilePictureUrl;
-                        foundCustomer.ProfilePictureUploadDate = DateTime.Now;
-                    }
-                    db.SaveChanges();
-
-                    return true;
+                    foundCustomer.ProfilePictureUrl = ee.CustomerObj.ProfilePictureUrl;
+                    foundCustomer.ProfilePictureUploadDate = DateTime.Now;
                 }
-                throw new NoCustomersFoundException(ErrorCodes.NoCustomersFoundExceptionMsg);
+                db.SaveChanges();
+
+                return true;
             }
             catch(DbUpdateException)
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmetics()
+        public IEnumerable<Models.Minimals.Output.Cosmetic> GetAllCosmetics()
         {
             try
             {
@@ -361,30 +354,36 @@ namespace NoskheAPI_Beta.Services
                 
                 throw new NoCosmeticsAvailabeException(ErrorCodes.NoCosmeticsAvailabeExceptionMsg);
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
         public int GetCustomerId()
         {
-            // agar peida shod va valid bud vali timesh tamum shode bud -> SecurityToken"Expired"Exception
-            // agar peida nashod -> "Unauthorized"AccessException
-            var a = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
-            if(a == null || a.IsValid == false) throw new UnauthorizedAccessException();
-            if(DateTime.UtcNow > a.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
-            return a.CustomerId;
+            try
+            {
+                // agar peida shod va valid bud vali timesh tamum shode bud -> SecurityToken"Expired"Exception
+                // agar peida nashod -> "Unauthorized"AccessException
+                var customer = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+                return customer.CustomerId;
+            }
+            catch
+            {
+                throw;
+            }
         }
 
-        public Models.Minimals.Output.Customer GetDetails()
+        public Models.Minimals.Output.Customer GetProfileInformation()
         {
             try
             {
-                
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var response = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
-                if(response != null) return new Models.Minimals.Output.Customer {
+                return new Models.Minimals.Output.Customer {
                     FirstName = response.FirstName,
                     LastName = response.LastName,
                     Gender = response.Gender,
@@ -394,14 +393,13 @@ namespace NoskheAPI_Beta.Services
                     ProfilePictureUrl = response.ProfilePictureUrl
                 };
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.Medicine> GetMedicines()
+        public IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines()
         {
             try
             {
@@ -412,17 +410,17 @@ namespace NoskheAPI_Beta.Services
 
                 throw new NoMedicinesAvailabeException(ErrorCodes.NoMedicinesAvailabeExceptionMsg);
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.Order> GetOrders()
+        public IEnumerable<Models.Minimals.Output.Order> GetCustomerOrders()
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
                 if(foundCustomer == null)
                 {
@@ -465,7 +463,7 @@ namespace NoskheAPI_Beta.Services
                     output.PharmacyName = selectedShoppingCart.Order.Pharmacy.Name;
                     output.PharmacyAddress = selectedShoppingCart.Order.Pharmacy.Address;
                     output.Address = selectedShoppingCart.Address;
-                    output.Email = foundCustomer.Email; // or 'email', the given paramether
+                    output.Email = foundCustomer.Email;
                     output.Cosmetics = new Dictionary<string, string[]>();
                     output.Medicines = new Dictionary<string, string[]>();
                     output.PrescriptionItems = new Dictionary<string, string[]>();
@@ -524,17 +522,17 @@ namespace NoskheAPI_Beta.Services
                     
                 return outputs.ToArray();
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.Cosmetic> GetShoppingCartCosmetics(string usci)
+        public IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(string usci)
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var responses =
                     from record in db.CosmeticShoppingCarts
                     // TODO: #LOADING
@@ -545,17 +543,17 @@ namespace NoskheAPI_Beta.Services
                 // un-satisfying result
                 throw new NoCosmeticsMatchedByUSCIExcpetion(ErrorCodes.NoCosmeticsMatchedByUSCIExcpetionMsg);
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.Medicine> GetShoppingCartMedicines(string usci)
+        public IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(string usci)
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var responses =
                     from record in db.MedicineShoppingCarts
                     // TODO: #LOADING
@@ -566,22 +564,18 @@ namespace NoskheAPI_Beta.Services
                 // un-satisfying result
                 throw new NoMedicinesMatchedByUSCIExcpetion(ErrorCodes.NoMedicinesMatchedByUSCIExcpetionMsg);
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public IEnumerable<Models.Minimals.Output.ShoppingCart> GetShoppingCarts()
+        public IEnumerable<Models.Minimals.Output.ShoppingCart> GetCustomerShoppingCarts()
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
-                if(foundCustomer == null)
-                {
-                    throw new NoShoppingCartsFoundException(ErrorCodes.NoShoppingCartsFoundExceptionMsg);
-                }
 
                 db.Entry(foundCustomer).Collection(c => c.ShoppingCarts).Query()
                     .Include(s => s.MedicineShoppingCarts)
@@ -591,6 +585,11 @@ namespace NoskheAPI_Beta.Services
                     .Include(s => s.Prescription)
                     .Include(s => s.Notation)
                     .Load();
+
+                if(foundCustomer.ShoppingCarts == null)
+                {
+                    throw new NoShoppingCartsFoundException(ErrorCodes.NoShoppingCartsFoundExceptionMsg);
+                }
 
                 List<Models.Minimals.Output.ShoppingCart> outputs = new List<Models.Minimals.Output.ShoppingCart>();
 
@@ -647,32 +646,36 @@ namespace NoskheAPI_Beta.Services
                 }
                 return outputs.ToArray();
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public bool SendSMS()
+        public bool RequestSmsForForgetPassword()
         {
             try
             {
-
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                throw new NotImplementedException();
             }
-            catch(DbUpdateException)
+            catch
             {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+                throw;
             }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
         }
 
-        public bool VerifySMSAuthenticationCode()
+        public bool VerifySmsCodeForForgetPassword()
         {
-            // try
-            // {
-
-            // }
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                throw new NotImplementedException();
+            }
+            catch
+            {
+                throw;
+            }
             // catch(SmsVerificationFailedException vfe)
             // {
             //     throw new SmsVerificationFailedException(vfe.Message);
@@ -681,11 +684,27 @@ namespace NoskheAPI_Beta.Services
             // {
             //     throw new SmsVerificationExpiredException(vee.Message);
             // }
-            // catch(DbUpdateException due)
-            // {
-            //     throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
-            // }
-            throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+        }
+
+        public void TokenValidationHandler()
+        {
+            // agar token dar db bud -> invalid ya expired
+            // agar token dar db nabud -> customer vojud nadarad
+            // ------
+            // invalid YA namojud (null) --> unauthorized exception midahad
+            // expired --> token expired exception midahad
+            // ------
+            // pas digar sharte null budane customer dar edame code fayde nadarad va az ghabl hame chiz malum hast
+            try
+            {
+                var customer = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+            }
+            catch 
+            {
+                throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+            }
         }
     }
 }

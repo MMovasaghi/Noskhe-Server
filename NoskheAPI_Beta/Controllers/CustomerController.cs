@@ -36,28 +36,14 @@ namespace NoskheAPI_Beta.Controllers
             _customerService = customerService;
             _appSettings = appSettings.Value;
         }
-        // GET: mobile-api/customer/get-details
+        // GET: mobile-api/customer/profile
         [HttpGet(Labels.GetProfileInformation)]
-        public ActionResult<Models.Minimals.Output.Customer> GetDetails()
+        public ActionResult<Models.Minimals.Output.Customer> GetProfileInformation()
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetDetails());
-            }
-            catch(NoCustomersFoundException ncfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ncfe.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
-                });
+                return Ok(_customerService.GetProfileInformation());
             }
             catch(UnauthorizedAccessException)
             {
@@ -79,14 +65,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/get-shopping-carts
+        // GET: mobile-api/customer/shopping-carts
         [HttpGet(Labels.GetCustomerShoppingCarts)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.ShoppingCart>> GetShoppingCarts()
+        public ActionResult<IEnumerable<Models.Minimals.Output.ShoppingCart>> GetCustomerShoppingCarts()
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetShoppingCarts());
+                return Ok(_customerService.GetCustomerShoppingCarts());
             }
             catch(NoShoppingCartsFoundException nscfe)
             {
@@ -95,13 +81,6 @@ namespace NoskheAPI_Beta.Controllers
                     Error = nscfe.Message
                 });
             }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
-                });
-            }
             catch(UnauthorizedAccessException)
             {
                 return Unauthorized();
@@ -122,14 +101,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
         
-        // GET: mobile-api/customer/get-orders
+        // GET: mobile-api/customer/orders
         [HttpGet(Labels.GetCustomerOrders)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Order>> GetOrders()
+        public ActionResult<IEnumerable<Models.Minimals.Output.Order>> GetCustomerOrders()
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetMedicines());
+                return Ok(_customerService.GetCustomerOrders());
             }
             catch(NoOrdersFoundException nofe)
             {
@@ -138,13 +117,6 @@ namespace NoskheAPI_Beta.Controllers
                     Error = nofe.Message
                 });
             }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
-                });
-            }
             catch(UnauthorizedAccessException)
             {
                 return Unauthorized();
@@ -165,14 +137,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
         
-        // GET: mobile-api/customer/get-cosmetics
+        // GET: mobile-api/customer/all-cosmetics
         [AllowAnonymous]
         [HttpGet(Labels.GetAllCosmetics)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmetics()
+        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetAllCosmetics()
         {
             try
             {
-                return Ok(_customerService.GetCosmetics());
+                return Ok(_customerService.GetAllCosmetics());
             }
             catch(NoCosmeticsAvailabeException ncae)
             {
@@ -181,13 +153,6 @@ namespace NoskheAPI_Beta.Controllers
                     Error = ncae.Message
                 });
             }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
-                });
-            }
             catch
             {
                 return BadRequest(new ResponseTemplate {
@@ -197,27 +162,20 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/get-cosmetics-by-usci
+        // GET: mobile-api/customer/shopping-cart-cosmetics
         [HttpGet(Labels.GetCosmeticsOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmetics(string usci)
+        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmeticsOfAShoppingCart(string usci)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetShoppingCartCosmetics(usci));
+                return Ok(_customerService.GetCosmeticsOfAShoppingCart(usci));
             }
             catch(NoCosmeticsMatchedByUSCIExcpetion ncmbue)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = ncmbue.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
                 });
             }
             catch(UnauthorizedAccessException)
@@ -240,27 +198,20 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
         
-        // GET: mobile-api/customer/get-medicines
+        // GET: mobile-api/customer/all-medicines
         [AllowAnonymous]
         [HttpGet(Labels.GetAllMedicines)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicines()
+        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetAllMedicines()
         {
             try
             {
-                return Ok(_customerService.GetMedicines());
+                return Ok(_customerService.GetAllMedicines());
             }
             catch(NoMedicinesAvailabeException nmae)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = nmae.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
                 });
             }
             catch
@@ -272,27 +223,20 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/get-medicines-by-usci
+        // GET: mobile-api/customer/shopping-cart-medicines
         [HttpGet(Labels.GetMedicinesOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicines(string usci)
+        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicinesOfAShoppingCart(string usci)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetShoppingCartMedicines(usci));
+                return Ok(_customerService.GetMedicinesOfAShoppingCart(usci));
             }
             catch(NoMedicinesMatchedByUSCIExcpetion nmmbue)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = nmmbue.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
                 });
             }
             catch(UnauthorizedAccessException)
@@ -315,14 +259,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // POST: mobile-api/customer/authenticate
+        // POST: mobile-api/customer/login
         [AllowAnonymous]
         [HttpPost(Labels.LoginWithEmailAndPass)] //string[] credential
-        public ActionResult<TokenTemplate> Authenticate([FromBody] Models.Android.AuthenticateTemplate at)
+        public ActionResult<TokenTemplate> LoginWithEmailAndPass([FromBody] Models.Android.AuthenticateTemplate at)
         {
             try
             {
-                return Ok(_customerService.Authenticate(at, _appSettings));
+                return Ok(_customerService.LoginWithEmailAndPass(at, _appSettings));
             }
             catch(LoginVerificationFailedException vfe)
             {
@@ -347,14 +291,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // POST: mobile-api/customer/authenticate-by-phone
+        // POST: mobile-api/customer/login-by-phone
         [AllowAnonymous]
         [HttpPost(Labels.LoginWithPhoneNumber)]
-        public ActionResult Authenticate([FromBody] Models.Android.AuthenticateByPhoneTemplate abp)
+        public ActionResult LoginWithPhoneNumber([FromBody] Models.Android.AuthenticateByPhoneTemplate abp)
         {
             try
             {
-                return Ok(_customerService.AuthenticateByPhone(abp, _appSettings));
+                return Ok(_customerService.LoginWithPhoneNumber(abp, _appSettings));
             }
             catch(NoCustomersMatchedByPhoneException ncmbpe)
             {
@@ -379,18 +323,18 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // POST: mobile-api/customer/send-sms-authentication-code
+        // POST: mobile-api/customer/request-forget-password
         [HttpPost(Labels.RequestSmsForForgetPassword)]
-        public ActionResult SendSMS([FromBody] Models.Android.SendSmsAuthenticationCodeTemplate ssac)
+        public ActionResult RequestSmsForForgetPassword([FromBody] Models.Android.SendSmsAuthenticationCodeTemplate ssac)
         {
             throw new NotImplementedException();
             // TODO: HasBeenExpired -> true
             // TODO: Sms Api
         }
 
-        // POST: mobile-api/customer/verify-sms-authentication-code
+        // POST: mobile-api/customer/verify-forget-password
         [HttpPost(Labels.VerifySmsCodeForForgetPassword)]
-        public ActionResult VerifySMSAuthenticationCode([FromBody] Models.Android.VerifySmsAuthenticationCodeTemplate vsac)
+        public ActionResult VerifySmsCodeForForgetPassword([FromBody] Models.Android.VerifySmsAuthenticationCodeTemplate vsac)
         {
             throw new NotImplementedException();
             // try
@@ -429,10 +373,10 @@ namespace NoskheAPI_Beta.Controllers
             // }
         }
 
-        // POST: mobile-api/customer/add-new
+        // POST: mobile-api/customer/new-customer
         [AllowAnonymous]
         [HttpPost(Labels.AddNewCustomer)]
-        public ActionResult<TokenTemplate> AddNew([FromBody] Models.Android.AddNewTemplate an)
+        public ActionResult<TokenTemplate> AddNewCustomer([FromBody] Models.Android.AddNewTemplate an)
         {
             try
             {
@@ -462,21 +406,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // PUT: mobile-api/customer/edit-existing
+        // PUT: mobile-api/customer/edit-profile
         [HttpPut(Labels.EditExistingCustomerProfile)]
-        public ActionResult EditExisting([FromBody] Models.Android.EditExistingTemplate ee)
+        public ActionResult EditExistingCustomerProfile([FromBody] Models.Android.EditExistingTemplate ee)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.EditExistingCustomer(ee));
-            }
-            catch(NoCustomersFoundException ncfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ncfe.Message
-                });
+                return Ok(_customerService.EditExistingCustomerProfile(ee));
             }
             catch(DatabaseFailureException dfe)
             {
@@ -505,7 +442,7 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
         
-        // POST: mobile-api/customer/add-new-shopping-cart
+        // POST: mobile-api/customer/new-shopping-cart
         [HttpPost(Labels.AddNewShoppingCart)]
         public ActionResult AddNewShoppingCart([FromBody] Models.Android.AddNewShoppingCartTemplate ansc)
         {
@@ -513,13 +450,6 @@ namespace NoskheAPI_Beta.Controllers
             {
                 GrabTokenFromHeader();
                 return Ok(_customerService.AddNewShoppingCart(ansc));
-            }
-            catch(NoCustomersFoundException ncfe)
-            {
-                return  BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ncfe.Message
-                });
             }
             catch(InvalidCosmeticIDFoundException icife)
             {
@@ -562,14 +492,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/create-new-payment-gateway
+        // GET: mobile-api/customer/new-payment
         [HttpGet(Labels.CreatePaymentUrlForOrder)]
-        public async Task<ActionResult<string>> CreateNewPaymentGateway(string uoi)
+        public async Task<ActionResult<string>> CreatePaymentUrlForOrder(int id)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(await _customerService.CreateNewPaymentGateway(uoi, HttpContext.Request.Host));
+                return Ok(await _customerService.CreatePaymentUrlForOrder(id, HttpContext.Request.Host));
             }
             catch(NoOrdersMatchedByUOIException nombue)
             {
@@ -596,14 +526,6 @@ namespace NoskheAPI_Beta.Controllers
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = stee.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = dfe.Message
                 });
             }
             catch

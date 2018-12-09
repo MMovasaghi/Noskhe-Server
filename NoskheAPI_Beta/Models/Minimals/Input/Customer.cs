@@ -10,7 +10,7 @@ namespace NoskheAPI_Beta.Models.Minimals.Input
         public DateTime Birthday { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string Phone { get; set; }
+        public string Phone { get; set; } // lozum nadare bara taghyeer
         public string ProfilePictureUrl { get; set; }
     }
 }

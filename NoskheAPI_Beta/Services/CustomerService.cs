@@ -216,7 +216,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         if(DateTime.UtcNow > existingCustomer.CustomerToken.ValidTo)
                         {
-                            // token creation process -----------------------------------------------------------------
+                            // token re-creation process -----------------------------------------------------------------
                             var tokenHandler = new JwtSecurityTokenHandler();
                             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
                             var tokenDescriptor = new SecurityTokenDescriptor
@@ -244,6 +244,7 @@ namespace NoskheAPI_Beta.Services
                             Expires = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
                         };
                     }
+                    throw new UnauthorizedAccessException();
                 }
                 throw new LoginVerificationFailedException(ErrorCodes.LoginVerificationFailedExceptionMsg);
             }

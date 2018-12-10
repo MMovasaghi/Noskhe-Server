@@ -40,6 +40,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetDbStatus());
             }
             catch(UnauthorizedAccessException)
@@ -68,6 +69,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetDatetime());
             }
             catch(UnauthorizedAccessException)
@@ -95,6 +97,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetServerState());
             }
             catch(UnauthorizedAccessException)
@@ -123,6 +126,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetProfile());
             }
             catch(UnauthorizedAccessException)
@@ -151,6 +155,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetOrders());
             }
             catch(InvalidTimeFormatException itfe)
@@ -186,6 +191,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetScore());
             }
             catch(UnauthorizedAccessException)
@@ -214,6 +220,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetSettles());
             }
             catch(NoInformationException nie)
@@ -249,6 +256,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.SetANewSettle(settle));
             }
             catch(DatabaseFailureException dfe)
@@ -284,6 +292,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.GetTopFivePharmacies());
             }
             catch(UnauthorizedAccessException)
@@ -344,6 +353,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.ToggleStateOfPharmacy());
             }
             catch(DatabaseFailureException dfe)
@@ -379,6 +389,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.NumberOfOrdersInThisWeek());
             }
             catch(NoInformationException nie)
@@ -414,6 +425,7 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_pharmacyService.AverageTimeOfPackingInThisWeek());
             }
             catch(NoInformationException nie)
@@ -444,6 +456,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         // GET: desktop-api/pharmacy/signalr
+        [AllowAnonymous] // TODO: WRONGGGGGG!!!
         [HttpGet(Labels.SignalR)]
         public async Task<ActionResult> SignalR(string identifier, string Error)
         {

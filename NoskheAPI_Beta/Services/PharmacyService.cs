@@ -51,7 +51,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         if(DateTime.UtcNow > existingPharmacy.PharmacyToken.ValidTo)
                         {
-                            // token creation process -----------------------------------------------------------------
+                            // token re-creation process -----------------------------------------------------------------
                             var tokenHandler = new JwtSecurityTokenHandler();
                             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
                             var tokenDescriptor = new SecurityTokenDescriptor
@@ -77,6 +77,37 @@ namespace NoskheAPI_Beta.Services
                         return new TokenTemplate {
                             Token = existingPharmacy.PharmacyToken.Token,
                             Expires = DateTimeOffset.Parse(existingPharmacy.PharmacyToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                        };
+                    }
+                    else // agar token pharmacy null bud
+                    {
+                        // adding new token
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[] 
+                            {
+                                new Claim(ClaimTypes.Name, existingPharmacy.PharmacyId.ToString())
+                            }),
+                            Expires = DateTime.UtcNow.AddDays(1),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                        var newPharmacyToken = new Models.PharmacyToken
+                        {
+                            Token = tokenHandler.WriteToken(token),
+                            ValidFrom = DateTime.UtcNow,
+                            ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
+                            Pharmacy = existingPharmacy,
+                            IsValid = true
+                        };
+                        db.PharmacyTokens.Add(newPharmacyToken);
+                        db.SaveChanges();
+
+                        return new TokenTemplate {
+                            Token = newPharmacyToken.Token,
+                            Expires = DateTimeOffset.Parse(newPharmacyToken.ValidTo.ToString()).ToUnixTimeSeconds()
                         };
                     }
                 }
@@ -703,9 +734,9 @@ namespace NoskheAPI_Beta.Services
             // pas digar sharte null budane pharmacy dar edame code fayde nadarad va az ghabl hame chiz malum hast
             try
             {
-                var customer = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
-                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
-                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+                var pharmacy = db.PharmacyTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(pharmacy == null || pharmacy.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > pharmacy.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
             }
             catch 
             {

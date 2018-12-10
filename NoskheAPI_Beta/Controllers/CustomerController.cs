@@ -282,6 +282,10 @@ namespace NoskheAPI_Beta.Controllers
                     Error = dfe.Message
                 });
             }
+            catch(UnauthorizedAccessException) // NOTE: if and only if the user has already registerd but the token hasn't been set for that user. Like db sample users (dar hengame sabte nam token tolid mishavad va emkan nadarad ke user bedune token bashad, vali agar token nadasht bayad unauthorized begirad)
+            {
+                return Unauthorized();
+            }
             catch
             {
                 return BadRequest(new ResponseTemplate {
@@ -380,7 +384,6 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
-                GrabTokenFromHeader();
                 return Ok(_customerService.AddNewCustomer(an, _appSettings));
             }
             catch(DuplicateCustomerException dce)

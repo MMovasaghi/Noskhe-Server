@@ -8,7 +8,7 @@ namespace NoskheAPI_Beta.Middleware
     public class ApiKeyHandler
     {
         private const string DesktopApiParameter = "desktop-api-key";
-        private const string DesktopAPIKeyToCheck = @"k3bKN^u9o(sW;qH8zKXp^:.=P""`gQ'V#wJ*8CK_da%?KB~w#?V{[YxnaY*6!rs";
+        private const string DesktopAPIKeyToCheck = @"k3bKN^u9o(sW;qH8zKXp^:.=P[}`gQ'V#wJ*8CK_da%?KB~w#?V{[YxnaY*6!rs";
         private const string AndroidApiParameter = "mobile-api-key";
         private const string AndroidAPIKeyToCheck = @"5NKr(b!ki^0.2okbH_|7]KP,*Jt=m=^;m6K~Q`F7lKB'?]qy*{6?;ylyyTti{'i";
         private RequestDelegate next;

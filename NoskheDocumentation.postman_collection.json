@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "aef74d7c-1d02-4ca5-acd2-b06b54b1e6e0",
 		"name": "NoskheDocumentation",
-		"description": "Noskhe API documentation\nWritten by: AmirMohammadBiuki",
+		"description": "Noskhe API documentation\nWritten by: AmirMohammad Biuki (C343)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -31,7 +31,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"CustomerObj\":\n\t{\n\t    \"FirstName\": \"reza\",\n\t    \"LastName\": \"gholiKhan\",\n\t    \"Gender\": 0,\n\t    \"Birthday\": \"2018/01/01\",\n\t    \"Email\": \"gholi@khani.com\",\n\t    \"Password\": \"<-SHA256 password string->\",\n\t    \"Phone\": \"09129876544\",\n\t    \"ProfilePictureUrl\": \"someShit.jpg\"\n\t}\n}"
 						},
 						"url": {
 							"raw": "{{LOCAL_IP}}{{ROUTE}}/new-customer",
@@ -42,6 +42,197 @@
 								"new-customer"
 							]
 						}
+					},
+					"response": [
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-customer",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-customer"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC2\"\n}"
+						},
+						{
+							"name": "DuplicateCustomerException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-customer",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-customer"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC3\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-customer",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-customer"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"CustomerObj\":\n\t{\n\t    \"FirstName\": \"reza\",\n\t    \"LastName\": \"gholiKhan\",\n\t    \"Gender\": 0,\n\t    \"Birthday\": \"2018/01/01\",\n\t    \"Email\": \"gholi@khan.com\",\n\t    \"Password\": \"<-SHA256 password string->\",\n\t    \"Phone\": \"09129876543\",\n\t    \"ProfilePictureUrl\": \"someShit.jpg\"\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-customer",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-customer"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE\",\n    \"expires\": 1544627422\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify Sms Code For Forget Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{API_KEY}}",
+								"value": "{{API_VALUE}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/verify-forget-password",
+							"host": [
+								"{{LOCAL_IP}}{{ROUTE}}"
+							],
+							"path": [
+								"verify-forget-password"
+							]
+						},
+						"description": "NotImplementedException"
 					},
 					"response": []
 				},
@@ -78,39 +269,193 @@
 							]
 						}
 					},
-					"response": []
-				},
-				{
-					"name": "Login With Phone Number",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "{{API_KEY}}",
-								"value": "{{API_VALUE}}",
-								"type": "text"
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"Email\": \"{{sample_user_email_1}}\",\n  \"Password\": \"{{sample_user_pass_1}}\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
 						},
-						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
-							"host": [
-								"{{LOCAL_IP}}{{ROUTE}}"
-							],
-							"path": [
-								"login-by-phone"
-							]
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"Email\": \"{{sample_user_email_1}}\",\n  \"Password\": \"{{sample_user_pass_1}}\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC2\"\n}"
+						},
+						{
+							"name": "LoginVerificationFailedException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"Email\": \"{{sample_user_email_1}}\",\n  \"Password\": \"{{sample_user_pass_1}}\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC15\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"Email\": \"{{sample_user_email_1}}\",\n  \"Password\": \"{{sample_user_pass_1}}\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQ1NTM3MDksImV4cCI6MTU0NDY0MDEwOSwiaWF0IjoxNTQ0NTUzNzA5fQ.XFhqW_LKg8988EYRpceDIdhvUTZS0mX7Hi0OJS1gqgw\",\n    \"expires\": 1544627509\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"Email\": \"{{sample_user_email_1}}\",\n  \"Password\": \"{{sample_user_pass_1}}\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
 						}
-					},
-					"response": []
+					]
 				},
 				{
 					"name": "Get Profile Information",
@@ -120,7 +465,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQzOTE2MTUsImV4cCI6MTU0NDQ3ODAxNSwiaWF0IjoxNTQ0MzkxNjE1fQ.ZuHnGpRLqvjEeX-oafKeB5cK4XfvXEfz9r4enOXYTBI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQ1NTM3MDksImV4cCI6MTU0NDY0MDEwOSwiaWF0IjoxNTQ0NTUzNzA5fQ.XFhqW_LKg8988EYRpceDIdhvUTZS0mX7Hi0OJS1gqgw",
 									"type": "string"
 								}
 							]
@@ -147,31 +492,148 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"firstName\": \"eee\",\n    \"lastName\": \"alie\",\n    \"gender\": 0,\n    \"birthday\": \"0001-01-01T00:00:00\",\n    \"email\": \"alih@alie.com\",\n    \"phone\": null,\n    \"profilePictureUrl\": null\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						}
+					]
 				},
 				{
-					"name": "Edit Existing Customer Profile",
+					"name": "Get All Cosmetics",
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
-						"method": "PUT",
+						"method": "GET",
 						"header": [
 							{
 								"key": "{{API_KEY}}",
 								"value": "{{API_VALUE}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
 								"type": "text"
 							}
 						],
@@ -180,30 +642,327 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/all-cosmetics",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"edit-profile"
+								"all-cosmetics"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-cosmetics"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"cosmeticId\": 1,\n        \"name\": \"Cosmetic_1\",\n        \"price\": 3.82,\n        \"productPictureUrl\": \"test1.jpg\"\n    },\n    {\n        \"cosmeticId\": 2,\n        \"name\": \"Cosmetic_2\",\n        \"price\": 4.82,\n        \"productPictureUrl\": \"test2.jpg\"\n    },\n    {\n        \"cosmeticId\": 3,\n        \"name\": \"Cosmetic_3\",\n        \"price\": 5.82,\n        \"productPictureUrl\": \"test3.jpg\"\n    }\n]"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-cosmetics"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "NoCosmeticsAvailabeException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-cosmetics"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC6\"\n}"
+						}
+					]
 				},
 				{
-					"name": "Add New Shopping Cart",
+					"name": "Get Medicines Of A Shopping Cart",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
 									"type": "string"
 								}
 							]
 						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{API_KEY}}",
+								"type": "text",
+								"value": "{{API_VALUE}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines?id=8",
+							"host": [
+								"{{LOCAL_IP}}{{ROUTE}}"
+							],
+							"path": [
+								"shopping-cart-medicines"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "NoMedicinesInTheShoppingCartException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-medicines"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC10\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-medicines"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines?id=7",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-medicines"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "7"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"medicineId\": 1,\n        \"name\": \"Medicine_1\",\n        \"price\": 3.82,\n        \"productPictureUrl\": \"Medicine_1.jpg\"\n    },\n    {\n        \"medicineId\": 2,\n        \"name\": \"Medicine_2\",\n        \"price\": 4.82,\n        \"productPictureUrl\": \"Medicine_2.jpg\"\n    },\n    {\n        \"medicineId\": 3,\n        \"name\": \"Medicine_3\",\n        \"price\": 5.82,\n        \"productPictureUrl\": \"Medicine_3.jpg\"\n    }\n]"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-medicines"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-medicines"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login With Phone Number",
+					"request": {
 						"method": "POST",
 						"header": [
 							{
@@ -219,19 +978,169 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"Phone\": \"CustomerPh1\"\n}"
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"new-shopping-cart"
+								"login-by-phone"
 							]
-						}
+						},
+						"description": "*Will be fixed #3*"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login-by-phone"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "NoCustomersMatchedByPhoneException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login-by-phone"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC8\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Phone\": \"CustomerPh1\"\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login-by-phone"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "true"
+						},
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login-by-phone",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login-by-phone"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC2\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Customer Shopping Carts",
@@ -241,7 +1150,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
 									"type": "string"
 								}
 							]
@@ -268,20 +1177,174 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-carts",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-carts"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-carts",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-carts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"shoppingCartId\": 7,\n        \"usci\": \"someUSCI\",\n        \"date\": \"2018-12-11T22:55:14.7270737\",\n        \"address\": \"sattarkhan, kooche aval\",\n        \"email\": \"gholi@khan.com\",\n        \"cosmetics\": {\n            \"Cosmetic_1\": [\n                \"0\",\n                \"3.82\"\n            ],\n            \"Cosmetic_2\": [\n                \"0\",\n                \"4.82\"\n            ],\n            \"Cosmetic_3\": [\n                \"0\",\n                \"5.82\"\n            ]\n        },\n        \"medicines\": {\n            \"Medicine_1\": [\n                \"0\",\n                \"3.82\"\n            ],\n            \"Medicine_2\": [\n                \"0\",\n                \"4.82\"\n            ],\n            \"Medicine_3\": [\n                \"0\",\n                \"5.82\"\n            ]\n        },\n        \"brandPreference\": 1,\n        \"hasPregnancy\": false,\n        \"hasOtherDiseases\": true,\n        \"description\": \"some desc\",\n        \"pictureUrl_1\": \"p1.jpg\",\n        \"pictureUrl_2\": \"p2.jpg\",\n        \"pictureUrl_3\": \"p3.jpg\",\n        \"totalPriceWithoutPrescription\": 0,\n        \"hasBeenRequested\": false\n    }\n]"
+						},
+						{
+							"name": "NoShoppingCartsFoundException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-carts",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-carts"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC13\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-carts",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-carts"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-carts",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-carts"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						}
+					]
 				},
 				{
-					"name": "Get Medicines Of A Shopping Cart",
+					"name": "Get All Medicines",
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [
@@ -296,102 +1359,123 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-medicines",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/all-medicines",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"shopping-cart-medicines"
+								"all-medicines"
 							]
 						}
 					},
-					"response": []
-				},
-				{
-					"name": "Get Cosmetics Of A Shopping Cart",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
-									"type": "string"
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-medicines"
+									]
 								}
-							]
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
 						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "{{API_KEY}}",
-								"value": "{{API_VALUE}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics",
-							"host": [
-								"{{LOCAL_IP}}{{ROUTE}}"
-							],
-							"path": [
-								"shopping-cart-cosmetics"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Customer Orders",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
-									"type": "string"
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-medicines"
+									]
 								}
-							]
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
 						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "{{API_KEY}}",
-								"value": "{{API_VALUE}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/mobile-api/customer/orders",
-							"host": [
-								"{{LOCAL_IP}}{{ROUTE}}"
-							],
-							"path": [
-								"mobile-api",
-								"customer",
-								"orders"
-							]
+						{
+							"name": "NoMedicinesAvailabeException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/all-medicines",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"all-medicines"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC9\"\n}"
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Request Sms For Forget Password",
+					"name": "Add New Shopping Cart",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
 									"type": "string"
 								}
 							]
@@ -402,60 +1486,479 @@
 								"key": "{{API_KEY}}",
 								"value": "{{API_VALUE}}",
 								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"ShoppingCartObj\":\n\t{\n\t    \"BrandPreference\": 1,\n\t    \"HasPregnancy\": false,\n\t    \"HasOtherDiseases\": true,\n\t    \"Description\": \"some desc\",\n\t    \"PictureUrl_1\": \"p1.jpg\",\n\t    \"PictureUrl_2\": \"p2.jpg\",\n\t    \"PictureUrl_3\": \"p3.jpg\",\n\t    \"AddressLongitude\": 3.4,\n\t    \"AddressLatitude\": 1.2,\n\t    \"Address\": \"sattarkhan, kooche aval\",\n\t    \"MedicineIds\": [1,2,3],\n\t    \"CosmeticIds\": [1,2,3],\n\t    \"HasBeenRequested\": false,\n\t}\n}"
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/request-forget-password",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"request-forget-password"
+								"new-shopping-cart"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "InvalidMedicineIDFoundException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC5\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "InvalidCosmeticIDFoundException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC4\"\n}"
+						},
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC2\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"ShoppingCartObj\":\n\t{\n\t    \"BrandPreference\": 1,\n\t    \"HasPregnancy\": false,\n\t    \"HasOtherDiseases\": true,\n\t    \"Description\": \"some desc\",\n\t    \"PictureUrl_1\": \"p1.jpg\",\n\t    \"PictureUrl_2\": \"p2.jpg\",\n\t    \"PictureUrl_3\": \"p3.jpg\",\n\t    \"AddressLongitude\": 3.4,\n\t    \"AddressLatitude\": 1.2,\n\t    \"Address\": \"sattarkhan, kooche aval\",\n\t    \"MedicineIds\": [1,2,3],\n\t    \"CosmeticIds\": [1,2,3],\n\t    \"HasBeenRequested\": false,\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-shopping-cart",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-shopping-cart"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"error\": \"7\"\n}"
+						}
+					]
 				},
 				{
-					"name": "Verify Sms Code For Forget Password",
+					"name": "Edit Existing Customer Profile",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
 									"type": "string"
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "{{API_KEY}}",
 								"value": "{{API_VALUE}}",
 								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"CustomerObj\":\n\t{\n\t    \"FirstName\": \"reza\",\n\t    \"LastName\": \"gholiKhaniii\",\n\t    \"Gender\": 0,\n\t    \"Birthday\": \"2018/01/01\",\n\t    \"Email\": \"gholi@khani.com\",\n\t    \"Password\": \"<-SHA256 password string->\",\n\t    \"Phone\": \"09129876544\",\n\t    \"ProfilePictureUrl\": \"someShit.jpg\"\n\t}\n}"
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/verify-forget-password",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"verify-forget-password"
+								"edit-profile"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"edit-profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"edit-profile"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"edit-profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						},
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"edit-profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC2\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/edit-profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"edit-profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				},
 				{
 					"name": "Create Payment Url For Order",
@@ -498,13 +2001,497 @@
 							]
 						}
 					},
+					"response": [
+						{
+							"name": "PaymentGatewayFailureException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC14\"\n}"
+						},
+						{
+							"name": "NoOrdersMatchedByIdException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC12\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-payment?id=1",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-payment"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get Cosmetics Of A Shopping Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{API_KEY}}",
+								"type": "text",
+								"value": "{{API_VALUE}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics?id=7",
+							"host": [
+								"{{LOCAL_IP}}{{ROUTE}}"
+							],
+							"path": [
+								"shopping-cart-cosmetics"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-cosmetics"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics?id=7",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-cosmetics"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "7"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"cosmeticId\": 1,\n        \"name\": \"Cosmetic_1\",\n        \"price\": 3.82,\n        \"productPictureUrl\": \"test1.jpg\"\n    },\n    {\n        \"cosmeticId\": 2,\n        \"name\": \"Cosmetic_2\",\n        \"price\": 4.82,\n        \"productPictureUrl\": \"test2.jpg\"\n    },\n    {\n        \"cosmeticId\": 3,\n        \"name\": \"Cosmetic_3\",\n        \"price\": 5.82,\n        \"productPictureUrl\": \"test3.jpg\"\n    }\n]"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-cosmetics"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-cosmetics"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "NoCosmeticsInTheShoppingCartException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/shopping-cart-cosmetics",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"shopping-cart-cosmetics"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC7\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Request Sms For Forget Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjYiLCJuYmYiOjE1NDQxMDA0NTAsImV4cCI6MTU0NDE4Njg1MCwiaWF0IjoxNTQ0MTAwNDUwfQ.TgwtPo3h0dgyGngXBOdoUsriRR3yYfz3pz5yquww6jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{API_KEY}}",
+								"value": "{{API_VALUE}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/request-forget-password",
+							"host": [
+								"{{LOCAL_IP}}{{ROUTE}}"
+							],
+							"path": [
+								"request-forget-password"
+							]
+						},
+						"description": "NotImplementedException"
+					},
 					"response": []
 				},
 				{
-					"name": "Get All Medicines",
+					"name": "Get Customer Orders",
 					"request": {
 						"auth": {
-							"type": "noauth"
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjciLCJuYmYiOjE1NDQ1NTM2MjIsImV4cCI6MTU0NDY0MDAyMiwiaWF0IjoxNTQ0NTUzNjIyfQ.X5RLz0TW9QUjkRch3Jt0cMq_D6aevk_2E5ezAM7m0CE",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [
@@ -519,46 +2506,200 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/all-medicines",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
-								"all-medicines"
+								"orders"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC1\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "NoOrdersFoundException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC11\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[]"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"CEC0\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Mobile API Documentation (Pharmacy)\n\n⚫ Customer Error Codes List ⚫ \n▶ Security Token Expired Exception Message ==> \"CEC0\"\n▶ API Unhandled Exception Message ==> \"CEC1\"\n▶ Database Failure Exception Message ==> \"CEC2\"\n▶ Duplicate Customer Exception Message ==> \"CEC3\"\n▶ Invalid Cosmetic ID Found Exception Message ==> \"CEC4\"\n▶ Invalid Medicine ID Found Exception Message ==> \"CEC5\"\n▶ No Cosmetics Availabe Exception Message ==> \"CEC6\"\n▶ No Cosmetics In The Shopping Cart Exception Message ==> \"CEC7\"\n▶ No Customers Matched ByP hone Exception Message ==> \"CEC8\"\n▶ No Medicines Availabe Exception Message ==> \"CEC9\"\n▶ No Medicines In The Shopping Cart Exception Message ==> \"CEC10\"\n▶ No Orders Found Exception Message ==> \"CEC11\"\n▶ No Orders Matched By Id Exception Message ==> \"CEC12\"\n▶ No Shopping Carts Found Exception Message ==> \"CEC13\"\n▶ Payment Gateway Failure Exception Message ==> \"CEC14\"\n▶ Login Verification Failed Exception Message ==> \"CEC15\"\n▶ Sms Verification Expired Exception Message ==> \"CEC16\"\n▶ Sms Verification Failed Exception Message ==> \"CEC17\"",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2e8a9f45-ca06-484d-8f4a-ed23fdd5da91",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				},
 				{
-					"name": "Get All Cosmetics",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "{{API_KEY}}",
-								"value": "{{API_VALUE}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/all-cosmetics",
-							"host": [
-								"{{LOCAL_IP}}{{ROUTE}}"
-							],
-							"path": [
-								"all-cosmetics"
-							]
-						}
-					},
-					"response": []
+					"listen": "test",
+					"script": {
+						"id": "66687e0d-e62a-424b-ae95-c54a3387534a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -573,7 +2714,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -600,7 +2741,136 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/server-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"server-state"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"error\": null\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/server-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"server-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/server-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"server-state"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/server-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"server-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Db Status",
@@ -610,7 +2880,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -637,7 +2907,136 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/db-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"db-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/db-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"db-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/db-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"db-state"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"error\": null\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/db-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"db-state"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				},
 				{
 					"name": "Get Date Time",
@@ -647,7 +3046,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -674,11 +3073,143 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/now",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"now"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"error\": \"12/11/18 11:22:54 PM\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/now",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"now"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/now",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"now"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/now",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"now"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Login With Email And Pass",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -706,7 +3237,152 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "LoginVerificationFailedException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"{{sample_pharmacy_email_1}}\", \"{{sample_pharmacy_pass_1}}\"]"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC4\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"{{sample_pharmacy_email_1}}\", \"{{sample_pharmacy_pass_1}}\"]"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"{{sample_pharmacy_email_1}}\", \"{{sample_pharmacy_pass_1}}\"]"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC2\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"{{sample_pharmacy_email_1}}\", \"{{sample_pharmacy_pass_1}}\"]"
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/login",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo\",\n    \"expires\": 1544631661\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Profile",
@@ -716,7 +3392,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -743,7 +3419,136 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"name\": \"PharmacyN_1\",\n    \"upi\": \"PharmacyUPI_1\",\n    \"email\": \"PharmacyE@1.com\",\n    \"phone\": \"PharmacyPh_1\",\n    \"profilePictureUrl\": \"PharmacyPP_1.jpg\",\n    \"address\": \"PharmacyA_1\",\n    \"isAvailableNow\": true,\n    \"credit\": 23.57,\n    \"managerName\": \"ManagerF_1 ManagerL_1\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/profile",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Toggle State Of Pharmacy",
@@ -753,7 +3558,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -780,7 +3585,168 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/toggle-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"toggle-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC2\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/toggle-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"toggle-state"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"error\": \"False\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/toggle-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"toggle-state"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/toggle-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"toggle-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/toggle-state",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"toggle-state"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Score",
@@ -790,7 +3756,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -817,7 +3783,136 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/score",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"score"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/score",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"score"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/score",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"score"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"upi\": \"PharmacyUPI_1\",\n    \"pharmacyName\": null,\n    \"customerSatisfaction\": 1,\n    \"rankAmongPharmacies\": 1,\n    \"packingAverageTimeInSeconds\": 14\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/score",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"score"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				},
 				{
 					"name": "Get Orders",
@@ -827,7 +3922,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -845,16 +3940,218 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+							"raw": "{{LOCAL_IP}}{{ROUTE}}/orders?start=start-undefined&end=end-undefined",
 							"host": [
 								"{{LOCAL_IP}}{{ROUTE}}"
 							],
 							"path": [
 								"orders"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "start-undefined"
+								},
+								{
+									"key": "end",
+									"value": "end-undefined"
+								}
 							]
-						}
+						},
+						"description": "TODO: Fix bug #4"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "InvalidTimeFormatException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC3\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "NoInformationException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC5\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Settles",
@@ -864,7 +4161,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -891,7 +4188,168 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "NoInformationException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/settles",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"settles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC5\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/settles",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"settles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/settles",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"settles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/settles",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"settles"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/settles",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"settles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"usi\": \"SettleUSI_1\",\n        \"commissionCoefficient\": 0.04,\n        \"numberOfOrders\": 42,\n        \"date\": \"2018-12-06T16:04:35.8631953\",\n        \"hasBeenSettled\": false,\n        \"credit\": 0\n    },\n    {\n        \"usi\": \"SettleUSI_3\",\n        \"commissionCoefficient\": 0.06,\n        \"numberOfOrders\": 23,\n        \"date\": \"2018-12-06T16:04:35.8644289\",\n        \"hasBeenSettled\": false,\n        \"credit\": 0\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "Set A New Settle",
@@ -931,9 +4389,196 @@
 							"path": [
 								"new-settle"
 							]
-						}
+						},
+						"description": "Felan bikhial"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-settle",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-settle"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-settle",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-settle"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-settle",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-settle"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-settle",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-settle"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "DatabaseFailureException",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/new-settle",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"new-settle"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC2\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Number Of Orders In This Week",
@@ -943,7 +4588,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -970,7 +4615,168 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders-count-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders-count-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "NoInformationException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders-count-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders-count-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC5\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders-count-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders-count-in-week"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0\n]"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders-count-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders-count-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/orders-count-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"orders-count-in-week"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				},
 				{
 					"name": "Average Time Of Packing In This Week",
@@ -980,7 +4786,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -1007,7 +4813,168 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/packings-average-time-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"packings-average-time-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/packings-average-time-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"packings-average-time-in-week"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "NoInformationException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/packings-average-time-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"packings-average-time-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC5\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/packings-average-time-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"packings-average-time-in-week"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0\n]"
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/packings-average-time-in-week",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"packings-average-time-in-week"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Top Five Pharmacies",
@@ -1017,7 +4984,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ0Mjk3ODQsImV4cCI6MTU0NDUxNjE4MywiaWF0IjoxNTQ0NDI5Nzg0fQ.M19JHyDKtubqqLnysieOZJMEOkSbb3-wukM0IVRiAXI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NDQ1NTc4NjEsImV4cCI6MTU0NDY0NDI2MSwiaWF0IjoxNTQ0NTU3ODYxfQ.HdQ_B0hhIpnpeot_OW26maQzFOOgTsmukBRnunRX6oo",
 									"type": "string"
 								}
 							]
@@ -1044,7 +5011,136 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "APIUnhandledException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/top-five",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"top-five"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC1\"\n}"
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/top-five",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"top-five"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "[\n    {\n        \"upi\": null,\n        \"pharmacyName\": \"PharmacyN_3\",\n        \"customerSatisfaction\": 5,\n        \"rankAmongPharmacies\": 3,\n        \"packingAverageTimeInSeconds\": 12\n    },\n    {\n        \"upi\": null,\n        \"pharmacyName\": \"PharmacyN_2\",\n        \"customerSatisfaction\": 2,\n        \"rankAmongPharmacies\": 2,\n        \"packingAverageTimeInSeconds\": 13\n    },\n    {\n        \"upi\": null,\n        \"pharmacyName\": \"PharmacyN_1\",\n        \"customerSatisfaction\": 1,\n        \"rankAmongPharmacies\": 1,\n        \"packingAverageTimeInSeconds\": 14\n    }\n]"
+						},
+						{
+							"name": "UnauthorizedAccessException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/top-five",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"top-five"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "SecurityTokenExpiredException",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/top-five",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"top-five"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"error\": \"PEC0\"\n}"
+						}
+					]
 				},
 				{
 					"name": "SignalR",
@@ -1074,10 +5170,75 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "UNABLE_TO_SEND_NOTIFICATION",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/signalr",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"signalr"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "{{API_KEY}}",
+										"value": "{{API_VALUE}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{LOCAL_IP}}{{ROUTE}}/signalr",
+									"host": [
+										"{{LOCAL_IP}}{{ROUTE}}"
+									],
+									"path": [
+										"signalr"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				}
 			],
-			"description": "Desktop API Documentation (Pharmacy)",
+			"description": "Desktop API Documentation (Pharmacy)\n\n⚫ Pharmacy Error Codes List ⚫ \n▶ API Unhandled Exception Message ==> \"PEC1\"\n▶ Database Failure Exception Message ==> \"PEC2\"\n▶ Invalid Time Format Exception Message ==> \"PEC3\"\n▶ Login Verification Failed Exception Message ==> \"PEC4\"\n▶ No Information Exception Message ==> \"PEC5\"\n▶ Security Token Expired Exception Message ==> \"PEC0\"",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -1087,7 +5248,29 @@
 						"type": "string"
 					}
 				]
-			}
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1e728706-9272-43be-a240-1e2fdc7c4183",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b040ec94-7008-441d-a4cf-013702044790",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"auth": {
@@ -1099,5 +5282,27 @@
 				"type": "string"
 			}
 		]
-	}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "6d33e849-89dd-4f71-ab17-9099a2118fb7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0669f919-505d-4e46-bd86-cfb056cf68e3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
 }

@@ -164,18 +164,18 @@ namespace NoskheAPI_Beta.Controllers
 
         // GET: mobile-api/customer/shopping-cart-cosmetics
         [HttpGet(Labels.GetCosmeticsOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmeticsOfAShoppingCart(string usci)
+        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmeticsOfAShoppingCart(int id)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetCosmeticsOfAShoppingCart(usci));
+                return Ok(_customerService.GetCosmeticsOfAShoppingCart(id));
             }
-            catch(NoCosmeticsMatchedByUSCIExcpetion ncmbue)
+            catch(NoCosmeticsInTheShoppingCartException ncitsce)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = ncmbue.Message
+                    Error = ncitsce.Message
                 });
             }
             catch(UnauthorizedAccessException)
@@ -225,18 +225,18 @@ namespace NoskheAPI_Beta.Controllers
 
         // GET: mobile-api/customer/shopping-cart-medicines
         [HttpGet(Labels.GetMedicinesOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicinesOfAShoppingCart(string usci)
+        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicinesOfAShoppingCart(int id)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.GetMedicinesOfAShoppingCart(usci));
+                return Ok(_customerService.GetMedicinesOfAShoppingCart(id));
             }
-            catch(NoMedicinesMatchedByUSCIExcpetion nmmbue)
+            catch(NoMedicinesInTheShoppingCartException nmitsce)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = nmmbue.Message
+                    Error = nmitsce.Message
                 });
             }
             catch(UnauthorizedAccessException)
@@ -504,12 +504,12 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(await _customerService.CreatePaymentUrlForOrder(id, HttpContext.Request.Host));
             }
-            catch(NoOrdersMatchedByUOIException nombue)
+            catch(NoOrdersMatchedByIdException nombie)
             {
                 return BadRequest(new ResponseTemplate
                 {
                     Success = false,
-                    Error = nombue.Message
+                    Error = nombie.Message
                 });
             }
             catch(PaymentGatewayFailureException pgfe)

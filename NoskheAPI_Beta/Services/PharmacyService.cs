@@ -21,7 +21,7 @@ namespace NoskheAPI_Beta.Services
         ResponseTemplate GetDatetime();
         ResponseTemplate GetServerState();
         Models.Minimals.Output.Pharmacy GetProfile();
-        IEnumerable<Models.Minimals.Output.Order> GetOrders(string start="start-undifiend", string end="end-undifiend");
+        IEnumerable<Models.Minimals.Output.Order> GetOrders(string start="start-undefined", string end="end-undefined");
         Models.Minimals.Output.Score GetScore();
         IEnumerable<Models.Minimals.Output.Settle> GetSettles();
         ResponseTemplate SetANewSettle(Models.Minimals.Input.Settle settle);
@@ -36,6 +36,7 @@ namespace NoskheAPI_Beta.Services
     }
     class PharmacyService : IPharmacyService
     {
+        // TODO: Fix bug #4
         private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         public string RequestToken { get; set; }
 
@@ -210,7 +211,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public IEnumerable<Order> GetOrders(string start="start-undifiend", string end="end-undifiend")
+        public IEnumerable<Order> GetOrders(string start="start-undefined", string end="end-undefined")
         {
             try
             {
@@ -278,7 +279,7 @@ namespace NoskheAPI_Beta.Services
                     tempOrder.HasBeenPaid = order.HasBeenPaid;
                     tempOrder.HasBeenDeliveredToCustomer = order.HasBeenDeliveredToCustomer;
                     tempOrder.HasBeenSettled = order.HasBeenSettled;
-                    tempOrder.CourierName = order.Courier.FirstName + " " + order.Courier.LastName;
+                    tempOrder.CourierName = /* order.Courier.FirstName ?? */"Mr. NoName" + " " + /* order.Courier.LastName ?? */"NoLastName"; // TODO: Fix bug #4
                     tempOrder.Address = order.ShoppingCart.Address;
                     tempOrder.Email = order.ShoppingCart.Customer.Email;
                     tempOrder.BrandPreference = order.ShoppingCart.Notation.BrandPreference;

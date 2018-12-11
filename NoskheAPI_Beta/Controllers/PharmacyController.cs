@@ -151,12 +151,12 @@ namespace NoskheAPI_Beta.Controllers
         
         // GET: desktop-api/pharmacy/orders
         [HttpGet(Labels.GetOrders)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Order>> GetOrders(string start="start-undifiend", string end="end-undifiend")
+        public ActionResult<IEnumerable<Models.Minimals.Output.Order>> GetOrders(string start="start-undefined", string end="end-undefined")
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_pharmacyService.GetOrders());
+                return Ok(_pharmacyService.GetOrders(start, end));
             }
             catch(InvalidTimeFormatException itfe)
             {
@@ -349,7 +349,7 @@ namespace NoskheAPI_Beta.Controllers
 
         // PUT: desktop-api/pharmacy/toggle-state
         [HttpPut(Labels.ToggleStateOfPharmacy)]
-        public ActionResult ToggleStateOfPharmacy([FromBody] string upi)
+        public ActionResult ToggleStateOfPharmacy()
         {
             try
             {

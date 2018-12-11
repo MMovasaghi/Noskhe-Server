@@ -29,17 +29,17 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<Models.Minimals.Output.ShoppingCart> GetCustomerShoppingCarts();
         IEnumerable<Models.Minimals.Output.Order> GetCustomerOrders();
         IEnumerable<Models.Minimals.Output.Cosmetic> GetAllCosmetics();
-        IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(string usci);
+        IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(int id);
         IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines();
-        IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(string usci);
+        IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(int id);
         TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
-        bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings);
+        bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
         bool RequestSmsForForgetPassword();
         bool VerifySmsCodeForForgetPassword();
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
         bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
         ResponseTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
-        Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp);
+        Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
@@ -63,7 +63,7 @@ namespace NoskheAPI_Beta.Services
                             Gender = an.CustomerObj.Gender,
                             Birthday = an.CustomerObj.Birthday,
                             Email = an.CustomerObj.Email,
-                            Password = SHA256_Algorithm.Compute(an.CustomerObj.Password),
+                            Password = an.CustomerObj.Password,
                             Phone = an.CustomerObj.Phone,
                             ProfilePictureUrl = an.CustomerObj.ProfilePictureUrl,
                             // server-side decisions
@@ -118,7 +118,7 @@ namespace NoskheAPI_Beta.Services
 
                 var customerShoppingCart =
                     new Models.ShoppingCart {
-                            USCI = USCIG.Generate(), // TODO: USCI generator
+                            USCI = "someUSCI", // TODO: USCI generator
                             Date = DateTime.Now,
                             AddressLatitude = ansc.ShoppingCartObj.AddressLatitude,
                             AddressLongitude = ansc.ShoppingCartObj.AddressLongitude,
@@ -308,7 +308,7 @@ namespace NoskheAPI_Beta.Services
 
                     throw new PaymentGatewayFailureException(ErrorCodes.PaymentGatewayFailureExceptionMsg);
                 }
-                throw new NoOrdersMatchedByUOIException(ErrorCodes.NoOrdersMatchedByUOIExceptionMsg);
+                throw new NoOrdersMatchedByIdException(ErrorCodes.NoOrdersMatchedByIdException);
             }
             catch
             {
@@ -327,7 +327,7 @@ namespace NoskheAPI_Beta.Services
                 foundCustomer.Gender = ee.CustomerObj.Gender;
                 foundCustomer.Birthday = ee.CustomerObj.Birthday;
                 foundCustomer.Email = ee.CustomerObj.Email;
-                foundCustomer.Password = SHA256_Algorithm.Compute(ee.CustomerObj.Password);
+                foundCustomer.Password = ee.CustomerObj.Password;
                 foundCustomer.Phone = ee.CustomerObj.Phone;
                 if(ee.CustomerObj.ProfilePictureUrl != foundCustomer.ProfilePictureUrl)
                 {
@@ -529,20 +529,28 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(string usci)
+        public IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(int id)
         {
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var responses =
-                    from record in db.CosmeticShoppingCarts
-                    // TODO: #LOADING
-                    where record.ShoppingCart.USCI == usci
-                    select new Models.Minimals.Output.Cosmetic { CosmeticId = record.CosmeticId, Name = record.Cosmetic.Name, Price = record.Cosmetic.Price, ProductPictureUrl = record.Cosmetic.ProductPictureUrl };
-                if(responses != null) return responses.ToArray();
+                var existingCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
+                db.Entry(existingCustomer).Collection(c => c.ShoppingCarts).Query()
+                    .Include(sc => sc.CosmeticShoppingCarts)
+                        .ThenInclude(msc => msc.Cosmetic)
+                    .Load();
 
-                // un-satisfying result
-                throw new NoCosmeticsMatchedByUSCIExcpetion(ErrorCodes.NoCosmeticsMatchedByUSCIExcpetionMsg);
+                var existingShoppingCart = existingCustomer.ShoppingCarts.Where(sc => sc.ShoppingCartId == id).FirstOrDefault();
+                if(existingShoppingCart != null)
+                {
+                    var cosmetics =
+                        from cosmetic in existingShoppingCart.CosmeticShoppingCarts
+                        where cosmetic.ShoppingCartId == id
+                        select new Models.Minimals.Output.Cosmetic { CosmeticId = cosmetic.Cosmetic.CosmeticId, Name = cosmetic.Cosmetic.Name, Price = cosmetic.Cosmetic.Price, ProductPictureUrl = cosmetic.Cosmetic.ProductPictureUrl };
+                    if(cosmetics != null) return cosmetics.ToArray();
+                    throw new NoCosmeticsInTheShoppingCartException(ErrorCodes.NoCosmeticsInTheShoppingCartExceptionMsg); // Khali hast
+                }
+                throw new UnauthorizedAccessException(); // NOTE: angah in customer id eshtebah zade va nabayad shopping carte kase dige ro neshun bede
             }
             catch
             {
@@ -550,20 +558,28 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(string usci)
+        public IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(int id)
         {
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var responses =
-                    from record in db.MedicineShoppingCarts
-                    // TODO: #LOADING
-                    where record.ShoppingCart.USCI == usci
-                    select new Models.Minimals.Output.Medicine { MedicineId = record.MedicineId, Name = record.Medicine.Name, Price = record.Medicine.Price, ProductPictureUrl = record.Medicine.ProductPictureUrl };
-                if(responses != null) return responses.ToArray();
+                var existingCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
+                db.Entry(existingCustomer).Collection(c => c.ShoppingCarts).Query()
+                    .Include(sc => sc.MedicineShoppingCarts)
+                        .ThenInclude(msc => msc.Medicine)
+                    .Load();
 
-                // un-satisfying result
-                throw new NoMedicinesMatchedByUSCIExcpetion(ErrorCodes.NoMedicinesMatchedByUSCIExcpetionMsg);
+                var existingShoppingCart = existingCustomer.ShoppingCarts.Where(sc => sc.ShoppingCartId == id).FirstOrDefault();
+                if(existingShoppingCart != null)
+                {
+                    var medicines =
+                        from medicine in existingShoppingCart.MedicineShoppingCarts
+                        where medicine.ShoppingCartId == id
+                        select new Models.Minimals.Output.Medicine { MedicineId = medicine.Medicine.MedicineId, Name = medicine.Medicine.Name, Price = medicine.Medicine.Price, ProductPictureUrl = medicine.Medicine.ProductPictureUrl };
+                    if(medicines != null) return medicines.ToArray();
+                    throw new NoMedicinesInTheShoppingCartException(ErrorCodes.NoMedicinesInTheShoppingCartExceptionMsg); // Khali hast
+                }
+                throw new UnauthorizedAccessException(); // NOTE: angah in customer id eshtebah zade va nabayad shopping carte kase dige ro neshun bede
             }
             catch
             {

@@ -49,6 +49,10 @@ namespace NoskheAPI_Beta.Classes.Communication
         {
             await Clients.Group(identifier).SendAsync("HandleNotification", arg1);
         }
+        public async Task SendMessagePhone(string identifier, string Data)
+        {
+            await Clients.Group(identifier).SendAsync("HandleNotification", Data);
+        }
     }
     public class NoskheAtFirst
     {

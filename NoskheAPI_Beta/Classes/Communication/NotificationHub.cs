@@ -19,30 +19,31 @@ namespace NoskheAPI_Beta.Classes.Communication
         public async Task Initialize(string identifier)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, identifier);
-            List<NoskheAtFirst> A = new List<NoskheAtFirst>()
-            {
-                new NoskheAtFirst()
-                {
-                    Picture_Urls = new List<string>()
-                    {
-                        "www.google.com",
-                        "www.pashm.com",
-                    },
-                    WithOutNoskhe_List = new List<WithOutNoskhe>()
-                    {
-                        new WithOutNoskhe()
-                        {
-                            Number = 10,
-                            Name = "Pashm"
-                        },
-                        new WithOutNoskhe()
-                        {
-                            Number = 20,
-                            Name = "Salam"
-                        },
-                    },
-                },
-            };
+            //List<NoskheAtFirst> A = new List<NoskheAtFirst>()
+            //{
+            //    new NoskheAtFirst()
+            //    {
+            //        Picture_Urls = new List<string>()
+            //        {
+            //            "www.google.com",
+            //            "www.pashm.com",
+            //        },
+            //        WithOutNoskhe_List = new List<WithOutNoskhe>()
+            //        {
+            //            new WithOutNoskhe()
+            //            {
+            //                Number = 10,
+            //                Name = "Pashm"
+            //            },
+            //            new WithOutNoskhe()
+            //            {
+            //                Number = 20,
+            //                Name = "Salam"
+            //            },
+            //        },
+            //    },
+            //};
+            string A = "Pashmam Conecting to server";
             await Clients.Group(identifier).SendAsync("HandleNotification", A);
         }
         public async Task SendMessage(string identifier, object arg1)

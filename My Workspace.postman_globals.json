@@ -1,21 +1,23 @@
 {
-	"id": "8f93dd45-012f-4dba-81dc-79f436a8cf65",
-	"values": [
-		{
-			"key": "SERVER_IP",
-			"value": "http://198.143.180.164:5000",
-			"description": "",
-			"enabled": true
-		},
-		{
-			"key": "LOCAL_IP",
-			"value": "https://localhost:5001",
-			"description": "",
-			"enabled": true
-		}
-	],
-	"name": "My Workspace Globals",
-	"_postman_variable_scope": "globals",
-	"_postman_exported_at": "2018-12-11T20:17:24.490Z",
-	"_postman_exported_using": "Postman/6.5.3"
+  "id": "32043bab-d1b9-bff3-4a42-c853f8db1fe7",
+  "name": "Postman Globals",
+  "values": [
+    {
+      "key": "SERVER_IP",
+      "value": "http://198.143.180.164:5000",
+      "description": "",
+      "type": "text",
+      "enabled": true
+    },
+    {
+      "key": "LOCAL_IP",
+      "value": "https://localhost:5001",
+      "description": "",
+      "type": "text",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "globals",
+  "_postman_exported_at": "2018-12-12T06:40:13.924Z",
+  "_postman_exported_using": "Postman/5.5.4"
 }

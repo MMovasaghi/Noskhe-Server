@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace NoskheAPI_Beta.Classes.Communication
 {

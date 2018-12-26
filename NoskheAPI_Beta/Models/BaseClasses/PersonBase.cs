@@ -1,8 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace NoskheAPI_Beta.Models.Minimals.Output
+namespace NoskheAPI_Beta.Models.BaseClasses
 {
-    public class Customer
+    public class PersonBase
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

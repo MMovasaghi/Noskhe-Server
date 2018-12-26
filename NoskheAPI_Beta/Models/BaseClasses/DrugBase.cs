@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NoskheAPI_Beta.Models.BaseClasses
 {
-    public class Drug
+    public class DrugBase
     {
         public string Name { get; set; }
         public decimal Price { get; set; }

@@ -2,19 +2,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Diagnostics;
+using NoskheAPI_Beta.Models.Minimals;
 
 namespace NoskheAPI_Beta.Classes.Communication
 {
-    /*
-     * Template For Sending Noskhe To Pharmacy : 
-     * 
-     *  {
-     *      Url1 = "www.Sample.com",
-     *      Url2 = "www.Sample.com",
-     *      Url3 = "www.Sample.com",
-     *      
-     *  }
-     */
     public class NotificationHub : Hub
     {
         public async Task Initialize(string identifier)
@@ -55,16 +46,6 @@ namespace NoskheAPI_Beta.Classes.Communication
         {
             await Clients.Group(identifier).SendAsync("HandleNotification", Data);
         }
-    }
-    public class NoskheAtFirst
-    {
-        public List<string> Picture_Urls { set; get; }
-        public List<WithOutNoskhe> WithOutNoskhe_List { set; get; }
-    }
-    public class WithOutNoskhe
-    {
-        public int Number { get; set; }
-        public string Name { get; set; }
     }
 
 }

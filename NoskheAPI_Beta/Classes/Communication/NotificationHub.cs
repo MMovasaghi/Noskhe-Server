@@ -117,6 +117,10 @@ namespace NoskheAPI_Beta.Classes.Communication
             };
             await Clients.Group(identifier).SendAsync("HandleNotification", noskheForFirstNotificationOnDesktop);
         }
+        public async Task SendMessagePHONE(string identifier, object arg1)
+        {
+
+        }
     }
 
 }

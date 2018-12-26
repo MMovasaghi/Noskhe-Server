@@ -11,6 +11,7 @@ namespace NoskheAPI_Beta.Models
         public uint LoginRequests { get; set; } // tedade loginha baraye track
         public DateTime ValidFrom { get; set; }
         public DateTime ValidTo { get; set; }
+        public bool IsAvailableInSignalR { get; set; } // bara inke toye hub login nakone dobare ta dardesar beshe
         // nav
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }

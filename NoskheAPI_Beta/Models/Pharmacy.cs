@@ -18,8 +18,8 @@ namespace NoskheAPI_Beta.Models
         public double AddressLatitude { get; set; }
         public string Address { get; set; }
         public bool IsAvailableNow { get; set; } // baraye tashkhise inke on/off hast
-        public bool IsBusy { get; set; } // baraye inke vaghti on hast vali saresh sholughe
         public decimal Credit { get; set; }
+        public uint PendingRequests { get; set; } // tedade request ha vaghti bala raft dige payam nadim
         /*
             n Order
             1 Manager

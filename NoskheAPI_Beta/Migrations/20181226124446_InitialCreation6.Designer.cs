@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NoskheAPI_Beta.Models;
 
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    partial class NoskheContextModelSnapshot : ModelSnapshot
+    [Migration("20181226124446_InitialCreation6")]
+    partial class InitialCreation6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

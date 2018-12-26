@@ -9,8 +9,8 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20181206123415_InitialCreation")]
-    partial class InitialCreation
+    [Migration("20181226120641_InitialCreation5")]
+    partial class InitialCreation5
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -148,6 +148,8 @@ namespace NoskheAPI_Beta.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("CustomerId");
+
+                    b.Property<bool>("IsAvailableInSignalR");
 
                     b.Property<bool>("IsValid");
 
@@ -348,13 +350,13 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<bool>("IsAvailableNow");
 
-                    b.Property<bool>("IsBusy");
-
                     b.Property<int>("ManagerId");
 
                     b.Property<string>("Name");
 
                     b.Property<string>("Password");
+
+                    b.Property<uint>("PendingRequests");
 
                     b.Property<string>("Phone");
 
@@ -377,6 +379,8 @@ namespace NoskheAPI_Beta.Migrations
                 {
                     b.Property<int>("PharmacyTokenId")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("IsAvailableInSignalR");
 
                     b.Property<bool>("IsValid");
 

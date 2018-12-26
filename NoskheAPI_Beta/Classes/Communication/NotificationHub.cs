@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Diagnostics;
 using NoskheAPI_Beta.Models.Minimals.Output;
+using System;
+using System.Linq;
 
 namespace NoskheAPI_Beta.Classes.Communication
 {
     public class NotificationHub : Hub
     {
+        private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         /*
          * ***** Template for sending data to pharmacy *****
          * 
@@ -60,10 +63,85 @@ namespace NoskheAPI_Beta.Classes.Communication
                 },
             };
          */
-        public async Task Initialize(string identifier)
+        public async Task Initialize(int dest, string requestToken)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, identifier);
-            await Clients.Group(identifier).SendAsync("HandleNotification", "LOGGED_IN_SUCCESSFULLY");
+            if(dest == 0) // customer
+            {
+                // check if the token is valid
+                switch (ValidateTokenHandler(0, requestToken))
+                {
+                    case 1: // matched user
+                        // add user to to group
+                        var name = GetUniqueId(0, requestToken).ToString();
+                        await Groups.AddToGroupAsync(Context.ConnectionId, name);
+                        // tell him/her
+                        await Clients.Group(name).SendAsync("RecieveStatus", 1, name); // response: 1
+                        break;
+                    // rahe hal : ghablesh ye bar check konim dasti -> checkToken() for pharmacy and customer
+                    case 0: // db failure
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", 0, null);
+                        break;
+                    case -1: // wrong pattern
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -1, null);
+                        break;
+                    case -2: // not matched or banned
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -2, null);
+                        break;
+                    case -3: // expired
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -3, null);
+                        break;
+                    case -4: // duplication occured
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -4, null);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if(dest == 1) // pharmacy
+            {
+                // check if the token is valid
+                switch (ValidateTokenHandler(1, requestToken))
+                {
+                    case 1: // matched user
+                        // add user to to group
+                        var name = GetUniqueId(1, requestToken).ToString();
+                        await Groups.AddToGroupAsync(Context.ConnectionId, name);
+                        // tell him/her
+                        await Clients.Group(name).SendAsync("RecieveStatus", 1, name); // response: 1
+                        break;
+                    // rahe hal : ghablesh ye bar check konim dasti -> checkToken() for pharmacy and customer
+                    case 0: // db failure
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", 0, null);
+                        break;
+                    case -1: // wrong pattern
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -1, null);
+                        break;
+                    case -2: // not matched or banned
+                        // do not add user to to group
+                        // how to tell him/her?
+                        await Clients.Caller.SendAsync("RecieveStatus", -2, null);
+                        break;
+                    case -3: // expired
+                        // do not add user to to group
+                        // how to tell him/her?
+                        await Clients.Caller.SendAsync("RecieveStatus", -3, null);
+                        break;
+                    case -4: // duplication occured
+                        // do not add user to to group
+                        await Clients.Caller.SendAsync("RecieveStatus", -4, null);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // await Clients.Group(identifier).SendAsync("HandleNotification", "LOGGED_IN_SUCCESSFULLY");
         }
         public async Task SendMessage(string identifier, object arg1)
         {
@@ -121,6 +199,59 @@ namespace NoskheAPI_Beta.Classes.Communication
         {
 
         }
-    }
+        private int ValidateTokenHandler(int dest, string requestToken)
+        {
+            var token = requestToken.Substring("Bearer ".Length).Trim();
+            if(requestToken == null || !requestToken.StartsWith("Bearer")) return -1;
+            if(dest == 0)
+            {
+                try
+                {
+                    var customer = db.CustomerTokens.Where(ct => ct.Token == token).FirstOrDefault();
+                    if(customer == null || customer.IsValid == false) return -2;
+                    if(DateTime.UtcNow > customer.ValidTo) return -3;
+                    if(customer.IsAvailableInSignalR == true) return -4;
+                    customer.IsAvailableInSignalR = true;
+                    db.SaveChanges();
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            else if(dest == 1)
+            {
+                try
+                {
+                    var pharmacy = db.PharmacyTokens.Where(ct => ct.Token == token).FirstOrDefault();
+                    if(pharmacy == null || pharmacy.IsValid == false) return -2;
+                    if(DateTime.UtcNow > pharmacy.ValidTo) return -3;
+                    if(pharmacy.IsAvailableInSignalR == true) return -4;
+                    pharmacy.IsAvailableInSignalR = true;
+                    db.SaveChanges();
+                }
+                catch 
+                {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+        private string GetUniqueId(int identifier, string requestToken)
+        {
+            var token = requestToken.Substring("Bearer ".Length).Trim();
+            if(identifier == 0)
+            {
+                var customer = db.CustomerTokens.Where(ct => ct.Token == token).FirstOrDefault();
+                return "C:" + customer.CustomerId;
+            }
+            if(identifier == 1)
+            {
+                var pharmacy = db.PharmacyTokens.Where(ct => ct.Token == token).FirstOrDefault();
+                return "P:" + pharmacy.PharmacyId;
+            }
+            return "Oops :|";
+        }
 
+    }
 }

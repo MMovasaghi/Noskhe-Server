@@ -101,7 +101,8 @@ namespace NoskheAPI_Beta.Services
                             ValidFrom = DateTime.UtcNow,
                             ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
                             Pharmacy = existingPharmacy,
-                            IsValid = true
+                            IsValid = true,
+                            IsAvailableInSignalR = false
                         };
                         db.PharmacyTokens.Add(newPharmacyToken);
                         db.SaveChanges();

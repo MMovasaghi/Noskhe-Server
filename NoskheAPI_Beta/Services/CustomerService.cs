@@ -90,7 +90,8 @@ namespace NoskheAPI_Beta.Services
                         ValidFrom = DateTime.UtcNow,
                         ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
                         Customer = newUser,
-                        IsValid = true
+                        IsValid = true,
+                        IsAvailableInSignalR = false
                     };
                     db.CustomerTokens.Add(newCustomerToken);
                     db.SaveChanges();

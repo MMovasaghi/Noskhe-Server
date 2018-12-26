@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NoskheAPI_Beta.Migrations
 {
-    public partial class InitialCreation : Migration
+    public partial class InitialCreation5 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -122,6 +122,7 @@ namespace NoskheAPI_Beta.Migrations
                     LoginRequests = table.Column<uint>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: false),
                     ValidTo = table.Column<DateTime>(nullable: false),
+                    IsAvailableInSignalR = table.Column<bool>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -200,8 +201,8 @@ namespace NoskheAPI_Beta.Migrations
                     AddressLatitude = table.Column<double>(nullable: false),
                     Address = table.Column<string>(nullable: true),
                     IsAvailableNow = table.Column<bool>(nullable: false),
-                    IsBusy = table.Column<bool>(nullable: false),
                     Credit = table.Column<decimal>(nullable: false),
+                    PendingRequests = table.Column<uint>(nullable: false),
                     ManagerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -391,6 +392,7 @@ namespace NoskheAPI_Beta.Migrations
                     LoginRequests = table.Column<uint>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: false),
                     ValidTo = table.Column<DateTime>(nullable: false),
+                    IsAvailableInSignalR = table.Column<bool>(nullable: false),
                     PharmacyId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

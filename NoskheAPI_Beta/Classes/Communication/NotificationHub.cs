@@ -75,9 +75,9 @@ namespace NoskheAPI_Beta.Classes.Communication
                     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSGDusBHcHurXuTpvVG2PMu44PjcGAMDjN0QsybEkwwg4Eo1CR",
                     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNn35JV-qkvadDzEBizt0v1jYNxbapM6evnbKPUjzlhrGCcq2_",
                 },
-                Cosmetics = new List<CosmeticOutput>()
+                Cosmetics = new List<Cosmetic>()
                 {
-                    new CosmeticOutput()
+                    new Cosmetic()
                     {
                         Name = "Lipstick",
                         Number = 3,
@@ -87,9 +87,9 @@ namespace NoskheAPI_Beta.Classes.Communication
                     }
 
                 },
-                Medicions = new List<MedicineOutput>()
+                Medicions = new List<Medicine>()
                 {
-                    new MedicineOutput()
+                    new Medicine()
                     {
                         Name = "Asetaminofen",
                         Number = 10,
@@ -97,7 +97,7 @@ namespace NoskheAPI_Beta.Classes.Communication
                         MedicineId = 186,
                         ProductPictureUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRg6DW40E6_NSu4FAj0gh8JPKAl-81fiOKQHcbR6QjSuSeH_9zV",
                     },
-                    new MedicineOutput()
+                    new Medicine()
                     {
                         Name = "Aspirin",
                         Number = 7,
@@ -106,7 +106,7 @@ namespace NoskheAPI_Beta.Classes.Communication
                         ProductPictureUrl = "https://cdn1.medicalnewstoday.com/content/images/articles/301/301766/bottle-of-aspirin.jpg",
                     },
                 },
-                Customer = new CustomerOutput()
+                Customer = new Customer()
                 {
                     FirstName = "محمدحسین",
                     LastName = "موثقی نیا",

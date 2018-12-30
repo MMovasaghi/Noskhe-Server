@@ -19,8 +19,6 @@ namespace NoskheAPI_Beta.Settings.Routing.Pharmacy
         public const string NumberOfOrdersInThisWeek = "orders-count-in-week"; // "Get-Weekly-Number-Of-Orders"
         public const string AverageTimeOfPackingInThisWeek = "packings-average-time-in-week"; // "Get-Weekly-Packing-Average-Time"
         public const string GetTopFivePharmacies = "top-five"; // "Get-Top-Five"
-        // 5- push notification
-        public const string SignalR = "signalr"; // "signalr"
         // new functions goes here
     }
 }

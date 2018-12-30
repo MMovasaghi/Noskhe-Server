@@ -455,23 +455,6 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: desktop-api/pharmacy/signalr
-        [AllowAnonymous] // TODO: WRONGGGGGG!!!
-        [HttpGet(Labels.SignalR)]
-        public async Task<ActionResult> SignalR(string identifier, string Error)
-        {
-            try
-            {
-                await this._hubContext.Clients.Group("amir").SendAsync("HandleNotification", "Hi Pashmam");
-            }
-            catch
-            {
-                return BadRequest(new ResponseTemplate { Success = false, Error = "UNABLE_TO_SEND_NOTIFICATION" });
-            }
-
-            return Ok(new ResponseTemplate { Success = true });
-        }
-
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

@@ -67,6 +67,22 @@ namespace NoskheAPI_Beta
                     ValidateAudience = false,
                     RequireExpirationTime = true
                 };
+                x.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Headers["Authorization"];
+                        // If the request is for our hub...
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/NotificationHub")))
+                        {
+                            // Read the token out of the query string
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
             // configure DI for application services
             services.AddScoped<ICustomerService, CustomerService>();
@@ -82,7 +98,6 @@ namespace NoskheAPI_Beta
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseAuthentication();
 
             if (env.IsDevelopment())
             {
@@ -98,13 +113,12 @@ namespace NoskheAPI_Beta
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<NotificationHub>("/NotificationHub");
             });
             
-            app.UseAuthentication();
-
             app.UseMvc();
         }
     }

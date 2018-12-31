@@ -543,13 +543,13 @@ namespace NoskheAPI_Beta.Controllers
         // Signalr Based Methods
 
         // POST: mobile-api/customer/pharmacies-near-me
-        [HttpPost(Labels.PharmaciesNearCustomer)]
-        public ActionResult PharmaciesNearCustomer([FromBody] Models.Android.AddNewShoppingCartTemplate ansc)
+        [HttpGet(Labels.PharmaciesNearCustomer)]
+        public ActionResult PharmaciesNearCustomer(int shoppingCartId)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.PharmaciesNearCustomer(ansc));
+                return Ok(_customerService.PharmaciesNearCustomer(shoppingCartId));
             }
             catch(InvalidCosmeticIDFoundException icife)
             {
@@ -605,7 +605,7 @@ namespace NoskheAPI_Beta.Controllers
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = ErrorCodes.?
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
                 });
             }
             catch
@@ -630,7 +630,7 @@ namespace NoskheAPI_Beta.Controllers
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = ErrorCodes.?
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
                 });
             }
             catch

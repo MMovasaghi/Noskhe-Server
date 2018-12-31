@@ -43,7 +43,7 @@ namespace NoskheAPI_Beta.Services
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-        IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(Models.Android.AddNewShoppingCartTemplate ansc);
+        IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(int shoppingCartId);
         ResponseTemplate WalletInquiry();
         ResponseTemplate PayTheOrder(int orderId);
     }
@@ -707,8 +707,36 @@ namespace NoskheAPI_Beta.Services
             // }
         }
 
-        public IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(Models.Android.AddNewShoppingCartTemplate ansc)
+        public IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(int shoppingCartId)
         {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingShoppingCart = db.ShoppingCarts.Where(sh => sh.ShoppingCartId == shoppingCartId).FirstOrDefault();
+                if (existingShoppingCart == null) throw new Exception();
+                // check if the shooping cart is for this user
+                if(existingShoppingCart.CustomerId != GetCustomerId()) throw new Exception();
+
+                var customerLocation = new double[] { existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude };
+
+                var pharmaciesLocation = from p in db.Pharmacies
+                                 select new { p.PharmacyId, p.AddressLatitude, p.AddressLongitude };
+
+                var nearPharmacies = new double[8];
+                ////foreach(var pharmacyLocation in pharmaciesLocation)
+                ////{
+                ////    distances.
+                ////}
+                //for(int i = 0; i < pharmaciesLocation.Count(); i++)
+                //{
+                //    pharmaciesLocation[i][2] = 
+                //}
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             /* 
             * 1- find 6 nearest phrmacies based on location and distance & 2 trusted pharmacy
             * 2- if a pharmacy status is not ready skip

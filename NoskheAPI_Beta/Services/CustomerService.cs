@@ -43,6 +43,9 @@ namespace NoskheAPI_Beta.Services
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+        IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(Models.Android.AddNewShoppingCartTemplate ansc);
+        ResponseTemplate WalletInquiry();
+        ResponseTemplate PayTheOrder(int orderId);
     }
     class CustomerService : ICustomerService
     {
@@ -702,6 +705,33 @@ namespace NoskheAPI_Beta.Services
             // {
             //     throw new SmsVerificationExpiredException(vee.Message);
             // }
+        }
+
+        public IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(Models.Android.AddNewShoppingCartTemplate ansc)
+        {
+            /* 
+            * 1- find 6 nearest phrmacies based on location and distance & 2 trusted pharmacy
+            * 2- if a pharmacy status is not ready skip
+            * 3- if all pharmacies were busy or not ready return busy error
+            * 4- otherwise save records to ShoppingCartMapping (ShoppingCartId+CustomerId+PharmacyIds) table & return list of FoundPharmaciesTemplate
+            * 4- invoke NotificationService.PharmacyShoppingCartReception(ShoppingCartMappingId)
+            */
+            // 1
+            // 2
+            // 3
+            // 4
+            // 5
+            throw new NotImplementedException();
+        }
+
+        public ResponseTemplate WalletInquiry()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ResponseTemplate PayTheOrder(int orderId)
+        {
+            throw new NotImplementedException();
         }
 
         public void TokenValidationHandler()

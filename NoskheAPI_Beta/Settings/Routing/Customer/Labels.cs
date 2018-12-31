@@ -27,6 +27,8 @@ namespace NoskheAPI_Beta.Settings.Routing.Customer
         public const string GetAllCosmetics = "all-cosmetics"; // Old: "Get-Medicines"
         
         // new function route names here
-        public const string SendOrderToPharmacy = "send-order"; // find nearest pharamacy, send SignalRTori to "P:IDish"
+        public const string PharmaciesNearCustomer = "pharmacies-near-me";
+        public const string WalletInquiry = "wallet";
+        public const string PayTheOrder = "pay";
     }
 }

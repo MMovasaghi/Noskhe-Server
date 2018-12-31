@@ -540,6 +540,109 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
+        // Signalr Based Methods
+
+        // POST: mobile-api/customer/pharmacies-near-me
+        [HttpPost(Labels.PharmaciesNearCustomer)]
+        public ActionResult PharmaciesNearCustomer([FromBody] Models.Android.AddNewShoppingCartTemplate ansc)
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_customerService.PharmaciesNearCustomer(ansc));
+            }
+            catch(InvalidCosmeticIDFoundException icife)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = icife.Message // TODO: ADD THIS TO DOC
+                });
+            }
+            catch(InvalidMedicineIDFoundException imife)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = imife.Message // TODO: ADD THIS TO DOC
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        // GET: mobile-api/customer/wallet
+        [HttpGet(Labels.WalletInquiry)]
+        public ActionResult WalletInquiry()
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_customerService.WalletInquiry());
+            }
+            catch(NotImplementedException ex)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.?
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        // GET: mobile-api/customer/pay
+        [HttpGet(Labels.PayTheOrder)]
+        public ActionResult PayTheOrder(int orderId)
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_customerService.PayTheOrder(orderId));
+            }
+            catch(NotImplementedException ex)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.?
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

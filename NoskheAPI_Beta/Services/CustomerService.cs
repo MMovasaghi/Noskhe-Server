@@ -18,6 +18,7 @@ using NoskheAPI_Beta.Models.Response;
 using NoskheBackend_Beta.Encryption;
 using ZarinPalGateway;
 using NoskheAPI_Beta.Settings.ResponseMessages.Customer;
+using GeoCoordinatePortable;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -714,30 +715,18 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingShoppingCart = db.ShoppingCarts.Where(sh => sh.ShoppingCartId == shoppingCartId).FirstOrDefault();
                 if (existingShoppingCart == null) throw new Exception();
-                // check if the shooping cart is for this user
-                //if(existingShoppingCart.CustomerId != GetCustomerId()) throw new Exception(); --------------
-
-                var customerLocation = new float[] { (float)existingShoppingCart.AddressLatitude, (float)existingShoppingCart.AddressLongitude };
-
-                var pharmaciesLocation = from p in db.Pharmacies
-                                 select new LocationObj { PharmacyId = p.PharmacyId, Lat = (float)p.AddressLatitude, Lon = (float)p.AddressLongitude };
-
-
-
+                var pharmaciesLocation = db.Pharmacies.Select(p => new { PharmacyId = p.PharmacyId, Lat = p.AddressLatitude, Lon = p.AddressLongitude });
+                
                 List<DistanceObj> nearPharmacies = new List<DistanceObj>();
+                GeoCoordinate shLoc = new GeoCoordinate(existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude);
+                GeoCoordinate phLoc = new GeoCoordinate();
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
-                    //nearPharmacies.Add(new DistanceObj { PharmacyId = pharmacyLocation.PharmacyId, Distance = Math.Sqrt(pharmacyLocation.Lat * pharmacyLocation.Lat + pharmacyLocation.Lon * pharmacyLocation.Lon) });
-                    nearPharmacies.Add(new DistanceObj { Distance = measure(pharmacyLocation.Lat, pharmacyLocation.Lon, customerLocation[0], customerLocation[1]), PharmacyId = GetCustomerId() });
+                    phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
+                    nearPharmacies.Add(new DistanceObj { Distance = shLoc.GetDistanceTo(phLoc), PharmacyId = pharmacyLocation.PharmacyId });
                 }
-                nearPharmacies.Sort();
-                foreach (var nearPharmacy in nearPharmacies)
-                {
-                }
-                //for(int i = 0; i < pharmaciesLocation.Count(); i++)
-                //{
-                //    pharmaciesLocation[i][2] = 
-                //}
+                var sorted = nearPharmacies.OrderBy(p => p.Distance).ToList();
+                
             }
             catch (Exception ex)
             {
@@ -789,29 +778,6 @@ namespace NoskheAPI_Beta.Services
                 throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
             }
         }
-        public float measure(float lat1, float lon1, float lat2, float lon2)
-        {
-            // generally used geo measurement function
-            var R = 6378.137; // Radius of earth in KM
-            var dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
-            var dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
-            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-            Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
-            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            var d = R * c;
-            return (float)d * 1000; // meters
-        }
-    }
-}
-
-namespace NoskheAPI_Beta.Services
-{
-    class LocationObj
-    {
-        public int PharmacyId { get; set; }
-        public float Lat { get; set; }
-        public float Lon { get; set; }
     }
 }
 
@@ -820,6 +786,6 @@ namespace NoskheAPI_Beta.Services
     class DistanceObj
     {
         public int PharmacyId { get; set; }
-        public float Distance { get; set; }
+        public double Distance { get; set; }
     }
 }

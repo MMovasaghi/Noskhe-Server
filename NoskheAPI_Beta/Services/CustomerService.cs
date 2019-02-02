@@ -57,7 +57,7 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
-                var foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email && q.Phone == an.CustomerObj.Phone)).FirstOrDefault();
+                var foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email || q.Phone == an.CustomerObj.Phone)).FirstOrDefault(); // bug fixed - same phone but return new registration
                 if(foundCustomer == null)
                 {
                     // adding new user

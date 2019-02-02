@@ -641,8 +641,7 @@ namespace NoskheAPI_Beta.Controllers
                 });
             }
         }
-
-
+        
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

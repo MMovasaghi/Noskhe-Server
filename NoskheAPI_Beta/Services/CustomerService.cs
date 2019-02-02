@@ -39,7 +39,7 @@ namespace NoskheAPI_Beta.Services
         bool VerifySmsCodeForForgetPassword();
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
         bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
-        ResponseTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
+        StatusAndIdTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
         Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
@@ -57,7 +57,7 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
-                var foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email || q.Phone == an.CustomerObj.Phone)).FirstOrDefault(); // bug fixed - same phone but return new registration
+                var foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email || q.Phone == an.CustomerObj.Phone)).FirstOrDefault(); // +bug: what if email and paswwords are null --> kerm rikhtan ba postman, +bug fixed:same phone but return new registration
                 if(foundCustomer == null)
                 {
                     // adding new user
@@ -113,7 +113,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public ResponseTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc)
+        public StatusAndIdTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc)
         {
             try
             {
@@ -197,9 +197,9 @@ namespace NoskheAPI_Beta.Services
                 db.SaveChanges();
 
                 // satisfying result
-                return new ResponseTemplate {
+                return new StatusAndIdTemplate {
                     Success = true,
-                    Error = customerShoppingCart.ShoppingCartId.ToString()
+                    Id = customerShoppingCart.ShoppingCartId.ToString()
                 };
             }
             catch(DbUpdateException)

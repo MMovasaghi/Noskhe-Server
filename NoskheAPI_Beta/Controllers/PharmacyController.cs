@@ -454,8 +454,9 @@ namespace NoskheAPI_Beta.Controllers
                 });
             }
         }
+
         [AllowAnonymous]
-        [HttpPost("new-drug-won")]
+        [HttpPost("new-drug-wn")]
         public ActionResult NewDrugWithN([FromBody] Models.Medicine inputMedicine)
         {
             try
@@ -480,7 +481,7 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
         [AllowAnonymous]
-        [HttpPost("new-drug-wn")]
+        [HttpPost("new-drug-won")]
         public ActionResult NewDrugWithOutN([FromBody] Models.Medicine inputMedicine)
         {
             try

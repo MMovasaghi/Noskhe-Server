@@ -275,3 +275,5 @@ __pycache__/
 # End of https://www.gitignore.io/api/aspnetcore
 
 NoskheAPI_Beta/Properties/launchSettings\.json
+launchSettings.json
+NoskheAPI_Beta/Properties/

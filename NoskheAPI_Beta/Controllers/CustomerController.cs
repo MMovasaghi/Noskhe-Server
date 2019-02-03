@@ -393,6 +393,13 @@ namespace NoskheAPI_Beta.Controllers
                     Error = dce.Message
                 });
             }
+            catch(EmailAndPhoneAreNullException eapane)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = eapane.Message
+                });
+            }
             catch(DatabaseFailureException dfe)
             {
                 return BadRequest(new ResponseTemplate {

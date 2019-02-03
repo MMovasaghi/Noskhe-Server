@@ -20,6 +20,7 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string LoginVerificationFailedExceptionMsg = "CEC15";
         public static string SmsVerificationExpiredExceptionMsg = "CEC16";
         public static string SmsVerificationFailedExceptionMsg = "CEC17";
+        public static string EmailAndPhoneAreNullExceptionMsg = "CEC18";
         // C# Standard Exception Error Code Messages
         public static string SecurityTokenExpiredExceptionMsg = "CEC0";
     }

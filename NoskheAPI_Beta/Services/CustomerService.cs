@@ -57,7 +57,25 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
-                var foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email || q.Phone == an.CustomerObj.Phone)).FirstOrDefault(); // +bug: what if email and paswwords are null --> kerm rikhtan ba postman, +bug fixed:same phone but return new registration
+                Models.Customer foundCustomer;
+                // raveshe tabahide sabte nam
+                if(an.CustomerObj.Email == null && an.CustomerObj.Phone == null)
+                {
+                    throw new EmailAndPhoneAreNullException(ErrorCodes.EmailAndPhoneAreNullExceptionMsg);
+                }
+                // ravesh haye mokhtalefe sabte nam
+                if(an.CustomerObj.Email == null) // sabtenam be raveshe "by email"
+                {
+                    foundCustomer = db.Customers.Where(q => (q.Phone == an.CustomerObj.Phone)).FirstOrDefault();
+                }
+                else if(an.CustomerObj.Phone == null) // sabtenam be raveshe "by phone"
+                {
+                    foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email)).FirstOrDefault();
+                }
+                else // sabte name kamel (email & phone : bi karbord dar barname)
+                {
+                    foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email && q.Phone == an.CustomerObj.Phone)).FirstOrDefault();
+                }
                 if(foundCustomer == null)
                 {
                     // adding new user

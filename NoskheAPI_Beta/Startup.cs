@@ -86,6 +86,7 @@ namespace NoskheAPI_Beta
             });
             // configure DI for application services
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IManagementService, ManagementService>();
             services.AddScoped<IPharmacyService, PharmacyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
         }

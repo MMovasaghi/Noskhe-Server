@@ -455,56 +455,6 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpPost("new-drug-wn")]
-        public ActionResult NewDrugWithN([FromBody] Models.Medicine inputMedicine)
-        {
-            try
-            {
-                Models.Medicine newMed = new Medicine() { Name = inputMedicine.Name, Price = inputMedicine.Price, ProductPictureUrl = inputMedicine.ProductPictureUrl, ProductPictureUploadDate = DateTime.Now };
-                NoskheContext db = new NoskheContext();
-                db.Medicines.Add(newMed);
-                db.SaveChanges();
-                return Ok(new ResponseTemplate
-                {
-                    Success = true,
-                    Error = "Added"
-                });
-            }
-            catch (DbUpdateException ex)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = ex.Message
-                });
-            }
-        }
-        [AllowAnonymous]
-        [HttpPost("new-drug-won")]
-        public ActionResult NewDrugWithOutN([FromBody] Models.Medicine inputMedicine)
-        {
-            try
-            {
-                Models.Medicine newMed = new Medicine() { Name = inputMedicine.Name, Price = inputMedicine.Price, ProductPictureUrl = inputMedicine.ProductPictureUrl, ProductPictureUploadDate = DateTime.Now };
-                NoskheContext db = new NoskheContext();
-                db.Medicines.Add(newMed);
-                db.SaveChanges();
-                return Ok(new ResponseTemplate
-                {
-                    Success = true,
-                    Error = "Added"
-                });
-            }
-            catch (DbUpdateException ex)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = ex.Message
-                });
-            }
-        }
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

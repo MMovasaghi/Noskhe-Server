@@ -32,6 +32,8 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<float> AverageTimeOfPackingInThisWeek();
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetPharmacyId();
+        ResponseTemplate ServiceResponse(int shoppingCartId);
+        ResponseTemplate InvoiceDetails(int shoppingCartId);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class PharmacyService : IPharmacyService
@@ -723,6 +725,45 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
+        }
+
+        public ResponseTemplate ServiceResponse(int shoppingCartId)
+        {
+            // (1) change status to first step accepted
+            // (2) signalr to customer for first step was successful
+
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                // var existingServiceMapping = db.ServiceMappings.Where(s => (s.ShoppingCartId == shoppingCartId && s.FoundPharmaciesIds[s.PrimativePharmacyIndex] == GetPharmacyId())).FirstOrDefault();
+                // if(existingServiceMapping == null) {}
+                
+
+            }
+            catch(DbUpdateException)
+            {
+                
+                throw;
+            }
+            throw new NotImplementedException();
+        }
+
+        public ResponseTemplate InvoiceDetails(int shoppingCartId)
+        {
+            // (1) add new order and calculate costs
+            // (2) sms
+            // (3) signalr invoice to customer the diffrence with wallet and say accepted
+
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+            }
+            catch(DbUpdateException)
+            {
+                
+                throw;
+            }
+            throw new NotImplementedException();
         }
 
         public void TokenValidationHandler()

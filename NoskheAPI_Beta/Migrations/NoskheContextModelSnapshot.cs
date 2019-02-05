@@ -212,6 +212,8 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<string>("ProductPictureUrl");
 
+                    b.Property<int>("Type");
+
                     b.HasKey("MedicineId");
 
                     b.ToTable("Medicines");
@@ -364,11 +366,15 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<DateTime>("RegisterationDate");
 
+                    b.Property<int?>("ServiceMappingId");
+
                     b.Property<string>("UPI");
 
                     b.HasKey("PharmacyId");
 
                     b.HasIndex("ManagerId");
+
+                    b.HasIndex("ServiceMappingId");
 
                     b.ToTable("Pharmacies");
                 });
@@ -466,6 +472,35 @@ namespace NoskheAPI_Beta.Migrations
                         .IsUnique();
 
                     b.ToTable("Scores");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.ServiceMapping", b =>
+                {
+                    b.Property<int>("ServiceMappingId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("CustomerCancellation");
+
+                    b.Property<DateTime>("CustomerCancellationDate");
+
+                    b.Property<int>("CustomerCancellationReason");
+
+                    b.Property<DateTime>("PharmacyCancellationDate");
+
+                    b.Property<int>("PharmacyCancellationReason");
+
+                    b.Property<int>("PharmacyServiceStatus");
+
+                    b.Property<int>("PrimativePharmacyIndex");
+
+                    b.Property<int>("ShoppingCartId");
+
+                    b.HasKey("ServiceMappingId");
+
+                    b.HasIndex("ShoppingCartId")
+                        .IsUnique();
+
+                    b.ToTable("ServiceMappings");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.Settle", b =>
@@ -623,6 +658,10 @@ namespace NoskheAPI_Beta.Migrations
                         .WithMany("Pharmacies")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("NoskheAPI_Beta.Models.ServiceMapping")
+                        .WithMany("FoundPharmacies")
+                        .HasForeignKey("ServiceMappingId");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>
@@ -654,6 +693,14 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
                         .WithOne("Score")
                         .HasForeignKey("NoskheAPI_Beta.Models.Score", "PharmacyId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.ServiceMapping", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.ShoppingCart", "ShoppingCart")
+                        .WithOne("PharmacyMapping")
+                        .HasForeignKey("NoskheAPI_Beta.Models.ServiceMapping", "ShoppingCartId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

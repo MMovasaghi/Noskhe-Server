@@ -30,5 +30,6 @@ namespace NoskheAPI_Beta.Settings.Routing.Customer
         public const string PharmaciesNearCustomer = "pharmacies-near-me";
         public const string WalletInquiry = "wallet";
         public const string PayTheOrder = "pay";
+        public const string RequestService = "request-service";
     }
 }

@@ -43,10 +43,10 @@ namespace NoskheAPI_Beta.Services
         Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
-        void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-        IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(int shoppingCartId);
         ResponseTemplate WalletInquiry();
         ResponseTemplate PayTheOrder(int orderId);
+        IEnumerable<FoundPharmaciesTemplate> RequestService(int shoppingCartId);
+        void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
     {
@@ -726,43 +726,47 @@ namespace NoskheAPI_Beta.Services
             // }
         }
 
-        public IEnumerable<FoundPharmaciesTemplate> PharmaciesNearCustomer(int shoppingCartId)
+        public List<DistanceObj> PharmaciesNearCustomer(int shoppingCartId)
         {
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingShoppingCart = db.ShoppingCarts.Where(sh => sh.ShoppingCartId == shoppingCartId).FirstOrDefault();
                 if (existingShoppingCart == null) throw new Exception();
-                var pharmaciesLocation = db.Pharmacies.Select(p => new { PharmacyId = p.PharmacyId, Lat = p.AddressLatitude, Lon = p.AddressLongitude });
-                
+                var pharmaciesLocation = db.Pharmacies.Select(p => new { PharmacyId = p.PharmacyId, Lat = p.AddressLatitude, Lon = p.AddressLongitude, Name = p.Name });
+
                 List<DistanceObj> nearPharmacies = new List<DistanceObj>();
                 GeoCoordinate shLoc = new GeoCoordinate(existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude);
                 GeoCoordinate phLoc = new GeoCoordinate();
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
                     phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
-                    nearPharmacies.Add(new DistanceObj { Distance = shLoc.GetDistanceTo(phLoc), PharmacyId = pharmacyLocation.PharmacyId });
+                    nearPharmacies.Add(new DistanceObj { Distance = shLoc.GetDistanceTo(phLoc), PharmacyId = pharmacyLocation.PharmacyId, Name = pharmacyLocation.Name });
                 }
                 var sorted = nearPharmacies.OrderBy(p => p.Distance).ToList();
                 
+                // for (int i = 0; i < sorted.Count; i++)
+                // {
+                //     if(sorted[i].Distance > 10)
+                //         sorted.RemoveAt(i);
+                // }
+                sorted.RemoveAll(item => item.Distance > 10);
+                
+                var trustedPharmacy = db.Pharmacies.Where(p => p.Name == "shafa").FirstOrDefault(); // todo: whatif it was null :||
+                sorted.Add(new DistanceObj { PharmacyId = trustedPharmacy.PharmacyId, Distance = shLoc.GetDistanceTo(new GeoCoordinate(trustedPharmacy.AddressLatitude, trustedPharmacy.AddressLongitude)) });
+                
+                if(sorted.Count > 9)
+                {
+                    sorted.RemoveRange(9, sorted.Count - 7);
+                }
+
+                return sorted;
             }
-            catch (Exception ex)
+            catch
             {
 
                 throw;
             }
-            /* 
-            * 1- find 6 nearest phrmacies based on location and distance & 2 trusted pharmacy
-            * 2- if a pharmacy status is not ready skip
-            * 3- if all pharmacies were busy or not ready return busy error
-            * 4- otherwise save records to ShoppingCartMapping (ShoppingCartId+CustomerId+PharmacyIds) table & return list of FoundPharmaciesTemplate
-            * 4- invoke NotificationService.PharmacyShoppingCartReception(ShoppingCartMappingId)
-            */
-            // 1
-            // 2
-            // 3
-            // 4
-            // 5
             throw new NotImplementedException();
         }
 
@@ -773,6 +777,43 @@ namespace NoskheAPI_Beta.Services
 
         public ResponseTemplate PayTheOrder(int orderId)
         {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<FoundPharmaciesTemplate> RequestService(int shoppingCartId)
+        {
+            // (1) pharmaciesnearme
+            // (2) signalr to first pharmacy
+            // (3) return list of pharmacies ids or errors
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                // (1)
+                var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
+                List<FoundPharmaciesTemplate> foundPharmaciesTemplate = new List<FoundPharmaciesTemplate>();
+                List<Models.Pharmacy> s = new List<Models.Pharmacy>();
+                foreach(var pharmacy in pharmaciesQueue)
+                {
+                    foundPharmaciesTemplate.Add(new FoundPharmaciesTemplate { PharmacyId = pharmacy.PharmacyId, Name = pharmacy.Name });
+                    s.Add(new Models.Pharmacy { PharmacyId = pharmacy.PharmacyId });
+                }
+
+                db.ServiceMappings.Add(
+                    new ServiceMapping {
+                        ShoppingCartId = shoppingCartId,
+                        FoundPharmacies = s,
+                        PrimativePharmacyIndex = 1
+                    }
+                );
+                db.SaveChanges();
+                // (2)
+                // (3)
+                return foundPharmaciesTemplate;
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
             throw new NotImplementedException();
         }
 
@@ -801,9 +842,10 @@ namespace NoskheAPI_Beta.Services
 
 namespace NoskheAPI_Beta.Services
 {
-    class DistanceObj
+    public class DistanceObj
     {
         public int PharmacyId { get; set; }
         public double Distance { get; set; }
+        public string Name { get; set; }
     }
 }

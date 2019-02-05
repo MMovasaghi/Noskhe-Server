@@ -33,5 +33,6 @@ namespace NoskheAPI_Beta.Models
         public Order Order { get; set; }
         public Notation Notation { get; set; }
         public Prescription Prescription { get; set; }
+        public ServiceMapping PharmacyMapping { get; set; }
     }
 }

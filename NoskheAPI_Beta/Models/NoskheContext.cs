@@ -56,5 +56,6 @@ namespace NoskheAPI_Beta.Models
         public DbSet<TextMessage> TextMessages { get; set; }
         public DbSet<CustomerToken> CustomerTokens { get; set; }
         public DbSet<PharmacyToken> PharmacyTokens { get; set; }
+        public DbSet<ServiceMapping> ServiceMappings { get; set; }
     }
 }

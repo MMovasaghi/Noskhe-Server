@@ -187,7 +187,7 @@ namespace NoskheAPI_Beta.Controllers
 
         // GET: desktop-api/pharmacy/score
         [HttpGet(Labels.GetScore)]
-        public ActionResult<Models.Minimals.Output.Score> GetScore(string upi)
+        public ActionResult<Models.Minimals.Output.Score> GetScore()
         {
             try
             {

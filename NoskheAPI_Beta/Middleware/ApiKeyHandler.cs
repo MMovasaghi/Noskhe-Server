@@ -33,28 +33,36 @@ namespace NoskheAPI_Beta.Middleware
             if (context.Request.Path.Value.Contains("/desktop-api"))
             {
                 if(CheckDesktopApiKeyExists)
+                {
                     if (context.Request.Headers[DesktopApiParameter].Equals(DesktopAPIKeyToCheck))
                     {
                         ValidKey = true;
                     }
+                }
                 else if(CheckManagementApiKeyExists)
+                {
                     if (context.Request.Headers[ManagementApiParameter].Equals(ManagementAPIKeyToCheck))
                     {
                         ValidKey = true;
                     }
+                }
             }
             else if (context.Request.Path.Value.Contains("/mobile-api"))
             {
                 if(CheckAndroidApiKeyExists)
-                    if (context.Request.Headers[AndroidApiParameter].Equals(AndroidAPIKeyToCheck))
+                {
+                   if (context.Request.Headers[AndroidApiParameter].Equals(AndroidAPIKeyToCheck))
                     {
                         ValidKey = true;
-                    }
+                    } 
+                }
                 else if(CheckIosApiKeyExists)
+                {
                     if (context.Request.Headers[IosApiParameter].Equals(IosAPIKeyToCheck))
                     {
                         ValidKey = true;
                     }
+                }
             }
             else if (context.Request.Path.Value.Contains("/Transaction/Report")) ValidKey = true;
             else if (context.Request.Path.Value.Contains("/NotificationHub")) ValidKey = true;

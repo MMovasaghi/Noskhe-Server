@@ -1069,19 +1069,19 @@ namespace NoskheAPI_Beta.Controllers
                         new TextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@1.com").FirstOrDefault(),
-                            HasBeenExpired = false,
+                            HasBeenLocked = false,
                             VerificationCode = "VerificationCode_1"
                         },
                         new TextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@2.com").FirstOrDefault(),
-                            HasBeenExpired = false,
+                            HasBeenLocked = false,
                             VerificationCode = "VerificationCode_2"
                         },
                         new TextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@3.com").FirstOrDefault(),
-                            HasBeenExpired = true,
+                            HasBeenLocked = true,
                             VerificationCode = "VerificationCode_3"
                         }
                     );

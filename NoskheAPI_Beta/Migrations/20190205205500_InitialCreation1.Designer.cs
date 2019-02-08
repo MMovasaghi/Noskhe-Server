@@ -9,8 +9,8 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20190205185329_InitialCreation8")]
-    partial class InitialCreation8
+    [Migration("20190205205500_InitialCreation1")]
+    partial class InitialCreation1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -567,6 +567,8 @@ namespace NoskheAPI_Beta.Migrations
                     b.Property<DateTime>("Date");
 
                     b.Property<bool>("HasBeenExpired");
+
+                    b.Property<int>("NumberOfAttempts");
 
                     b.Property<string>("VerificationCode");
 

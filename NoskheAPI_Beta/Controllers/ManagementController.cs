@@ -8,8 +8,6 @@ using NoskheAPI_Beta.Settings.Routing.Management;
 
 namespace NoskheAPI_Beta.Controllers
 {
-    // 1- funce sms ha kolan kharab hast
-    // 3- AuthenticateByPhone kharab ast
     [Route("desktop-api/[controller]")]
     [ApiController]
     public class ManagementController : ControllerBase
@@ -69,7 +67,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         // GET: desktop-api/management/all-medicines
-        [HttpPost(Labels.ShowAllMedicines)]
+        [HttpGet(Labels.ShowAllMedicines)]
         public ActionResult ShowAllMedicines()
         {
             try

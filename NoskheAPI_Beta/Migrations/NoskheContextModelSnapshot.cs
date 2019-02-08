@@ -566,6 +566,8 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<bool>("HasBeenExpired");
 
+                    b.Property<int>("NumberOfAttempts");
+
                     b.Property<string>("VerificationCode");
 
                     b.HasKey("TextMessageId");

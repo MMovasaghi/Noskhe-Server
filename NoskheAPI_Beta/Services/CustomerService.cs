@@ -34,7 +34,7 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines();
         IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(int id);
         TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
-        bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
+        ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
         bool RequestSmsForForgetPassword();
         bool VerifySmsCodeForForgetPassword();
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
@@ -277,25 +277,20 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public bool LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings)
+        public ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings)
         {
+            // 24 hour - 3 maximum sms - 2 minutes in between same request
             try
             {
-                var response = db.Customers.Where(q => q.Phone == abp.Phone).FirstOrDefault();
-                if(response != null)
+                var existingCustomer = db.Customers.Where(q => q.Phone == abp.Phone).FirstOrDefault();
+                if(existingCustomer != null)
                 {
-                    db.TextMessages.Add(
-                        new TextMessage {
-                            Date = DateTime.Now,
-                            VerificationCode = "221312", // TODO: Rand generator
-                            Customer = response,
-                            HasBeenExpired = false
-                        }
-                    );
-                    db.SaveChanges();
-
-                    // satisfying result
-                    return true;
+                    db.Entry(existingCustomer).Reference(c => c.TextMessage).Load();
+                    var textMessage = existingCustomer.TextMessage;
+                    if(textMessage != null)
+                    {
+                        
+                    }
                 }
 
                 // un-satisfying result

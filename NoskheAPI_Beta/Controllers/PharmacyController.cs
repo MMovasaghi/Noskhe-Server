@@ -16,6 +16,7 @@ using NoskheAPI_Beta.Settings.Routing.Pharmacy;
 using Microsoft.IdentityModel.Tokens;
 using NoskheAPI_Beta.CustomExceptions.Pharmacy;
 using NoskheAPI_Beta.Settings.ResponseMessages.Pharmacy;
+using NoskheAPI_Beta.Models.Minimals.Input;
 
 namespace NoskheAPI_Beta.Controllers
 {
@@ -25,11 +26,13 @@ namespace NoskheAPI_Beta.Controllers
     public class PharmacyController : ControllerBase
     {
         private IHubContext<NotificationHub> _hubContext { get; set; }
+        private INotificationService _notificationService;
         private IPharmacyService _pharmacyService;
         private readonly AppSettings _appSettings;
-        public PharmacyController(IPharmacyService pharmacyService, IOptions<AppSettings> appSettings, IHubContext<NotificationHub> hubContext)
+        public PharmacyController(IPharmacyService pharmacyService, INotificationService notificationService, IOptions<AppSettings> appSettings, IHubContext<NotificationHub> hubContext)
         {
             _pharmacyService = pharmacyService;
+            _notificationService = notificationService;
             _appSettings = appSettings.Value;
             _hubContext = hubContext;
         }
@@ -458,12 +461,12 @@ namespace NoskheAPI_Beta.Controllers
         /////////////////////////////////////////////////////////////////////////////
         // GET: desktop-api/pharmacy/service-response
         [HttpGet(Labels.ServiceResponse)]
-        public ActionResult ServiceResponse(int shoppingCartId)
+        public ActionResult ServiceResponse(int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_pharmacyService.ServiceResponse(shoppingCartId));
+                return Ok(_pharmacyService.ServiceResponse(_notificationService, _hubContext, shoppingCartId, accepted, reason));
             }
             catch(DatabaseFailureException dfe)
             {
@@ -492,14 +495,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: desktop-api/pharmacy/invoice-details
-        [HttpGet(Labels.InvoiceDetails)]
-        public ActionResult InvoiceDetails(int shoppingCartId)
+        // POST: desktop-api/pharmacy/invoice-details
+        [HttpPost(Labels.InvoiceDetails)]
+        public ActionResult InvoiceDetails([FromBody] PrescriptionInvoice invoice)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_pharmacyService.InvoiceDetails(shoppingCartId));
+                return Ok(_pharmacyService.InvoiceDetails(_notificationService, _hubContext, HttpContext.Request.Host, invoice));
             }
             catch(DatabaseFailureException dfe)
             {

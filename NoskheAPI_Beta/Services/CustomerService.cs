@@ -45,9 +45,10 @@ namespace NoskheAPI_Beta.Services
         Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
-        ResponseTemplate WalletInquiry();
+        CreditTemplate WalletInquiry();
         ResponseTemplate PayTheOrder(int orderId);
         Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
+        Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
@@ -768,9 +769,12 @@ namespace NoskheAPI_Beta.Services
             throw new NotImplementedException();
         }
 
-        public ResponseTemplate WalletInquiry()
+        public CreditTemplate WalletInquiry()
         {
-            throw new NotImplementedException();
+            return new CreditTemplate {
+                Success = true,
+                Credit = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault().Money
+            };
         }
 
         public ResponseTemplate PayTheOrder(int orderId)
@@ -798,61 +802,14 @@ namespace NoskheAPI_Beta.Services
                     new ServiceMapping {
                         ShoppingCartId = shoppingCartId,
                         FoundPharmacies = foundPharmaciesString,
-                        PrimativePharmacyId = pharmaciesQueue.First().PharmacyId
+                        PrimativePharmacyId = pharmaciesQueue.First().PharmacyId,
+                        PharmacyServiceStatus = PharmacyServiceStatus.Pending
                     }
                 );
                 db.SaveChanges();
                 
-                var IDs = foundPharmaciesString.Trim(',');
                 // (2)
-                var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
-                db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
-                db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
-                db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
-                db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
-                    .Include(msc => msc.Medicine).Load();
-                db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
-                    .Include(msc => msc.Cosmetic).Load();
-                
-                var cosmetics = new List<Models.Minimals.Output.Cosmetic>();
-                foreach (var cosmetic in existingShoppingCart.CosmeticShoppingCarts)
-                {
-                    cosmetics.Add(new Models.Minimals.Output.Cosmetic {
-                        Name = cosmetic.Cosmetic.Name,
-                        Number = cosmetic.Quantity,
-                        Price = cosmetic.Cosmetic.Price,
-                        ProductPictureUrl = cosmetic.Cosmetic.ProductPictureUrl
-                    });
-                }
-                var medicines = new List<Models.Minimals.Output.Medicine>();
-                foreach (var medicine in existingShoppingCart.MedicineShoppingCarts)
-                {
-                    medicines.Add(new Models.Minimals.Output.Medicine {
-                        Name = medicine.Medicine.Name,
-                        Number = medicine.Quantity,
-                        Price = medicine.Medicine.Price,
-                        ProductPictureUrl = medicine.Medicine.ProductPictureUrl
-                    });
-                }
-                var picUrls = new List<string> { existingShoppingCart.Prescription.PictureUrl_1, existingShoppingCart.Prescription.PictureUrl_2, existingShoppingCart.Prescription.PictureUrl_3 };
-                
-                NoskheForFirstNotificationOnDesktop newItem = new NoskheForFirstNotificationOnDesktop
-                {
-                    Customer = new Models.Minimals.Output.Customer
-                    {
-                        FirstName = existingShoppingCart.Customer.FirstName,
-                        LastName = existingShoppingCart.Customer.LastName,
-                        Birthday = existingShoppingCart.Customer.Birthday,
-                        Email = existingShoppingCart.Customer.Email,
-                        Phone = existingShoppingCart.Customer.Phone,
-                        Gender = existingShoppingCart.Customer.Gender,
-                        ProfilePictureUrl = existingShoppingCart.Customer.ProfilePictureUrl
-                    },
-                    Cosmetics = cosmetics,
-                    Medicines = medicines,
-                    Picture_Urls = picUrls,
-                    Notation = existingShoppingCart.Notation
-                };
+                var newItem = PrepareObject(shoppingCartId);
                 await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
                 // (3)
                 return new ResponseTemplate {
@@ -863,7 +820,86 @@ namespace NoskheAPI_Beta.Services
             {
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new NotImplementedException();
+        }
+
+        public async Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var foundCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
+                string gender = foundCustomer.Gender == Models.Gender.Male ? "آقای" : "خانم";
+                string description = $"شارژ کیف پول کاربر {gender} {foundCustomer.FirstName} {foundCustomer.LastName} - اپلیکیشن نسخه";
+                ServicePointManager.Expect100Continue = false;
+                PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", credit, description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                string paymentUrl = "";
+                if (request.Body.Status == 100)
+                    paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
+                else
+                    throw new PaymentGatewayFailureException(ErrorCodes.PaymentGatewayFailureExceptionMsg);
+                return new AddCreditTemplate {
+                    Success = true,
+                    Url = paymentUrl
+                };
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public NoskheForFirstNotificationOnDesktop PrepareObject(int shoppingCartId)
+        {
+            var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
+            db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
+            db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
+            db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
+            db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
+                .Include(msc => msc.Medicine).Load();
+            db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
+                .Include(msc => msc.Cosmetic).Load();
+            
+            var cosmetics = new List<Models.Minimals.Output.Cosmetic>();
+            foreach (var cosmetic in existingShoppingCart.CosmeticShoppingCarts)
+            {
+                cosmetics.Add(new Models.Minimals.Output.Cosmetic {
+                    Name = cosmetic.Cosmetic.Name,
+                    Number = cosmetic.Quantity,
+                    Price = cosmetic.Cosmetic.Price,
+                    ProductPictureUrl = cosmetic.Cosmetic.ProductPictureUrl
+                });
+            }
+            var medicines = new List<Models.Minimals.Output.Medicine>();
+            foreach (var medicine in existingShoppingCart.MedicineShoppingCarts)
+            {
+                medicines.Add(new Models.Minimals.Output.Medicine {
+                    Name = medicine.Medicine.Name,
+                    Number = medicine.Quantity,
+                    Price = medicine.Medicine.Price,
+                    ProductPictureUrl = medicine.Medicine.ProductPictureUrl
+                });
+            }
+            var picUrls = new List<string> { existingShoppingCart.Prescription.PictureUrl_1, existingShoppingCart.Prescription.PictureUrl_2, existingShoppingCart.Prescription.PictureUrl_3 };
+            
+            NoskheForFirstNotificationOnDesktop newItem = new NoskheForFirstNotificationOnDesktop
+            {
+                Customer = new Models.Minimals.Output.Customer
+                {
+                    FirstName = existingShoppingCart.Customer.FirstName,
+                    LastName = existingShoppingCart.Customer.LastName,
+                    Birthday = existingShoppingCart.Customer.Birthday,
+                    Email = existingShoppingCart.Customer.Email,
+                    Phone = existingShoppingCart.Customer.Phone,
+                    Gender = existingShoppingCart.Customer.Gender,
+                    ProfilePictureUrl = existingShoppingCart.Customer.ProfilePictureUrl
+                },
+                Cosmetics = cosmetics,
+                Medicines = medicines,
+                Picture_Urls = picUrls,
+                Notation = existingShoppingCart.Notation
+            };
+            return newItem;
         }
 
         public void TokenValidationHandler()

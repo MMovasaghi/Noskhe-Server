@@ -553,43 +553,81 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // Signalr Based Methods
+        // GET: mobile-api/customer/add-credit
+        [HttpGet(Labels.AddCreditToWallet)]
+        public async Task<ActionResult<string>> AddCreditToWallet(int credit)
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(await _customerService.AddCreditToWallet(credit, HttpContext.Request.Host));
+            }
+            catch(NoOrdersMatchedByIdException nombie)
+            {
+                return BadRequest(new ResponseTemplate
+                {
+                    Success = false,
+                    Error = nombie.Message
+                });
+            }
+            catch(PaymentGatewayFailureException pgfe)
+            {
+                return BadRequest(new ResponseTemplate
+                {
+                    Success = false,
+                    Error = pgfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
 
-        // // GET: mobile-api/customer/wallet
-        // [HttpGet(Labels.WalletInquiry)]
-        // public ActionResult WalletInquiry()
-        // {
-        //     try
-        //     {
-        //         GrabTokenFromHeader();
-        //         return Ok(_customerService.WalletInquiry());
-        //     }
-        //     catch(DatabaseFailureException dfe)
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = dfe.Message
-        //         });
-        //     }
-        //     catch(UnauthorizedAccessException)
-        //     {
-        //         return Unauthorized();
-        //     }
-        //     catch(SecurityTokenExpiredException stee)
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = stee.Message
-        //         });
-        //     }
-        //     catch
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = ErrorCodes.APIUnhandledExceptionMsg
-        //         });
-        //     }
-        // }
+        // GET: mobile-api/customer/wallet
+        [HttpGet(Labels.WalletInquiry)]
+        public ActionResult WalletInquiry()
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_customerService.WalletInquiry());
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        // Signalr Based Methods
 
         // // GET: mobile-api/customer/pay
         // [HttpGet(Labels.PayTheOrder)]

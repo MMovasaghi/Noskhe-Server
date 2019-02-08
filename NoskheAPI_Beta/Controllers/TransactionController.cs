@@ -20,8 +20,8 @@ namespace NoskheAPI_Beta.Controllers
                 {
                     ServicePointManager.Expect100Continue = false;
                     PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                    var request = await zp.PaymentVerificationAsync("9c82812c-08c8-11e8-ad5e-005056a205be", Authority, 100);
-                    if (request.Body.Status == 100)
+                    var request = await zp.PaymentVerificationAsync("9c82812c-08c8-11e8-ad5e-005056a205be", Authority, 100); // BUG: amount of money is not defined
+                    if (request.Body.Status == 100) // TODO: if money is paid correctly, then add to customer's wallet
                     {
                         ViewBag.IsSuccess = true;
                         ViewBag.RefID = request.Body.RefID;

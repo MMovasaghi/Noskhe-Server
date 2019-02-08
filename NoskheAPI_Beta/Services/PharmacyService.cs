@@ -2,16 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NoskheAPI_Beta.Classes;
+using NoskheAPI_Beta.Classes.Communication;
 using NoskheAPI_Beta.CustomExceptions.Pharmacy;
+using NoskheAPI_Beta.Models.Minimals.Input;
 using NoskheAPI_Beta.Models.Minimals.Output;
 using NoskheAPI_Beta.Models.Response;
 using NoskheAPI_Beta.Settings.ResponseMessages.Pharmacy;
 using NoskheBackend_Beta.General;
+using ZarinPalGateway;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -32,8 +39,8 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<float> AverageTimeOfPackingInThisWeek();
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetPharmacyId();
-        ResponseTemplate ServiceResponse(int shoppingCartId);
-        ResponseTemplate InvoiceDetails(int shoppingCartId);
+        Task<ResponseTemplate> ServiceResponse(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason);
+        Task<ResponseTemplate> InvoiceDetails(INotificationService notificationService, IHubContext<NotificationHub> hubContext, HostString hostIp, PrescriptionInvoice invoice);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class PharmacyService : IPharmacyService
@@ -404,7 +411,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public IEnumerable<Settle> GetSettles()
+        public IEnumerable<Models.Minimals.Output.Settle> GetSettles()
         {
             try
             {
@@ -727,43 +734,140 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public ResponseTemplate ServiceResponse(int shoppingCartId)
+        public async Task<ResponseTemplate> ServiceResponse(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason)
         {
             // (1) change status to first step accepted
             // (2) signalr to customer for first step was successful
-
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                // var existingServiceMapping = db.ServiceMappings.Where(s => (s.ShoppingCartId == shoppingCartId && s.FoundPharmaciesIds[s.PrimativePharmacyIndex] == GetPharmacyId())).FirstOrDefault();
-                // if(existingServiceMapping == null) {}
-                
-
+                var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == shoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
+                if(existingServiceMapping == null) {
+                    throw new UnauthorizedAccessException();
+                }
+                switch (accepted)
+                {
+                    // (1)
+                    case true:
+                        existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.FirstStepAcceptance;
+                        Models.Order newOrder = new Models.Order {
+                            ShoppingCartId = shoppingCartId,
+                            Courier = null, // TODO: a function to choose what to do
+                            HasBeenAcceptedByCustomer = false,
+                            PharmacyId = GetPharmacyId(),
+                            UOI = "someShit", // TODO
+                            Date = DateTime.Now
+                        };
+                        db.Orders.Add(newOrder);
+                        break;
+                    case false:
+                        // TODO: sabt dar yek table marbut be kanceli ha (using => Models.PharmacyCancellationReason reason)
+                        // existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Rejected;
+                        // existingServiceMapping.PharmacyCancellationDate = DateTime.Now;
+                        // existingServiceMapping.PharmacyCancellationReason = reason;
+                        var index = existingServiceMapping.FoundPharmacies.Split(',').ToList().FindIndex(x => x == GetPharmacyId().ToString());
+                        existingServiceMapping.PrimativePharmacyId = int.Parse(existingServiceMapping.FoundPharmacies.Split(',')[index + 1]);
+                        existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Pending;
+                        // (2)
+                        CustomerService customerService = new CustomerService();
+                        var newItem = customerService.PrepareObject(shoppingCartId);
+                        await notificationService.P_PharmacyReception(hubContext, existingServiceMapping.PrimativePharmacyId, newItem);
+                        break;
+                }
+                db.SaveChanges();
+                return new ResponseTemplate {
+                    Success = true
+                };
             }
             catch(DbUpdateException)
             {
-                
-                throw;
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new NotImplementedException();
         }
 
-        public ResponseTemplate InvoiceDetails(int shoppingCartId)
+        public async Task<ResponseTemplate> InvoiceDetails(INotificationService notificationService, IHubContext<NotificationHub> hubContext, HostString hostIp, PrescriptionInvoice invoice)
         {
-            // (1) add new order and calculate costs
+            // (1) calculate costs
             // (2) sms
             // (3) signalr invoice to customer the diffrence with wallet and say accepted
 
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingOrder = db.Orders.Where(o => o.ShoppingCartId == invoice.ShoppingCartId).FirstOrDefault();
+                var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == invoice.ShoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
+                if(existingServiceMapping == null) {
+                    throw new UnauthorizedAccessException();
+                }
+                db.Entry(existingOrder).Reference(o => o.ShoppingCart).Query()
+                    .Include(s => s.Prescription)
+                    .Include(s => s.Customer)
+                    .Include(s => s.MedicineShoppingCarts)
+                        .ThenInclude(m => m.Medicine)
+                    .Include(s => s.CosmeticShoppingCarts)
+                        .ThenInclude(m => m.Cosmetic)
+                    .Load();
+                
+                foreach (var prescriptionItem in invoice.PrescriptionItems)
+                {
+                    prescriptionItem.PrescriptionId = existingOrder.ShoppingCart.Prescription.PrescriptionId;
+                    db.PrescriptionItems.Add(prescriptionItem);
+                }
+                existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.SecondStepAcceptance;
+                db.SaveChanges();
+                // (1)
+                decimal totalPriceWithoutShippingCost = 0;
+                if(existingOrder.ShoppingCart.MedicineShoppingCarts != null)
+                {
+                    foreach (var medicine in existingOrder.ShoppingCart.MedicineShoppingCarts)
+                    {
+                        totalPriceWithoutShippingCost += (medicine.Medicine.Price * medicine.Quantity);
+                    }
+                }
+                if(existingOrder.ShoppingCart.CosmeticShoppingCarts != null)
+                {
+                    foreach (var cosmetic in existingOrder.ShoppingCart.CosmeticShoppingCarts)
+                    {
+                        totalPriceWithoutShippingCost += (cosmetic.Cosmetic.Price * cosmetic.Quantity);
+                    }
+                }
+                if(invoice.PrescriptionItems != null)
+                {
+                    foreach (var prescriptionItem in invoice.PrescriptionItems)
+                    {
+                        totalPriceWithoutShippingCost += (prescriptionItem.Price * prescriptionItem.Quantity);
+                    }
+                }
+                existingOrder.Price = totalPriceWithoutShippingCost + 1000; // TODO: mohasebeye hazine safar bar asase fasele
+                db.SaveChanges();
+                // (2)
+                // (3)
+                string gender = existingOrder.ShoppingCart.Customer.Gender == Models.Gender.Male ? "آقای" : "خانم";
+                string description = $"پرداخت باقیمانده هزینه سفارش به کد {existingOrder.UOI} به نام {gender} {existingOrder.ShoppingCart.Customer.FirstName} {existingOrder.ShoppingCart.Customer.LastName} - اپلیکیشن نسخه";
+                ServicePointManager.Expect100Continue = false;
+                PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(Math.Abs(existingOrder.Price - GetCurrentWalletCredit(existingOrder.ShoppingCart.CustomerId))), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                string paymentUrl = "";
+                if (request.Body.Status == 100)
+                    paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
+                else
+                    throw new PaymentGatewayFailureException(ErrorCodes.PaymentGatewayFailureExceptionMsg);
+
+                
+                await notificationService.C_InvoiceDetails(hubContext, existingOrder.ShoppingCart.CustomerId, totalPriceWithoutShippingCost, 1000, paymentUrl); // TODO: mohasebeye hazine safar bar asase fasele
+                return new ResponseTemplate {
+                    Success = true
+                };
             }
             catch(DbUpdateException)
             {
-                
-                throw;
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
-            throw new NotImplementedException();
+        }
+
+        public decimal GetCurrentWalletCredit(int customerId)
+        {
+            return db.Customers.Where(c => c.CustomerId == customerId).FirstOrDefault().Money;
         }
 
         public void TokenValidationHandler()

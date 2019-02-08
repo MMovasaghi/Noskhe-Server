@@ -11,9 +11,9 @@ namespace NoskheAPI_Beta.Services
         // Pharmacy SignalR
         Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, NoskheForFirstNotificationOnDesktop prescriptionDetails);   
         // Customer SignalR
-        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized);
-        Task C_PaymentDetail(IHubContext<NotificationHub> hubContext, int customerId);
-        Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone);
+        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized); // for real time process
+        Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);
+        Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone); // not needed now
     }
     class NotificationService : INotificationService
     {
@@ -39,9 +39,9 @@ namespace NoskheAPI_Beta.Services
             throw new System.NotImplementedException();
         }
 
-        public Task C_PaymentDetail(IHubContext<NotificationHub> hubContext, int customerId)
+        public async Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl)
         {
-            throw new System.NotImplementedException();
+            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("InvoiceDetails", priceWithoutShippingCost, shippingCost, paymentUrl);
         }
 
         public Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone)

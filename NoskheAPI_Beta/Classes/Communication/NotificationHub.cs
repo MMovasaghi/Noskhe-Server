@@ -25,7 +25,7 @@ namespace NoskheAPI_Beta.Classes.Communication
         }
 
         // Pharmacy SignalR
-        public async Task P_PharmacyReception(int pharmacyId, object prescriptionDetails)
+        public async Task P_PharmacyReception(int pharmacyId, NoskheForFirstNotificationOnDesktop prescriptionDetails)
         {
             // Joziyate kholase noskhe va moshtari baraye darukhane ersal mishavad
             string name = Context.User.Identity.Name;
@@ -33,16 +33,21 @@ namespace NoskheAPI_Beta.Classes.Communication
         }
 
         // Customer SignalR
-        public async Task C_PharmacyInquiry(int customerId, string pharmacyName, bool finalized)
+        public async Task C_PharmacyInquiry(int customerId, string pharmacyName, string courierName, string phone, bool finalized)
         {
             // Ersale darukhane dar halate estelam be client (movaghati ya ghat'ii)
             string name = Context.User.Identity.Name;
-            await Clients.Group(name).SendAsync("PharmacyInquiry", pharmacyName, finalized);
+            await Clients.Group(name).SendAsync("PharmacyInquiry", pharmacyName, courierName, phone, finalized);
         }
         public async Task C_PaymentDetail(int customerId)
         {
             string name = Context.User.Identity.Name;
             await Clients.Group(name).SendAsync("PaymentDetail", "url");
+        }
+        public async Task C_CourierDetail(int customerId, string courierName, string phone)
+        {
+            string name = Context.User.Identity.Name;
+            await Clients.Group(name).SendAsync("PaymentDetail", "url", courierName, phone);
         }
     }
 }

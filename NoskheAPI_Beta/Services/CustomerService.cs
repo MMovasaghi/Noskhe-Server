@@ -789,7 +789,7 @@ namespace NoskheAPI_Beta.Services
                 List<Models.Pharmacy> s = new List<Models.Pharmacy>();
                 foreach(var pharmacy in pharmaciesQueue)
                 {
-                    foundPharmaciesTemplate.Add(new FoundPharmaciesTemplate { PharmacyId = pharmacy.PharmacyId, Name = pharmacy.Name });
+                    // foundPharmaciesTemplate.Add(new FoundPharmaciesTemplate { PharmacyId = pharmacy.PharmacyId, Name = pharmacy.Name }); TODO: REMOVE, JUST RESPONSE OF TRUE OR FALSE
                     s.Add(new Models.Pharmacy { PharmacyId = pharmacy.PharmacyId });
                 }
 

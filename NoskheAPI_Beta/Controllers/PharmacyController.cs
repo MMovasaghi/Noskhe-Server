@@ -216,7 +216,7 @@ namespace NoskheAPI_Beta.Controllers
 
         // GET: desktop-api/pharmacy/settles
         [HttpGet(Labels.GetSettles)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Settle>> GetSettles(string upi, string start="start-undifiend", string end="end-undifiend")
+        public ActionResult<IEnumerable<Models.Minimals.Output.Settle>> GetSettles(string start="start-undifiend", string end="end-undifiend")
         {
             try
             {

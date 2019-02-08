@@ -89,6 +89,7 @@ namespace NoskheAPI_Beta
             services.AddScoped<IManagementService, ManagementService>();
             services.AddScoped<IPharmacyService, PharmacyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

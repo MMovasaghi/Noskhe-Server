@@ -9,7 +9,7 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20190205205500_InitialCreation1")]
+    [Migration("20190208131029_InitialCreation1")]
     partial class InitialCreation1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,6 +140,25 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotificationMap", b =>
+                {
+                    b.Property<int>("CustomerNotificationMapId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Connected");
+
+                    b.Property<string>("ConnectionID");
+
+                    b.Property<int>("CustomerId");
+
+                    b.HasKey("CustomerNotificationMapId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("CustomerNotificationMap");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerToken", b =>
@@ -368,17 +387,32 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<DateTime>("RegisterationDate");
 
-                    b.Property<int?>("ServiceMappingId");
-
                     b.Property<string>("UPI");
 
                     b.HasKey("PharmacyId");
 
                     b.HasIndex("ManagerId");
 
-                    b.HasIndex("ServiceMappingId");
-
                     b.ToTable("Pharmacies");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotificationMap", b =>
+                {
+                    b.Property<int>("PharmacyNotificationMapId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Connected");
+
+                    b.Property<string>("ConnectionID");
+
+                    b.Property<int>("PharmacyId");
+
+                    b.HasKey("PharmacyNotificationMapId");
+
+                    b.HasIndex("PharmacyId")
+                        .IsUnique();
+
+                    b.ToTable("PharmacyNotificationMap");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>
@@ -487,13 +521,15 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<int>("CustomerCancellationReason");
 
+                    b.Property<string>("FoundPharmacies");
+
                     b.Property<DateTime>("PharmacyCancellationDate");
 
                     b.Property<int>("PharmacyCancellationReason");
 
                     b.Property<int>("PharmacyServiceStatus");
 
-                    b.Property<int>("PrimativePharmacyIndex");
+                    b.Property<int>("PrimativePharmacyId");
 
                     b.Property<int>("ShoppingCartId");
 
@@ -566,7 +602,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<DateTime>("Date");
 
-                    b.Property<bool>("HasBeenExpired");
+                    b.Property<bool>("HasBeenLocked");
 
                     b.Property<int>("NumberOfAttempts");
 
@@ -598,6 +634,14 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasOne("NoskheAPI_Beta.Models.ShoppingCart", "ShoppingCart")
                         .WithMany("CosmeticShoppingCarts")
                         .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotificationMap", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithOne("CustomerNotificationMap")
+                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerNotificationMap", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -662,10 +706,14 @@ namespace NoskheAPI_Beta.Migrations
                         .WithMany("Pharmacies")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
 
-                    b.HasOne("NoskheAPI_Beta.Models.ServiceMapping")
-                        .WithMany("FoundPharmacies")
-                        .HasForeignKey("ServiceMappingId");
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotificationMap", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
+                        .WithOne("PharmacyNotificationMap")
+                        .HasForeignKey("NoskheAPI_Beta.Models.PharmacyNotificationMap", "PharmacyId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>

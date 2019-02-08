@@ -7,8 +7,8 @@ namespace NoskheAPI_Beta.Models
     public class ServiceMapping
     {
         public int ServiceMappingId { get; set; }
-        public List<Pharmacy> FoundPharmacies { get; set; }
-        public int PrimativePharmacyIndex { get; set; } // for ease-of-use
+        public string FoundPharmacies { get; set; }
+        public int PrimativePharmacyId { get; set; } // for ease-of-use
         
         public PharmacyServiceStatus PharmacyServiceStatus { get; set; }
         public PharmacyCancellationReason PharmacyCancellationReason { get; set; }

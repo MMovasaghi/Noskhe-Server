@@ -31,5 +31,6 @@ namespace NoskheAPI_Beta.Models
         public Score Score { get; set; }
         public List<Settle> Settles { get; set; }
         public PharmacyToken PharmacyToken { get; set; }
+        public PharmacyNotificationMap PharmacyNotificationMap { get; set; }
     }
 }

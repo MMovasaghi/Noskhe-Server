@@ -19,6 +19,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NoskheAPI_Beta.Settings.ResponseMessages.Customer;
 using NoskheAPI_Beta.Settings.Routing.Customer;
+using Microsoft.AspNetCore.SignalR;
+using NoskheAPI_Beta.Classes.Communication;
 
 namespace NoskheAPI_Beta.Controllers
 {
@@ -30,11 +32,15 @@ namespace NoskheAPI_Beta.Controllers
     public class CustomerController : ControllerBase
     {
         private ICustomerService _customerService;
+        private INotificationService _notificationService;
         private readonly AppSettings _appSettings;
-        public CustomerController(ICustomerService customerService, IOptions<AppSettings> appSettings)
+        private IHubContext<NotificationHub> _hubContext { get; set; }
+        public CustomerController(ICustomerService customerService, INotificationService notificationService, IOptions<AppSettings> appSettings, IHubContext<NotificationHub> hubContext)
         {
             _customerService = customerService;
+            _notificationService = notificationService;
             _appSettings = appSettings.Value;
+            _hubContext = hubContext;
         }
         // GET: mobile-api/customer/profile
         [HttpGet(Labels.GetProfileInformation)]
@@ -629,7 +635,7 @@ namespace NoskheAPI_Beta.Controllers
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.RequestService(shoppingCartId));
+                return Ok(_customerService.RequestService(_notificationService, _hubContext, shoppingCartId));
             }
             catch(DatabaseFailureException dfe)
             {

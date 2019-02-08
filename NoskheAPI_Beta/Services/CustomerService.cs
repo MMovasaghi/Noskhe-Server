@@ -19,6 +19,8 @@ using NoskheBackend_Beta.Encryption;
 using ZarinPalGateway;
 using NoskheAPI_Beta.Settings.ResponseMessages.Customer;
 using GeoCoordinatePortable;
+using Microsoft.AspNetCore.SignalR;
+using NoskheAPI_Beta.Classes.Communication;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -45,7 +47,7 @@ namespace NoskheAPI_Beta.Services
         int GetCustomerId();
         ResponseTemplate WalletInquiry();
         ResponseTemplate PayTheOrder(int orderId);
-        IEnumerable<FoundPharmaciesTemplate> RequestService(int shoppingCartId);
+        Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
@@ -101,7 +103,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         Subject = new ClaimsIdentity(new Claim[] 
                         {
-                            new Claim(ClaimTypes.Name, newUser.CustomerId.ToString())
+                            new Claim(ClaimTypes.Name, "C"+newUser.CustomerId.ToString())
                         }),
                         Expires = DateTime.UtcNow.AddDays(1),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -246,7 +248,7 @@ namespace NoskheAPI_Beta.Services
                             {
                                 Subject = new ClaimsIdentity(new Claim[] 
                                 {
-                                    new Claim(ClaimTypes.Name, existingCustomer.CustomerId.ToString())
+                                    new Claim(ClaimTypes.Name, "C"+existingCustomer.CustomerId.ToString())
                                 }),
                                 Expires = DateTime.UtcNow.AddDays(1),
                                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -745,9 +747,10 @@ namespace NoskheAPI_Beta.Services
                 //     if(sorted[i].Distance > 10)
                 //         sorted.RemoveAt(i);
                 // }
-                sorted.RemoveAll(item => item.Distance > 10);
+
+                // sorted.RemoveAll(item => item.Distance > 100000); // TODO: tehran values for appropriate measurements
                 
-                var trustedPharmacy = db.Pharmacies.Where(p => p.Name == "shafa").FirstOrDefault(); // todo: whatif it was null :||
+                var trustedPharmacy = db.Pharmacies.Where(p => p.Name == "PharmacyN_1").FirstOrDefault(); // todo: whatif it was null :||
                 sorted.Add(new DistanceObj { PharmacyId = trustedPharmacy.PharmacyId, Distance = shLoc.GetDistanceTo(new GeoCoordinate(trustedPharmacy.AddressLatitude, trustedPharmacy.AddressLongitude)) });
                 
                 if(sorted.Count > 9)
@@ -775,7 +778,7 @@ namespace NoskheAPI_Beta.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<FoundPharmaciesTemplate> RequestService(int shoppingCartId)
+        public async Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId)
         {
             // (1) pharmaciesnearme
             // (2) signalr to first pharmacy
@@ -785,25 +788,76 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 // (1)
                 var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
-                List<FoundPharmaciesTemplate> foundPharmaciesTemplate = new List<FoundPharmaciesTemplate>();
-                List<Models.Pharmacy> s = new List<Models.Pharmacy>();
-                foreach(var pharmacy in pharmaciesQueue)
+                string foundPharmaciesString = "";
+                foreach (var pharmacy in pharmaciesQueue)
                 {
-                    // foundPharmaciesTemplate.Add(new FoundPharmaciesTemplate { PharmacyId = pharmacy.PharmacyId, Name = pharmacy.Name }); TODO: REMOVE, JUST RESPONSE OF TRUE OR FALSE
-                    s.Add(new Models.Pharmacy { PharmacyId = pharmacy.PharmacyId });
+                    foundPharmaciesString += (pharmacy.PharmacyId + ",");
                 }
 
                 db.ServiceMappings.Add(
                     new ServiceMapping {
                         ShoppingCartId = shoppingCartId,
-                        FoundPharmacies = s,
-                        PrimativePharmacyIndex = 1
+                        FoundPharmacies = foundPharmaciesString,
+                        PrimativePharmacyId = pharmaciesQueue.First().PharmacyId
                     }
                 );
                 db.SaveChanges();
+                
+                var IDs = foundPharmaciesString.Trim(',');
                 // (2)
+                var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
+                db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
+                db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
+                db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
+                db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
+                    .Include(msc => msc.Medicine).Load();
+                db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
+                    .Include(msc => msc.Cosmetic).Load();
+                
+                var cosmetics = new List<Models.Minimals.Output.Cosmetic>();
+                foreach (var cosmetic in existingShoppingCart.CosmeticShoppingCarts)
+                {
+                    cosmetics.Add(new Models.Minimals.Output.Cosmetic {
+                        Name = cosmetic.Cosmetic.Name,
+                        Number = cosmetic.Quantity,
+                        Price = cosmetic.Cosmetic.Price,
+                        ProductPictureUrl = cosmetic.Cosmetic.ProductPictureUrl
+                    });
+                }
+                var medicines = new List<Models.Minimals.Output.Medicine>();
+                foreach (var medicine in existingShoppingCart.MedicineShoppingCarts)
+                {
+                    medicines.Add(new Models.Minimals.Output.Medicine {
+                        Name = medicine.Medicine.Name,
+                        Number = medicine.Quantity,
+                        Price = medicine.Medicine.Price,
+                        ProductPictureUrl = medicine.Medicine.ProductPictureUrl
+                    });
+                }
+                var picUrls = new List<string> { existingShoppingCart.Prescription.PictureUrl_1, existingShoppingCart.Prescription.PictureUrl_2, existingShoppingCart.Prescription.PictureUrl_3 };
+                
+                NoskheForFirstNotificationOnDesktop newItem = new NoskheForFirstNotificationOnDesktop
+                {
+                    Customer = new Models.Minimals.Output.Customer
+                    {
+                        FirstName = existingShoppingCart.Customer.FirstName,
+                        LastName = existingShoppingCart.Customer.LastName,
+                        Birthday = existingShoppingCart.Customer.Birthday,
+                        Email = existingShoppingCart.Customer.Email,
+                        Phone = existingShoppingCart.Customer.Phone,
+                        Gender = existingShoppingCart.Customer.Gender,
+                        ProfilePictureUrl = existingShoppingCart.Customer.ProfilePictureUrl
+                    },
+                    Cosmetics = cosmetics,
+                    Medicines = medicines,
+                    Picture_Urls = picUrls,
+                    Notation = existingShoppingCart.Notation
+                };
+                await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
                 // (3)
-                return foundPharmaciesTemplate;
+                return new ResponseTemplate {
+                    Success = true
+                };
             }
             catch(DbUpdateException)
             {

@@ -112,6 +112,27 @@ namespace NoskheAPI_Beta.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerNotificationMap",
+                columns: table => new
+                {
+                    CustomerNotificationMapId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ConnectionID = table.Column<string>(nullable: true),
+                    Connected = table.Column<bool>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerNotificationMap", x => x.CustomerNotificationMapId);
+                    table.ForeignKey(
+                        name: "FK_CustomerNotificationMap_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CustomerTokens",
                 columns: table => new
                 {
@@ -170,7 +191,7 @@ namespace NoskheAPI_Beta.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<DateTime>(nullable: false),
                     VerificationCode = table.Column<string>(nullable: true),
-                    HasBeenExpired = table.Column<bool>(nullable: false),
+                    HasBeenLocked = table.Column<bool>(nullable: false),
                     NumberOfAttempts = table.Column<int>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false)
                 },
@@ -182,6 +203,39 @@ namespace NoskheAPI_Beta.Migrations
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pharmacies",
+                columns: table => new
+                {
+                    PharmacyId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(nullable: true),
+                    UPI = table.Column<string>(nullable: true),
+                    RegisterationDate = table.Column<DateTime>(nullable: false),
+                    Email = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true),
+                    Phone = table.Column<string>(nullable: true),
+                    ProfilePictureUrl = table.Column<string>(nullable: true),
+                    ProfilePictureUploadDate = table.Column<DateTime>(nullable: false),
+                    AddressLongitude = table.Column<double>(nullable: false),
+                    AddressLatitude = table.Column<double>(nullable: false),
+                    Address = table.Column<string>(nullable: true),
+                    IsAvailableNow = table.Column<bool>(nullable: false),
+                    Credit = table.Column<decimal>(nullable: false),
+                    PendingRequests = table.Column<uint>(nullable: false),
+                    ManagerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pharmacies", x => x.PharmacyId);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_Managers_ManagerId",
+                        column: x => x.ManagerId,
+                        principalTable: "Managers",
+                        principalColumn: "ManagerId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -288,7 +342,8 @@ namespace NoskheAPI_Beta.Migrations
                 {
                     ServiceMappingId = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    PrimativePharmacyIndex = table.Column<int>(nullable: false),
+                    FoundPharmacies = table.Column<string>(nullable: true),
+                    PrimativePharmacyId = table.Column<int>(nullable: false),
                     PharmacyServiceStatus = table.Column<int>(nullable: false),
                     PharmacyCancellationReason = table.Column<int>(nullable: false),
                     PharmacyCancellationDate = table.Column<DateTime>(nullable: false),
@@ -306,68 +361,6 @@ namespace NoskheAPI_Beta.Migrations
                         principalTable: "ShoppingCarts",
                         principalColumn: "ShoppingCartId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PrescriptionItems",
-                columns: table => new
-                {
-                    PrescriptionItemId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: true),
-                    Price = table.Column<decimal>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    PrescriptionId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PrescriptionItems", x => x.PrescriptionItemId);
-                    table.ForeignKey(
-                        name: "FK_PrescriptionItems_Prescriptions_PrescriptionId",
-                        column: x => x.PrescriptionId,
-                        principalTable: "Prescriptions",
-                        principalColumn: "PrescriptionId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pharmacies",
-                columns: table => new
-                {
-                    PharmacyId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: true),
-                    UPI = table.Column<string>(nullable: true),
-                    RegisterationDate = table.Column<DateTime>(nullable: false),
-                    Email = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true),
-                    Phone = table.Column<string>(nullable: true),
-                    ProfilePictureUrl = table.Column<string>(nullable: true),
-                    ProfilePictureUploadDate = table.Column<DateTime>(nullable: false),
-                    AddressLongitude = table.Column<double>(nullable: false),
-                    AddressLatitude = table.Column<double>(nullable: false),
-                    Address = table.Column<string>(nullable: true),
-                    IsAvailableNow = table.Column<bool>(nullable: false),
-                    Credit = table.Column<decimal>(nullable: false),
-                    PendingRequests = table.Column<uint>(nullable: false),
-                    ManagerId = table.Column<int>(nullable: false),
-                    ServiceMappingId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pharmacies", x => x.PharmacyId);
-                    table.ForeignKey(
-                        name: "FK_Pharmacies_Managers_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "Managers",
-                        principalColumn: "ManagerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Pharmacies_ServiceMappings_ServiceMappingId",
-                        column: x => x.ServiceMappingId,
-                        principalTable: "ServiceMappings",
-                        principalColumn: "ServiceMappingId",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -434,6 +427,27 @@ namespace NoskheAPI_Beta.Migrations
                         column: x => x.ShoppingCartId,
                         principalTable: "ShoppingCarts",
                         principalColumn: "ShoppingCartId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PharmacyNotificationMap",
+                columns: table => new
+                {
+                    PharmacyNotificationMapId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ConnectionID = table.Column<string>(nullable: true),
+                    Connected = table.Column<bool>(nullable: false),
+                    PharmacyId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PharmacyNotificationMap", x => x.PharmacyNotificationMapId);
+                    table.ForeignKey(
+                        name: "FK_PharmacyNotificationMap_Pharmacies_PharmacyId",
+                        column: x => x.PharmacyId,
+                        principalTable: "Pharmacies",
+                        principalColumn: "PharmacyId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -511,6 +525,28 @@ namespace NoskheAPI_Beta.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PrescriptionItems",
+                columns: table => new
+                {
+                    PrescriptionItemId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(nullable: true),
+                    Price = table.Column<decimal>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false),
+                    PrescriptionId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrescriptionItems", x => x.PrescriptionItemId);
+                    table.ForeignKey(
+                        name: "FK_PrescriptionItems_Prescriptions_PrescriptionId",
+                        column: x => x.PrescriptionId,
+                        principalTable: "Prescriptions",
+                        principalColumn: "PrescriptionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Occurrences",
                 columns: table => new
                 {
@@ -546,6 +582,12 @@ namespace NoskheAPI_Beta.Migrations
                 name: "IX_CosmeticShoppingCarts_ShoppingCartId",
                 table: "CosmeticShoppingCarts",
                 column: "ShoppingCartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerNotificationMap_CustomerId",
+                table: "CustomerNotificationMap",
+                column: "CustomerId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerTokens_CustomerId",
@@ -592,9 +634,10 @@ namespace NoskheAPI_Beta.Migrations
                 column: "ManagerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pharmacies_ServiceMappingId",
-                table: "Pharmacies",
-                column: "ServiceMappingId");
+                name: "IX_PharmacyNotificationMap_PharmacyId",
+                table: "PharmacyNotificationMap",
+                column: "PharmacyId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PharmacyTokens_PharmacyId",
@@ -651,6 +694,9 @@ namespace NoskheAPI_Beta.Migrations
                 name: "CosmeticShoppingCarts");
 
             migrationBuilder.DropTable(
+                name: "CustomerNotificationMap");
+
+            migrationBuilder.DropTable(
                 name: "CustomerTokens");
 
             migrationBuilder.DropTable(
@@ -663,6 +709,9 @@ namespace NoskheAPI_Beta.Migrations
                 name: "Occurrences");
 
             migrationBuilder.DropTable(
+                name: "PharmacyNotificationMap");
+
+            migrationBuilder.DropTable(
                 name: "PharmacyTokens");
 
             migrationBuilder.DropTable(
@@ -670,6 +719,9 @@ namespace NoskheAPI_Beta.Migrations
 
             migrationBuilder.DropTable(
                 name: "Scores");
+
+            migrationBuilder.DropTable(
+                name: "ServiceMappings");
 
             migrationBuilder.DropTable(
                 name: "Settles");
@@ -696,13 +748,10 @@ namespace NoskheAPI_Beta.Migrations
                 name: "Pharmacies");
 
             migrationBuilder.DropTable(
-                name: "Managers");
-
-            migrationBuilder.DropTable(
-                name: "ServiceMappings");
-
-            migrationBuilder.DropTable(
                 name: "ShoppingCarts");
+
+            migrationBuilder.DropTable(
+                name: "Managers");
 
             migrationBuilder.DropTable(
                 name: "Customers");

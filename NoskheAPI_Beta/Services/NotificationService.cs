@@ -31,7 +31,6 @@ namespace NoskheAPI_Beta.Services
         public async Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, NoskheForFirstNotificationOnDesktop prescriptionDetails)
         {
             await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("PharmacyReception", prescriptionDetails);
-            // await
         }
 
         public Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized)

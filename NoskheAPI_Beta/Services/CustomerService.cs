@@ -791,27 +791,27 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 // (1)
-                // var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
-                // string foundPharmaciesString = "";
-                // foreach (var pharmacy in pharmaciesQueue)
-                // {
-                //     foundPharmaciesString += (pharmacy.PharmacyId + ",");
-                // }
+                var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
+                string foundPharmaciesString = "";
+                foreach (var pharmacy in pharmaciesQueue)
+                {
+                    foundPharmaciesString += (pharmacy.PharmacyId + ",");
+                }
 
-                // db.ServiceMappings.Add(
-                //     new ServiceMapping {
-                //         ShoppingCartId = shoppingCartId,
-                //         FoundPharmacies = foundPharmaciesString,
-                //         PrimativePharmacyId = pharmaciesQueue.First().PharmacyId,
-                //         PharmacyServiceStatus = PharmacyServiceStatus.Pending
-                //     }
-                // );
-                // db.SaveChanges();
+                db.ServiceMappings.Add(
+                    new ServiceMapping {
+                        ShoppingCartId = shoppingCartId,
+                        FoundPharmacies = foundPharmaciesString,
+                        PrimativePharmacyId = pharmaciesQueue.First().PharmacyId,
+                        PharmacyServiceStatus = PharmacyServiceStatus.Pending
+                    }
+                );
+                db.SaveChanges();
                 
                 // (2)
-                // var newItem = PrepareObject(shoppingCartId);
-                // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
-                await notificationService.P_PharmacyReception(hubContext, 3, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2" } });
+                var newItem = PrepareObject(shoppingCartId);
+                await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
+                // await notificationService.P_PharmacyReception(hubContext, 3, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2" } });
                 // (3)
                 return new ResponseTemplate {
                     Success = true

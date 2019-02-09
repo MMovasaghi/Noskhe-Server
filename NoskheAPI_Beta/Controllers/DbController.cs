@@ -168,7 +168,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 28.21,
                             AddressLatitude = 28.29,
                             Address = "PharmacyA_1",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@1.com").FirstOrDefault(),
                             Credit = 23.57M
                         },
@@ -184,7 +184,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 27.21,
                             AddressLatitude = 27.29,
                             Address = "PharmacyA_2",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@2.com").FirstOrDefault(),
                             Credit = 21.57M
                         },
@@ -200,7 +200,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 26.21,
                             AddressLatitude = 26.29,
                             Address = "PharmacyA_3",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@3.com").FirstOrDefault(),
                             Credit = 22.57M
                         },
@@ -216,7 +216,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 28.21,
                             AddressLatitude = 28.29,
                             Address = "PharmacyA_4",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@1.com").FirstOrDefault(),
                             Credit = 25.57M
                         },
@@ -232,7 +232,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 27.21,
                             AddressLatitude = 27.29,
                             Address = "PharmacyA_5",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@2.com").FirstOrDefault(),
                             Credit = 26.57M
                         },
@@ -248,7 +248,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLongitude = 26.21,
                             AddressLatitude = 26.29,
                             Address = "PharmacyA_6",
-                            IsAvailableNow = true,
+                            IsAvailableNow = false,
                             Manager = db.Managers.Where(s => s.Email == "ManagerE@3.com").FirstOrDefault(),
                             Credit = 28.57M
                         }

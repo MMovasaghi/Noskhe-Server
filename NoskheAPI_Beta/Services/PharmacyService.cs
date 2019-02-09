@@ -82,6 +82,7 @@ namespace NoskheAPI_Beta.Services
                             db.SaveChanges();
                         }
                         existingPharmacy.PharmacyToken.LoginRequests++; // afzoodane tedade dafaate login
+                        existingPharmacy.IsAvailableNow = true; // turn on status
                         db.SaveChanges();
 
                         return new TokenTemplate {
@@ -114,6 +115,7 @@ namespace NoskheAPI_Beta.Services
                             IsAvailableInSignalR = false
                         };
                         db.PharmacyTokens.Add(newPharmacyToken);
+                        existingPharmacy.IsAvailableNow = true; // turn on status
                         db.SaveChanges();
 
                         return new TokenTemplate {

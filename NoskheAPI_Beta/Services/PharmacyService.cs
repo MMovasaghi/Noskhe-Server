@@ -745,7 +745,7 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == shoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
                 if(existingServiceMapping == null) {
-                    throw new UnauthorizedAccessException();
+                    throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
                 }
                 switch (accepted)
                 {
@@ -889,7 +889,8 @@ namespace NoskheAPI_Beta.Services
             }
             catch 
             {
-                throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+                throw;
+                // throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
             }
         }
     }

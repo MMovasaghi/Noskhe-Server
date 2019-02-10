@@ -528,12 +528,12 @@ namespace NoskheAPI_Beta.Controllers
 
         // GET: mobile-api/customer/request-service
         [HttpGet(Labels.RequestService)]
-        public ActionResult RequestService(int shoppingCartId)
+        public async Task<ActionResult> RequestService(int shoppingCartId)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_customerService.RequestService(_notificationService, _hubContext, shoppingCartId));
+                return Ok(await _customerService.RequestService(_notificationService, _hubContext, shoppingCartId));
             }
             catch(DatabaseFailureException dfe)
             {

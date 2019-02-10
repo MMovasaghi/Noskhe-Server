@@ -44,7 +44,6 @@ namespace NoskheAPI_Beta.Services
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         CreditTemplate WalletInquiry();
-        ResponseTemplate PayTheOrder(int orderId);
         Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
@@ -713,15 +712,11 @@ namespace NoskheAPI_Beta.Services
 
         public CreditTemplate WalletInquiry()
         {
+            TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
             return new CreditTemplate {
                 Success = true,
                 Credit = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault().Money
             };
-        }
-
-        public ResponseTemplate PayTheOrder(int orderId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId)

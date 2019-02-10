@@ -461,12 +461,12 @@ namespace NoskheAPI_Beta.Controllers
         /////////////////////////////////////////////////////////////////////////////
         // GET: desktop-api/pharmacy/service-response
         [HttpGet(Labels.ServiceResponse)]
-        public ActionResult ServiceResponse(int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason)
+        public async Task<ActionResult> ServiceResponse(int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_pharmacyService.ServiceResponse(_notificationService, _hubContext, shoppingCartId, accepted, reason));
+                return Ok(await _pharmacyService.ServiceResponse(_notificationService, _hubContext, shoppingCartId, accepted, reason));
             }
             catch(DatabaseFailureException dfe)
             {
@@ -497,12 +497,12 @@ namespace NoskheAPI_Beta.Controllers
 
         // POST: desktop-api/pharmacy/invoice-details
         [HttpPost(Labels.InvoiceDetails)]
-        public ActionResult InvoiceDetails([FromBody] PrescriptionInvoice invoice)
+        public async Task<ActionResult> InvoiceDetails([FromBody] PrescriptionInvoice invoice)
         {
             try
             {
                 GrabTokenFromHeader();
-                return Ok(_pharmacyService.InvoiceDetails(_notificationService, _hubContext, HttpContext.Request.Host, invoice));
+                return Ok(await _pharmacyService.InvoiceDetails(_notificationService, _hubContext, HttpContext.Request.Host, invoice));
             }
             catch(DatabaseFailureException dfe)
             {

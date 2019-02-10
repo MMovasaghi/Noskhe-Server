@@ -9,8 +9,8 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20190209191900_InitialCreation1")]
-    partial class InitialCreation1
+    [Migration("20190210115712_InitialCreation")]
+    partial class InitialCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -125,7 +125,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<string>("LastName");
 
-                    b.Property<decimal>("Money");
+                    b.Property<int>("Money");
 
                     b.Property<string>("Password");
 

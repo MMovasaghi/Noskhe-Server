@@ -32,9 +32,7 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<Models.Minimals.Output.ShoppingCart> GetCustomerShoppingCarts();
         IEnumerable<Models.Minimals.Output.Order> GetCustomerOrders();
         IEnumerable<Models.Minimals.Output.Cosmetic> GetAllCosmetics();
-        IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(int id);
         IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines();
-        IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(int id);
         TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
         ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
         bool RequestSmsForForgetPassword();
@@ -42,7 +40,7 @@ namespace NoskheAPI_Beta.Services
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
         bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
         StatusAndIdTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
-        Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na
+        // Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na // kolan lazem nist
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         CreditTemplate WalletInquiry();
@@ -270,7 +268,40 @@ namespace NoskheAPI_Beta.Services
                             Expires = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
                         };
                     }
-                    throw new UnauthorizedAccessException();
+                    else // agar token pharmacy null bud
+                    {
+                        // adding new token
+                        // token re-creation process -----------------------------------------------------------------
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[] 
+                            {
+                                new Claim(ClaimTypes.Name, "C"+existingCustomer.CustomerId.ToString())
+                            }),
+                            Expires = DateTime.UtcNow.AddDays(1),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                        var newCustomerToken = new Models.CustomerToken
+                        {
+                            Token = tokenHandler.WriteToken(token),
+                            ValidFrom = DateTime.UtcNow,
+                            ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
+                            Customer = existingCustomer,
+                            IsValid = true,
+                            IsAvailableInSignalR = false
+                        };
+                        db.CustomerTokens.Add(newCustomerToken);
+                        db.SaveChanges();
+
+                        return new TokenTemplate {
+                            Token = newCustomerToken.Token,
+                            Expires = DateTimeOffset.Parse(newCustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                        };
+                    }
+                    // throw new UnauthorizedAccessException(); TODO: uncomment this and remove the else scope
                 }
                 throw new LoginVerificationFailedException(ErrorCodes.LoginVerificationFailedExceptionMsg);
             }
@@ -304,39 +335,6 @@ namespace NoskheAPI_Beta.Services
                 throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
             }
         }
-
-        public async Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp)
-        {
-            try
-            {
-                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var response = db.Orders.Where(q => q.OrderId == id).FirstOrDefault();
-
-                if (response != null)
-                {
-                    var sc = db.ShoppingCarts.Where(w => w.ShoppingCartId == response.ShoppingCartId).FirstOrDefault();
-                    var c = db.Customers.Where(e => e.CustomerId == sc.CustomerId).FirstOrDefault();
-                    string gender = c.Gender == Gender.Male ? "آقای" : "خانم";
-                    string description = $"پرداخت سفارش به کد {response.UOI} به نام {gender} {c.FirstName} {c.LastName} - اپلیکیشن نسخه";
-                    ServicePointManager.Expect100Continue = false;
-                    PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                    var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(response.Price), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
-
-                    if (request.Body.Status == 100)
-                    {
-                        return "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
-                    }
-
-                    throw new PaymentGatewayFailureException(ErrorCodes.PaymentGatewayFailureExceptionMsg);
-                }
-                throw new NoOrdersMatchedByIdException(ErrorCodes.NoOrdersMatchedByIdException);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
         public bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee)
         {
             try
@@ -545,64 +543,6 @@ namespace NoskheAPI_Beta.Services
 
                     
                 return outputs.ToArray();
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public IEnumerable<Models.Minimals.Output.Cosmetic> GetCosmeticsOfAShoppingCart(int id)
-        {
-            try
-            {
-                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var existingCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
-                db.Entry(existingCustomer).Collection(c => c.ShoppingCarts).Query()
-                    .Include(sc => sc.CosmeticShoppingCarts)
-                        .ThenInclude(msc => msc.Cosmetic)
-                    .Load();
-
-                var existingShoppingCart = existingCustomer.ShoppingCarts.Where(sc => sc.ShoppingCartId == id).FirstOrDefault();
-                if(existingShoppingCart != null)
-                {
-                    var cosmetics =
-                        from cosmetic in existingShoppingCart.CosmeticShoppingCarts
-                        where cosmetic.ShoppingCartId == id
-                        select new Models.Minimals.Output.Cosmetic { CosmeticId = cosmetic.Cosmetic.CosmeticId, Name = cosmetic.Cosmetic.Name, Price = cosmetic.Cosmetic.Price, ProductPictureUrl = cosmetic.Cosmetic.ProductPictureUrl };
-                    if(cosmetics != null) return cosmetics.ToArray();
-                    throw new NoCosmeticsInTheShoppingCartException(ErrorCodes.NoCosmeticsInTheShoppingCartExceptionMsg); // Khali hast
-                }
-                throw new UnauthorizedAccessException(); // NOTE: angah in customer id eshtebah zade va nabayad shopping carte kase dige ro neshun bede
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public IEnumerable<Models.Minimals.Output.Medicine> GetMedicinesOfAShoppingCart(int id)
-        {
-            try
-            {
-                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var existingCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
-                db.Entry(existingCustomer).Collection(c => c.ShoppingCarts).Query()
-                    .Include(sc => sc.MedicineShoppingCarts)
-                        .ThenInclude(msc => msc.Medicine)
-                    .Load();
-
-                var existingShoppingCart = existingCustomer.ShoppingCarts.Where(sc => sc.ShoppingCartId == id).FirstOrDefault();
-                if(existingShoppingCart != null)
-                {
-                    var medicines =
-                        from medicine in existingShoppingCart.MedicineShoppingCarts
-                        where medicine.ShoppingCartId == id
-                        select new Models.Minimals.Output.Medicine { MedicineId = medicine.Medicine.MedicineId, Name = medicine.Medicine.Name, Price = medicine.Medicine.Price, ProductPictureUrl = medicine.Medicine.ProductPictureUrl };
-                    if(medicines != null) return medicines.ToArray();
-                    throw new NoMedicinesInTheShoppingCartException(ErrorCodes.NoMedicinesInTheShoppingCartExceptionMsg); // Khali hast
-                }
-                throw new UnauthorizedAccessException(); // NOTE: angah in customer id eshtebah zade va nabayad shopping carte kase dige ro neshun bede
             }
             catch
             {

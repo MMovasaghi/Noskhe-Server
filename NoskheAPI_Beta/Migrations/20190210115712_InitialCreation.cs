@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NoskheAPI_Beta.Migrations
 {
-    public partial class InitialCreation1 : Migration
+    public partial class InitialCreation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -65,7 +65,7 @@ namespace NoskheAPI_Beta.Migrations
                     Phone = table.Column<string>(nullable: true),
                     ProfilePictureUrl = table.Column<string>(nullable: true),
                     ProfilePictureUploadDate = table.Column<DateTime>(nullable: false),
-                    Money = table.Column<decimal>(nullable: false)
+                    Money = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

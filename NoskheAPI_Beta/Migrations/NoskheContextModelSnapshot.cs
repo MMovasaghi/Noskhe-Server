@@ -123,7 +123,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<string>("LastName");
 
-                    b.Property<decimal>("Money");
+                    b.Property<int>("Money");
 
                     b.Property<string>("Password");
 

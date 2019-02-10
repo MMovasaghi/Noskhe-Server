@@ -16,7 +16,7 @@ namespace NoskheAPI_Beta.Models
         public string Phone { get; set; }
         public string ProfilePictureUrl { get; set; }
         public DateTime ProfilePictureUploadDate { get; set; }
-        public decimal Money { get; set; }
+        public int Money { get; set; }
         /*
             n ShoppingCart
             1 TextMessage

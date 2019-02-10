@@ -12,9 +12,9 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string NoCosmeticsInTheShoppingCartExceptionMsg = "CEC7";
         public static string NoCustomersMatchedByPhoneExceptionMsg = "CEC8";
         public static string NoMedicinesAvailabeExceptionMsg = "CEC9";
-        public static string NoMedicinesInTheShoppingCartExceptionMsg = "CEC10";
+        public static string NoMedicinesInTheShoppingCartExceptionMsg = "CEC10"; // TODO: remove this (DEPRECATED)
         public static string NoOrdersFoundExceptionMsg = "CEC11";
-        public static string NoOrdersMatchedByIdException = "CEC12";
+        public static string NoOrdersMatchedByIdException = "CEC12"; // TODO: remove this (DEPRECATED)
         public static string NoShoppingCartsFoundExceptionMsg = "CEC13";
         public static string PaymentGatewayFailureExceptionMsg = "CEC14";
         public static string LoginVerificationFailedExceptionMsg = "CEC15";

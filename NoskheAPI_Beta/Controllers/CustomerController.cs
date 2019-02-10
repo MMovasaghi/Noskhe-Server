@@ -179,42 +179,6 @@ namespace NoskheAPI_Beta.Controllers
                 });
             }
         }
-
-        // GET: mobile-api/customer/shopping-cart-cosmetics
-        [HttpGet(Labels.GetCosmeticsOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetCosmeticsOfAShoppingCart(int id)
-        {
-            try
-            {
-                GrabTokenFromHeader();
-                return Ok(_customerService.GetCosmeticsOfAShoppingCart(id));
-            }
-            catch(NoCosmeticsInTheShoppingCartException ncitsce)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ncitsce.Message
-                });
-            }
-            catch(UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-            catch(SecurityTokenExpiredException stee)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = stee.Message
-                });
-            }
-            catch
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ErrorCodes.APIUnhandledExceptionMsg
-                });
-            }
-        }
         
         // GET: mobile-api/customer/all-medicines
         // [AllowAnonymous]
@@ -231,42 +195,6 @@ namespace NoskheAPI_Beta.Controllers
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = nmae.Message
-                });
-            }
-            catch(UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-            catch(SecurityTokenExpiredException stee)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = stee.Message
-                });
-            }
-            catch
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ErrorCodes.APIUnhandledExceptionMsg
-                });
-            }
-        }
-
-        // GET: mobile-api/customer/shopping-cart-medicines
-        [HttpGet(Labels.GetMedicinesOfAShoppingCart)]
-        public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetMedicinesOfAShoppingCart(int id)
-        {
-            try
-            {
-                GrabTokenFromHeader();
-                return Ok(_customerService.GetMedicinesOfAShoppingCart(id));
-            }
-            catch(NoMedicinesInTheShoppingCartException nmitsce)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = nmitsce.Message
                 });
             }
             catch(UnauthorizedAccessException)
@@ -532,67 +460,14 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/new-payment
-        [HttpGet(Labels.CreatePaymentUrlForOrder)]
-        public async Task<ActionResult<string>> CreatePaymentUrlForOrder(int id)
-        {
-            try
-            {
-                GrabTokenFromHeader();
-                return Ok(await _customerService.CreatePaymentUrlForOrder(id, HttpContext.Request.Host));
-            }
-            catch(NoOrdersMatchedByIdException nombie)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = nombie.Message
-                });
-            }
-            catch(PaymentGatewayFailureException pgfe)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = pgfe.Message
-                });
-            }
-            catch(UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-            catch(SecurityTokenExpiredException stee)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = stee.Message
-                });
-            }
-            catch
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ErrorCodes.APIUnhandledExceptionMsg
-                });
-            }
-        }
-
         // GET: mobile-api/customer/add-credit
         [HttpGet(Labels.AddCreditToWallet)]
-        public async Task<ActionResult<string>> AddCreditToWallet(int credit)
+        public async Task<ActionResult> AddCreditToWallet(int credit)
         {
             try
             {
                 GrabTokenFromHeader();
                 return Ok(await _customerService.AddCreditToWallet(credit, HttpContext.Request.Host));
-            }
-            catch(NoOrdersMatchedByIdException nombie)
-            {
-                return BadRequest(new ResponseTemplate
-                {
-                    Success = false,
-                    Error = nombie.Message
-                });
             }
             catch(PaymentGatewayFailureException pgfe)
             {
@@ -651,45 +526,6 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // Signalr Based Methods
-
-        // // GET: mobile-api/customer/pay
-        // [HttpGet(Labels.PayTheOrder)]
-        // public ActionResult PayTheOrder(int orderId)
-        // {
-        //     try
-        //     {
-        //         GrabTokenFromHeader();
-        //         return Ok(_customerService.PayTheOrder(orderId));
-        //     }
-        //     catch(DatabaseFailureException dfe)
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = dfe.Message
-        //         });
-        //     }
-        //     catch(UnauthorizedAccessException)
-        //     {
-        //         return Unauthorized();
-        //     }
-        //     catch(SecurityTokenExpiredException stee)
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = stee.Message
-        //         });
-        //     }
-        //     catch
-        //     {
-        //         return BadRequest(new ResponseTemplate {
-        //             Success = false,
-        //             Error = ErrorCodes.APIUnhandledExceptionMsg
-        //         });
-        //     }
-        // }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GET: mobile-api/customer/request-service
         [HttpGet(Labels.RequestService)]
         public ActionResult RequestService(int shoppingCartId)

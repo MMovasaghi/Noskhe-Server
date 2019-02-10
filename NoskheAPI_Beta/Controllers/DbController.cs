@@ -58,7 +58,7 @@ namespace NoskheAPI_Beta.Controllers
                             Phone = "CustomerPh1",
                             ProfilePictureUrl = "CustomerPP1.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
-                            Money = 3.45M
+                            Money = 3000
                         },
                         new Customer {
                             FirstName = "CustomerF2",
@@ -71,7 +71,7 @@ namespace NoskheAPI_Beta.Controllers
                             Phone = "CustomerPh2",
                             ProfilePictureUrl = "CustomerPP2.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
-                            Money = 4.45M
+                            Money = 3500
                         },
                         new Customer {
                             FirstName = "CustomerF3",
@@ -84,7 +84,7 @@ namespace NoskheAPI_Beta.Controllers
                             Phone = "CustomerPh3",
                             ProfilePictureUrl = "CustomerPP3.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
-                            Money = 5.45M
+                            Money = 4000
                         }
                     );
                     db.SaveChanges();

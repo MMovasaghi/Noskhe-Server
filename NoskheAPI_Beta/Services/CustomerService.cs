@@ -927,7 +927,8 @@ namespace NoskheAPI_Beta.Services
             }
             catch 
             {
-                throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+                throw;
+                // throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
             }
         }
     }

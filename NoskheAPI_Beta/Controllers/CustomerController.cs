@@ -160,6 +160,17 @@ namespace NoskheAPI_Beta.Controllers
                     Error = ncae.Message
                 });
             }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
             catch
             {
                 return BadRequest(new ResponseTemplate {
@@ -220,6 +231,17 @@ namespace NoskheAPI_Beta.Controllers
                 return BadRequest(new ResponseTemplate {
                     Success = false,
                     Error = nmae.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
                 });
             }
             catch

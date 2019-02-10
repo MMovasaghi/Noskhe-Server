@@ -369,6 +369,7 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var responses =
                     from record in db.Cosmetics
                     select new Models.Minimals.Output.Cosmetic { CosmeticId = record.CosmeticId, Name = record.Name, Price = record.Price, ProductPictureUrl = record.ProductPictureUrl };
@@ -425,6 +426,7 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var responses =
                     from record in db.Medicines
                     select new Models.Minimals.Output.Medicine { MedicineId = record.MedicineId, Name = record.Name, Price = record.Price, ProductPictureUrl = record.ProductPictureUrl };

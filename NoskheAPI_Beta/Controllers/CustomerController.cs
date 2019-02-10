@@ -144,12 +144,13 @@ namespace NoskheAPI_Beta.Controllers
         }
         
         // GET: mobile-api/customer/all-cosmetics
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [HttpGet(Labels.GetAllCosmetics)]
         public ActionResult<IEnumerable<Models.Minimals.Output.Cosmetic>> GetAllCosmetics()
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_customerService.GetAllCosmetics());
             }
             catch(NoCosmeticsAvailabeException ncae)
@@ -205,12 +206,13 @@ namespace NoskheAPI_Beta.Controllers
         }
         
         // GET: mobile-api/customer/all-medicines
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [HttpGet(Labels.GetAllMedicines)]
         public ActionResult<IEnumerable<Models.Minimals.Output.Medicine>> GetAllMedicines()
         {
             try
             {
+                GrabTokenFromHeader();
                 return Ok(_customerService.GetAllMedicines());
             }
             catch(NoMedicinesAvailabeException nmae)

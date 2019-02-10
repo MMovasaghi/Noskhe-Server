@@ -731,7 +731,7 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingShoppingCart = db.ShoppingCarts.Where(sh => sh.ShoppingCartId == shoppingCartId).FirstOrDefault();
                 if (existingShoppingCart == null) throw new Exception();
-                var pharmaciesLocation = db.Pharmacies.Select(p => new { PharmacyId = p.PharmacyId, Lat = p.AddressLatitude, Lon = p.AddressLongitude, Name = p.Name });
+                var pharmaciesLocation = db.Pharmacies.Where(p => (p.IsAvailableNow == true && p.PendingRequests < 5)).Select(p => new { PharmacyId = p.PharmacyId, Lat = p.AddressLatitude, Lon = p.AddressLongitude, Name = p.Name });
 
                 List<DistanceObj> nearPharmacies = new List<DistanceObj>();
                 GeoCoordinate shLoc = new GeoCoordinate(existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude);
@@ -792,6 +792,10 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 // (1)
                 var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
+                
+                var firstPharmacy = db.Pharmacies.Where(p => p.PharmacyId == pharmaciesQueue.First().PharmacyId).FirstOrDefault(); // TODO: decrement and increment control
+                firstPharmacy.PendingRequests++;
+
                 string foundPharmaciesString = "";
                 foreach (var pharmacy in pharmaciesQueue)
                 {
@@ -811,6 +815,7 @@ namespace NoskheAPI_Beta.Services
                 // (2)
                 var newItem = PrepareObject(shoppingCartId);
                 await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
+                // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2", Birthday = DateTime.Now, Email = "shit", Gender = Gender.Male, Phone = "some othe shit", ProfilePictureUrl = "shity shit!" }, Cosmetics = new List<Models.Minimals.Output.Cosmetic> { new Models.Minimals.Output.Cosmetic { CosmeticId = 1, Name = "some cosmetic", Number = 2, Price = 100, ProductPictureUrl = "url" } }, Medicines = new List<Models.Minimals.Output.Medicine> { new Models.Minimals.Output.Medicine { MedicineId = 1, Name = "s", Number = 3, Price = 20, ProductPictureUrl = "ss" } }, Notation = new Notation { BrandPreference = BrandType.Global, Description = "s", HasOtherDiseases = false, HasPregnancy = false, NotationId = 1, ShoppingCartId = 3 } });
                 // (3)
                 return new ResponseTemplate {
                     Success = true
@@ -899,6 +904,7 @@ namespace NoskheAPI_Beta.Services
                 Picture_Urls = picUrls,
                 Notation = existingShoppingCart.Notation
             };
+            newItem.Notation.ShoppingCart = null; // if not -> message is not going to be sent to pharmacy through signalr
             return newItem;
         }
 

@@ -12,7 +12,7 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string NoCosmeticsInTheShoppingCartExceptionMsg = "CEC7";
         public static string NoCustomersMatchedByPhoneExceptionMsg = "CEC8";
         public static string NoMedicinesAvailabeExceptionMsg = "CEC9";
-        public static string RepeatedTextMessageRequestsException = "CEC10";
+        public static string RepeatedTextMessageRequestsExceptionMsg = "CEC10";
         public static string NoOrdersFoundExceptionMsg = "CEC11";
         public static string TextMessageVerificationTimeExpiredExceptionMsg = "CEC12";
         public static string NoShoppingCartsFoundExceptionMsg = "CEC13";

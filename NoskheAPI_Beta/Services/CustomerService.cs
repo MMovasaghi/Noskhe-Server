@@ -740,7 +740,7 @@ namespace NoskheAPI_Beta.Services
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
                         if(difference < 2)
                         {
-                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsException);
+                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsExceptionMsg);
                         }
                     }
                     Random code = new Random();
@@ -828,7 +828,7 @@ namespace NoskheAPI_Beta.Services
                         }
                         if(difference < 30)
                         {
-                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsException);
+                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsExceptionMsg);
                         }
                         if(lastMessage.NumberOfAttempts > 4)
                         {

@@ -481,7 +481,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         [AllowAnonymous]
-        // GET: mobile-api/customer/request-phone-login
+        // POST: mobile-api/customer/request-phone-login
         [HttpPost(Labels.RequestPhoneLogin)]
         public ActionResult RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
         {
@@ -520,7 +520,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         [AllowAnonymous]
-        // GET: mobile-api/customer/verify-phone-login
+        // POST: mobile-api/customer/verify-phone-login
         [HttpPost(Labels.VerifyPhoneLogin)]
         public ActionResult VerifyPhoneLogin([FromBody] Models.Android.VerifyPhoneTemplate vpt)
         {
@@ -570,7 +570,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         [AllowAnonymous]
-        // GET: mobile-api/customer/request-reset-password
+        // POST: mobile-api/customer/request-reset-password
         [HttpPost(Labels.RequestResetPassword)]
         public ActionResult RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
         {
@@ -620,7 +620,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         [AllowAnonymous]
-        // GET: mobile-api/customer/verify-reset-password
+        // POST: mobile-api/customer/verify-reset-password
         [HttpPost(Labels.VerifyResetPassword)]
         public ActionResult VerifyResetPassword([FromBody] Models.Android.VerifyPhoneTemplate vpt)
         {
@@ -669,7 +669,7 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // GET: mobile-api/customer/reset-password
+        // POST: mobile-api/customer/reset-password
         [HttpPost(Labels.ResetPassword)]
         public ActionResult ResetPassword([FromBody] Models.Android.ResetPasswordTemplate rpt)
         {
@@ -706,7 +706,7 @@ namespace NoskheAPI_Beta.Controllers
         }
 
         [AllowAnonymous]
-        // GET: mobile-api/customer/verify-phone-number
+        // POST: mobile-api/customer/verify-phone-number
         [HttpPost(Labels.VerifyPhoneNumber)]
         public ActionResult VerifyPhoneNumber([FromBody] Models.Android.VerifyPhoneTemplate vpt)
         {

@@ -253,88 +253,6 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
-        // POST: mobile-api/customer/login-by-phone
-        [AllowAnonymous]
-        [HttpPost(Labels.LoginWithPhoneNumber)]
-        public ActionResult LoginWithPhoneNumber([FromBody] Models.Android.AuthenticateByPhoneTemplate abp)
-        {
-            try
-            {
-                return Ok(_customerService.LoginWithPhoneNumber(abp, _appSettings));
-            }
-            catch(NoCustomersMatchedByPhoneException ncmbpe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ncmbpe.Message
-                });
-            }
-            catch(DatabaseFailureException dfe)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = dfe.Message
-                });
-            }
-            catch
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = ErrorCodes.APIUnhandledExceptionMsg
-                });
-            }
-        }
-
-        // POST: mobile-api/customer/request-forget-password
-        [HttpPost(Labels.RequestSmsForForgetPassword)]
-        public ActionResult RequestSmsForForgetPassword([FromBody] Models.Android.SendSmsAuthenticationCodeTemplate ssac)
-        {
-            throw new NotImplementedException();
-            // TODO: HasBeenExpired -> true
-            // TODO: Sms Api
-        }
-
-        // POST: mobile-api/customer/verify-forget-password
-        [HttpPost(Labels.VerifySmsCodeForForgetPassword)]
-        public ActionResult VerifySmsCodeForForgetPassword([FromBody] Models.Android.VerifySmsAuthenticationCodeTemplate vsac)
-        {
-            throw new NotImplementedException();
-            // try
-            // {
-            //     var response = db.TextMessages.Where(q => (q.Customer.Phone == vsac.Phone && q.VerificationCode == vsac.VerificationCode)).FirstOrDefault();
-            //     if(response != null)
-            //     {
-            //         if(response.HasBeenExpired == false)
-            //         {
-            //             response.HasBeenExpired = true; // vaghti ke dorost bude YA vaghte masalan 2 daghighe tamum shode bashe
-            //             db.SaveChanges();
-
-            //             // satisfying result
-            //             return Ok(new ResponseTemplate {
-            //                 Success = true
-            //             });
-            //         }
-
-            //         return BadRequest(new ResponseTemplate {
-            //             Success = false,
-            //             Error = "VERIFICATION_EXPIRED"
-            //         });
-            //     }
-
-            //     return BadRequest(new ResponseTemplate {
-            //         Success = false,
-            //         Error = "VERIFICATION_FAILED"
-            //     });
-            // }
-            // catch
-            // {
-            //     return BadRequest(new ResponseTemplate {
-            //         Success = false,
-            //         Error = "DATABASE_FAILURE"
-            //     });
-            // }
-        }
-
         // POST: mobile-api/customer/new-customer
         [AllowAnonymous]
         [HttpPost(Labels.AddNewCustomer)]
@@ -560,8 +478,283 @@ namespace NoskheAPI_Beta.Controllers
                     Error = ErrorCodes.APIUnhandledExceptionMsg
                 });
             }
-        }        
-        
+        }
+
+        [AllowAnonymous]
+        // GET: mobile-api/customer/request-phone-login
+        [HttpPost(Labels.RequestPhoneLogin)]
+        public ActionResult RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
+        {
+            try
+            {
+                return Ok(_customerService.RequestPhoneLogin(pt));
+            }
+            catch(RepeatedTextMessageRequestsException rtmte)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = rtmte.Message
+                });
+            }
+            catch(NoCustomersMatchedByPhoneException ncmbpe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ncmbpe.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        [AllowAnonymous]
+        // GET: mobile-api/customer/verify-phone-login
+        [HttpPost(Labels.VerifyPhoneLogin)]
+        public ActionResult VerifyPhoneLogin([FromBody] Models.Android.VerifyPhoneTemplate vpt)
+        {
+            try
+            {
+                return Ok(_customerService.VerifyPhoneLogin(vpt, _appSettings));
+            }
+            catch(NoCustomersMatchedByPhoneException ncmbpe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ncmbpe.Message
+                });
+            }
+            catch(TextMessageVerificationTimeExpiredException tmvtee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvtee.Message
+                });
+            }
+            catch(TextMessageVerificationFailedException tmvfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvfe.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        [AllowAnonymous]
+        // GET: mobile-api/customer/request-reset-password
+        [HttpPost(Labels.RequestResetPassword)]
+        public ActionResult RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
+        {
+            try
+            {
+                return Ok(_customerService.RequestResetPassword(pt));
+            }            
+            catch(NoCustomersMatchedByPhoneException ncmbpe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ncmbpe.Message
+                });
+            }
+            catch(RepeatedTextMessageRequestsException rtmre)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = rtmre.Message
+                });
+            }
+            catch(NumberOfTextMessageTriesExceededException notmtee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = notmtee.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        [AllowAnonymous]
+        // GET: mobile-api/customer/verify-reset-password
+        [HttpPost(Labels.VerifyResetPassword)]
+        public ActionResult VerifyResetPassword([FromBody] Models.Android.VerifyPhoneTemplate vpt)
+        {
+            try
+            {
+                return Ok(_customerService.VerifyResetPassword(vpt, _appSettings));
+            }
+            catch(NoCustomersMatchedByPhoneException ncmbpe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ncmbpe.Message
+                });
+            }
+            catch(TextMessageVerificationFailedException tmvfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvfe.Message
+                });
+            }
+            catch(TextMessageVerificationTimeExpiredException tmvtee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvtee.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        // GET: mobile-api/customer/reset-password
+        [HttpPost(Labels.ResetPassword)]
+        public ActionResult ResetPassword([FromBody] Models.Android.ResetPasswordTemplate rpt)
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_customerService.ResetPassword(rpt));
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        [AllowAnonymous]
+        // GET: mobile-api/customer/verify-phone-number
+        [HttpPost(Labels.VerifyPhoneNumber)]
+        public ActionResult VerifyPhoneNumber([FromBody] Models.Android.VerifyPhoneTemplate vpt)
+        {
+            try
+            {
+                return Ok(_customerService.VerifyPhoneNumber(vpt));
+            }
+            catch(NoCustomersMatchedByPhoneException ncmbpe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ncmbpe.Message
+                });
+            }
+            catch(TextMessageVerificationFailedException tmvfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvfe.Message
+                });
+            }
+            catch(TextMessageVerificationTimeExpiredException tmvtee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = tmvtee.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

@@ -63,6 +63,8 @@ namespace NoskheAPI_Beta.Migrations
                     Email = table.Column<string>(nullable: true),
                     Password = table.Column<string>(nullable: true),
                     Phone = table.Column<string>(nullable: true),
+                    IsPhoneValidated = table.Column<bool>(nullable: false),
+                    IsEmailValidated = table.Column<bool>(nullable: false),
                     ProfilePictureUrl = table.Column<string>(nullable: true),
                     ProfilePictureUploadDate = table.Column<DateTime>(nullable: false),
                     Money = table.Column<int>(nullable: false)
@@ -112,6 +114,28 @@ namespace NoskheAPI_Beta.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CourierTextMessages",
+                columns: table => new
+                {
+                    CourierTextMessageId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Type = table.Column<int>(nullable: false),
+                    Message = table.Column<string>(nullable: true),
+                    CourierId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourierTextMessages", x => x.CourierTextMessageId);
+                    table.ForeignKey(
+                        name: "FK_CourierTextMessages_Couriers_CourierId",
+                        column: x => x.CourierId,
+                        principalTable: "Couriers",
+                        principalColumn: "CourierId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CustomerNotificationMap",
                 columns: table => new
                 {
@@ -133,6 +157,54 @@ namespace NoskheAPI_Beta.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerResetPasswordToken",
+                columns: table => new
+                {
+                    CustomerResetPasswordTokenId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Token = table.Column<string>(nullable: true),
+                    IsValid = table.Column<bool>(nullable: false),
+                    TokenRefreshRequests = table.Column<uint>(nullable: false),
+                    ValidFrom = table.Column<DateTime>(nullable: false),
+                    ValidTo = table.Column<DateTime>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerResetPasswordToken", x => x.CustomerResetPasswordTokenId);
+                    table.ForeignKey(
+                        name: "FK_CustomerResetPasswordToken_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerTextMessages",
+                columns: table => new
+                {
+                    CustomerTextMessageId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Type = table.Column<int>(nullable: false),
+                    Message = table.Column<string>(nullable: true),
+                    NumberOfAttempts = table.Column<int>(nullable: false),
+                    Validated = table.Column<bool>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerTextMessages", x => x.CustomerTextMessageId);
+                    table.ForeignKey(
+                        name: "FK_CustomerTextMessages_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CustomerTokens",
                 columns: table => new
                 {
@@ -144,7 +216,6 @@ namespace NoskheAPI_Beta.Migrations
                     LoginRequests = table.Column<uint>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: false),
                     ValidTo = table.Column<DateTime>(nullable: false),
-                    IsAvailableInSignalR = table.Column<bool>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -177,29 +248,6 @@ namespace NoskheAPI_Beta.Migrations
                     table.PrimaryKey("PK_ShoppingCarts", x => x.ShoppingCartId);
                     table.ForeignKey(
                         name: "FK_ShoppingCarts_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TextMessages",
-                columns: table => new
-                {
-                    TextMessageId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Date = table.Column<DateTime>(nullable: false),
-                    VerificationCode = table.Column<string>(nullable: true),
-                    HasBeenLocked = table.Column<bool>(nullable: false),
-                    NumberOfAttempts = table.Column<int>(nullable: false),
-                    CustomerId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TextMessages", x => x.TextMessageId);
-                    table.ForeignKey(
-                        name: "FK_TextMessages_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId",
@@ -463,7 +511,6 @@ namespace NoskheAPI_Beta.Migrations
                     LoginRequests = table.Column<uint>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: false),
                     ValidTo = table.Column<DateTime>(nullable: false),
-                    IsAvailableInSignalR = table.Column<bool>(nullable: false),
                     PharmacyId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -584,10 +631,26 @@ namespace NoskheAPI_Beta.Migrations
                 column: "ShoppingCartId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourierTextMessages_CourierId",
+                table: "CourierTextMessages",
+                column: "CourierId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomerNotificationMap_CustomerId",
                 table: "CustomerNotificationMap",
                 column: "CustomerId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerResetPasswordToken_CustomerId",
+                table: "CustomerResetPasswordToken",
+                column: "CustomerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerTextMessages_CustomerId",
+                table: "CustomerTextMessages",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerTokens_CustomerId",
@@ -677,12 +740,6 @@ namespace NoskheAPI_Beta.Migrations
                 name: "IX_ShoppingCarts_CustomerId",
                 table: "ShoppingCarts",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TextMessages_CustomerId",
-                table: "TextMessages",
-                column: "CustomerId",
-                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -694,7 +751,16 @@ namespace NoskheAPI_Beta.Migrations
                 name: "CosmeticShoppingCarts");
 
             migrationBuilder.DropTable(
+                name: "CourierTextMessages");
+
+            migrationBuilder.DropTable(
                 name: "CustomerNotificationMap");
+
+            migrationBuilder.DropTable(
+                name: "CustomerResetPasswordToken");
+
+            migrationBuilder.DropTable(
+                name: "CustomerTextMessages");
 
             migrationBuilder.DropTable(
                 name: "CustomerTokens");
@@ -725,9 +791,6 @@ namespace NoskheAPI_Beta.Migrations
 
             migrationBuilder.DropTable(
                 name: "Settles");
-
-            migrationBuilder.DropTable(
-                name: "TextMessages");
 
             migrationBuilder.DropTable(
                 name: "Cosmetics");

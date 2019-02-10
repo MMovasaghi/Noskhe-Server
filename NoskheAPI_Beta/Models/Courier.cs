@@ -24,5 +24,6 @@ namespace NoskheAPI_Beta.Models
             n Order
         */
         public List<Order> Orders { get; set; }
+        public List<CourierTextMessage> CourierTextMessages { get; set; }
     }
 }

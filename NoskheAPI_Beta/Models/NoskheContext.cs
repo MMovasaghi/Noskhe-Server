@@ -53,8 +53,10 @@ namespace NoskheAPI_Beta.Models
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Occurrence> Occurrences { get; set; }
         public DbSet<Settle> Settles { get; set; }
-        public DbSet<TextMessage> TextMessages { get; set; }
+        public DbSet<CustomerTextMessage> CustomerTextMessages { get; set; }
+        public DbSet<CourierTextMessage> CourierTextMessages { get; set; }
         public DbSet<CustomerToken> CustomerTokens { get; set; }
+        public DbSet<CustomerResetPasswordToken> CustomerResetPasswordToken { get; set; }
         public DbSet<PharmacyToken> PharmacyTokens { get; set; }
         public DbSet<ServiceMapping> ServiceMappings { get; set; }
     }

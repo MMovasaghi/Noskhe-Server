@@ -68,7 +68,7 @@ namespace NoskheAPI_Beta.Services
                             {
                                 Subject = new ClaimsIdentity(new Claim[] 
                                 {
-                                    new Claim(ClaimTypes.Name, "P"+existingPharmacy.PharmacyId.ToString())
+                                    new Claim(ClaimTypes.Name, "P" + existingPharmacy.PharmacyId.ToString())
                                 }),
                                 Expires = DateTime.UtcNow.AddDays(1),
                                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -99,7 +99,7 @@ namespace NoskheAPI_Beta.Services
                         {
                             Subject = new ClaimsIdentity(new Claim[] 
                             {
-                                new Claim(ClaimTypes.Name, "P"+existingPharmacy.PharmacyId.ToString())
+                                new Claim(ClaimTypes.Name, "P" + existingPharmacy.PharmacyId.ToString())
                             }),
                             Expires = DateTime.UtcNow.AddDays(1),
                             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -112,7 +112,6 @@ namespace NoskheAPI_Beta.Services
                             ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
                             Pharmacy = existingPharmacy,
                             IsValid = true,
-                            IsAvailableInSignalR = false
                         };
                         db.PharmacyTokens.Add(newPharmacyToken);
                         existingPharmacy.IsAvailableNow = true; // turn on status

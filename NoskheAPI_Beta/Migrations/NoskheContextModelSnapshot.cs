@@ -108,6 +108,26 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("Couriers");
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CourierTextMessage", b =>
+                {
+                    b.Property<int>("CourierTextMessageId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CourierId");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<string>("Message");
+
+                    b.Property<int>("Type");
+
+                    b.HasKey("CourierTextMessageId");
+
+                    b.HasIndex("CourierId");
+
+                    b.ToTable("CourierTextMessages");
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
@@ -120,6 +140,10 @@ namespace NoskheAPI_Beta.Migrations
                     b.Property<string>("FirstName");
 
                     b.Property<int>("Gender");
+
+                    b.Property<bool>("IsEmailValidated");
+
+                    b.Property<bool>("IsPhoneValidated");
 
                     b.Property<string>("LastName");
 
@@ -159,14 +183,61 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("CustomerNotificationMap");
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerResetPasswordToken", b =>
+                {
+                    b.Property<int>("CustomerResetPasswordTokenId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CustomerId");
+
+                    b.Property<bool>("IsValid");
+
+                    b.Property<string>("Token");
+
+                    b.Property<uint>("TokenRefreshRequests");
+
+                    b.Property<DateTime>("ValidFrom");
+
+                    b.Property<DateTime>("ValidTo");
+
+                    b.HasKey("CustomerResetPasswordTokenId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("CustomerResetPasswordToken");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerTextMessage", b =>
+                {
+                    b.Property<int>("CustomerTextMessageId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CustomerId");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<string>("Message");
+
+                    b.Property<int>("NumberOfAttempts");
+
+                    b.Property<int>("Type");
+
+                    b.Property<bool>("Validated");
+
+                    b.HasKey("CustomerTextMessageId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CustomerTextMessages");
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerToken", b =>
                 {
                     b.Property<int>("CustomerTokenId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("CustomerId");
-
-                    b.Property<bool>("IsAvailableInSignalR");
 
                     b.Property<bool>("IsValid");
 
@@ -418,8 +489,6 @@ namespace NoskheAPI_Beta.Migrations
                     b.Property<int>("PharmacyTokenId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("IsAvailableInSignalR");
-
                     b.Property<bool>("IsValid");
 
                     b.Property<uint>("LoginRequests");
@@ -591,29 +660,6 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("ShoppingCarts");
                 });
 
-            modelBuilder.Entity("NoskheAPI_Beta.Models.TextMessage", b =>
-                {
-                    b.Property<int>("TextMessageId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("CustomerId");
-
-                    b.Property<DateTime>("Date");
-
-                    b.Property<bool>("HasBeenLocked");
-
-                    b.Property<int>("NumberOfAttempts");
-
-                    b.Property<string>("VerificationCode");
-
-                    b.HasKey("TextMessageId");
-
-                    b.HasIndex("CustomerId")
-                        .IsUnique();
-
-                    b.ToTable("TextMessages");
-                });
-
             modelBuilder.Entity("NoskheAPI_Beta.Models.Account", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
@@ -635,11 +681,35 @@ namespace NoskheAPI_Beta.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CourierTextMessage", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Courier", "Courier")
+                        .WithMany("CourierTextMessages")
+                        .HasForeignKey("CourierId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotificationMap", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
                         .WithOne("CustomerNotificationMap")
                         .HasForeignKey("NoskheAPI_Beta.Models.CustomerNotificationMap", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerResetPasswordToken", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithOne("CustomerResetPasswordToken")
+                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerResetPasswordToken", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerTextMessage", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithMany("CustomerTextMessages")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -767,14 +837,6 @@ namespace NoskheAPI_Beta.Migrations
                     b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
                         .WithMany("ShoppingCarts")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("NoskheAPI_Beta.Models.TextMessage", b =>
-                {
-                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
-                        .WithOne("TextMessage")
-                        .HasForeignKey("NoskheAPI_Beta.Models.TextMessage", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

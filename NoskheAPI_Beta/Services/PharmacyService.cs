@@ -68,7 +68,7 @@ namespace NoskheAPI_Beta.Services
                             {
                                 Subject = new ClaimsIdentity(new Claim[] 
                                 {
-                                    new Claim(ClaimTypes.Name, "P"+existingPharmacy.PharmacyId.ToString())
+                                    new Claim(ClaimTypes.Name, "P" + existingPharmacy.PharmacyId.ToString())
                                 }),
                                 Expires = DateTime.UtcNow.AddDays(1),
                                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -99,7 +99,7 @@ namespace NoskheAPI_Beta.Services
                         {
                             Subject = new ClaimsIdentity(new Claim[] 
                             {
-                                new Claim(ClaimTypes.Name, "P"+existingPharmacy.PharmacyId.ToString())
+                                new Claim(ClaimTypes.Name, "P" + existingPharmacy.PharmacyId.ToString())
                             }),
                             Expires = DateTime.UtcNow.AddDays(1),
                             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -112,7 +112,6 @@ namespace NoskheAPI_Beta.Services
                             ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
                             Pharmacy = existingPharmacy,
                             IsValid = true,
-                            IsAvailableInSignalR = false
                         };
                         db.PharmacyTokens.Add(newPharmacyToken);
                         existingPharmacy.IsAvailableNow = true; // turn on status
@@ -754,7 +753,8 @@ namespace NoskheAPI_Beta.Services
                         existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.FirstStepAcceptance;
                         Models.Order newOrder = new Models.Order {
                             ShoppingCartId = shoppingCartId,
-                            Courier = null, // TODO: a function to choose what to do
+                            // Courier = null, // TODO: a function to choose what to do
+                            CourierId = 1,
                             HasBeenAcceptedByCustomer = false,
                             PharmacyId = GetPharmacyId(),
                             UOI = "someShit", // TODO

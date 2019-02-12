@@ -4,7 +4,15 @@ namespace NoskheAPI_Beta.Settings.Routing.Customer
     {
         // 1-login
         public const string LoginWithEmailAndPass = "login"; // Old: "Authenticate"
-        public const string LoginWithPhoneNumber = "login-by-phone"; // Old: "Authenticate-By-Phone"
+        // phone login
+        public const string RequestPhoneLogin = "request-phone-login";
+        public const string VerifyPhoneLogin = "verify-phone-login";
+        // reset password
+        public const string RequestResetPassword = "request-reset-password";
+        public const string VerifyResetPassword = "verify-reset-password";
+        public const string ResetPassword = "reset-password";
+        // verify phone
+        public const string VerifyPhoneNumber = "verify-phone-number";
         // 2-register
         public const string AddNewCustomer = "new-customer"; // Old: "Add-New"
         // 3-profile

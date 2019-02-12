@@ -14,6 +14,8 @@ namespace NoskheAPI_Beta.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string Phone { get; set; }
+        public bool IsPhoneValidated { get; set; }
+        public bool IsEmailValidated { get; set; }
         public string ProfilePictureUrl { get; set; }
         public DateTime ProfilePictureUploadDate { get; set; }
         public int Money { get; set; }
@@ -22,8 +24,9 @@ namespace NoskheAPI_Beta.Models
             1 TextMessage
         */
         public List<ShoppingCart> ShoppingCarts { get; set; }
-        public TextMessage TextMessage { get; set; }
+        public List<CustomerTextMessage> CustomerTextMessages { get; set; }
         public CustomerToken CustomerToken { get; set; }
-        public CustomerNotificationMap CustomerNotificationMap { get; set; }
+        public CustomerResetPasswordToken CustomerResetPasswordToken { get; set; }
+        public CustomerNotificationMap CustomerNotificationMap { get; set; } // TODO: remove
     }
 }

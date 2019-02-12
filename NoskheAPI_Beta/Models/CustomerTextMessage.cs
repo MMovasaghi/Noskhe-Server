@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace NoskheAPI_Beta.Models
 {
-    public class TextMessage
+    public class CustomerTextMessage
     {
-        public int TextMessageId { get; set; }
+        public int CustomerTextMessageId { get; set; }
         public DateTime Date { get; set; }
-        public string VerificationCode { get; set; }
-        public bool HasBeenLocked { get; set; }
+        public CustomerTextMessageType Type { get; set; }
+        public string Message { get; set; }
         public int NumberOfAttempts { get; set; }
+        public bool Validated { get; set; }
+        // nav
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
     }

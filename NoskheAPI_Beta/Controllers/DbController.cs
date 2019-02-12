@@ -435,13 +435,6 @@ namespace NoskheAPI_Beta.Controllers
                             HasOtherDiseases = false,
                             Description = "NotationD_5",
                             ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_005").FirstOrDefault()
-                        },
-                        new Notation {
-                            BrandPreference = BrandType.Local,
-                            HasPregnancy = false,
-                            HasOtherDiseases = false,
-                            Description = "NotationD_6",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_006").FirstOrDefault()
                         }
                     );
                     db.SaveChanges();
@@ -1063,26 +1056,23 @@ namespace NoskheAPI_Beta.Controllers
         {
             try
             {
-                if(db.TextMessages.Count() == 0)
+                if(db.CustomerTextMessages.Count() == 0)
                 {
-                    db.TextMessages.AddRange(
-                        new TextMessage {
+                    db.CustomerTextMessages.AddRange(
+                        new CustomerTextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@1.com").FirstOrDefault(),
-                            HasBeenLocked = false,
-                            VerificationCode = "VerificationCode_1"
+                            Message = "VerificationCode_1"
                         },
-                        new TextMessage {
+                        new CustomerTextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@2.com").FirstOrDefault(),
-                            HasBeenLocked = false,
-                            VerificationCode = "VerificationCode_2"
+                            Message = "VerificationCode_2"
                         },
-                        new TextMessage {
+                        new CustomerTextMessage {
                             Date = DateTime.Now,
                             Customer = db.Customers.Where(q => q.Email == "CustomerE@3.com").FirstOrDefault(),
-                            HasBeenLocked = true,
-                            VerificationCode = "VerificationCode_3"
+                            Message = "VerificationCode_3"
                         }
                     );
                     db.SaveChanges();

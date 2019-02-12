@@ -21,6 +21,7 @@ using NoskheAPI_Beta.Settings.ResponseMessages.Customer;
 using GeoCoordinatePortable;
 using Microsoft.AspNetCore.SignalR;
 using NoskheAPI_Beta.Classes.Communication;
+using NoskheAPI_Beta.Models.Android;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -34,9 +35,9 @@ namespace NoskheAPI_Beta.Services
         IEnumerable<Models.Minimals.Output.Cosmetic> GetAllCosmetics();
         IEnumerable<Models.Minimals.Output.Medicine> GetAllMedicines();
         TokenTemplate LoginWithEmailAndPass(Models.Android.AuthenticateTemplate at, AppSettings appSettings);
-        ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
-        bool RequestSmsForForgetPassword();
-        bool VerifySmsCodeForForgetPassword();
+        // ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
+        // bool RequestSmsForForgetPassword();
+        // bool VerifySmsCodeForForgetPassword();
         TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
         bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
         StatusAndIdTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
@@ -46,6 +47,12 @@ namespace NoskheAPI_Beta.Services
         CreditTemplate WalletInquiry();
         Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
+        ResponseTemplate RequestPhoneLogin(Models.Android.PhoneTemplate pt);
+        TokenTemplate VerifyPhoneLogin(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
+        ResponseTemplate RequestResetPassword(Models.Android.PhoneTemplate pt);
+        TokenTemplate VerifyResetPassword(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
+        ResponseTemplate ResetPassword(ResetPasswordTemplate rp);        
+        ResponseTemplate VerifyPhoneNumber(Models.Android.VerifyPhoneTemplate vpt);
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
@@ -93,6 +100,18 @@ namespace NoskheAPI_Beta.Services
                         };
                     db.Customers.Add(newUser);
                     db.SaveChanges(); // TODO: agar usere jadid add shod vali add kardane token expception dad bayad che konim?
+                    
+                    Random code = new Random();
+                    db.CustomerTextMessages.Add(
+                        new CustomerTextMessage {
+                            Customer = newUser,
+                            Date = DateTime.Now,
+                            Message = code.Next(11111, 99999).ToString(),
+                            Type = CustomerTextMessageType.VerifyPhoneNumber,
+                            Validated = false
+                        }
+                    );
+                    // TODO: (*) sms
 
                     // adding new token
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -101,7 +120,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         Subject = new ClaimsIdentity(new Claim[] 
                         {
-                            new Claim(ClaimTypes.Name, "C"+newUser.CustomerId.ToString())
+                            new Claim(ClaimTypes.Name, "C" + newUser.CustomerId.ToString())
                         }),
                         Expires = DateTime.UtcNow.AddDays(1),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -113,7 +132,6 @@ namespace NoskheAPI_Beta.Services
                         ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
                         Customer = newUser,
                         IsValid = true,
-                        IsAvailableInSignalR = false
                     };
                     db.CustomerTokens.Add(newCustomerToken);
                     db.SaveChanges();
@@ -141,7 +159,7 @@ namespace NoskheAPI_Beta.Services
 
                 var customerShoppingCart =
                     new Models.ShoppingCart {
-                            USCI = "someUSCI", // TODO: USCI generator
+                            USCI = "testUSCI", // TODO: USCI generator
                             Date = DateTime.Now,
                             AddressLatitude = ansc.ShoppingCartObj.AddressLatitude,
                             AddressLongitude = ansc.ShoppingCartObj.AddressLongitude,
@@ -149,7 +167,6 @@ namespace NoskheAPI_Beta.Services
                             HasBeenRequested = false,
                             Customer = foundCustomer
                         };
-
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
@@ -174,7 +191,7 @@ namespace NoskheAPI_Beta.Services
                 foreach (var id in ansc.ShoppingCartObj.CosmeticIds)
                 {
                     try
-                    {    
+                    {
                         db.CosmeticShoppingCarts.Add(
                             new CosmeticShoppingCart {
                                 Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id).FirstOrDefault(),
@@ -190,18 +207,6 @@ namespace NoskheAPI_Beta.Services
                 }
 
                 // TODO: MAYBE INPUT IS NULL
-                db.Notations.Add(
-                    new Notation {
-                        BrandPreference = ansc.ShoppingCartObj.BrandPreference,
-                        Description = ansc.ShoppingCartObj.Description,
-                        HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
-                        HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
-                        ShoppingCart = customerShoppingCart
-                    }
-                );
-                db.SaveChanges();
-
-                // TODO: MAYBE INPUT IS NULL
                 db.Prescriptions.Add(
                     new Prescription {
                         HasBeenAcceptedByPharmacy = false,
@@ -209,6 +214,18 @@ namespace NoskheAPI_Beta.Services
                         PictureUrl_2 = ansc.ShoppingCartObj.PictureUrl_2,
                         PictureUrl_3 = ansc.ShoppingCartObj.PictureUrl_3, 
                         PicturesUploadDate = DateTime.Now,
+                        ShoppingCart = customerShoppingCart
+                    }
+                );
+                db.SaveChanges();
+
+                // TODO: MAYBE INPUT IS NULL
+                db.Notations.Add(
+                    new Notation {
+                        BrandPreference = ansc.ShoppingCartObj.BrandPreference,
+                        Description = ansc.ShoppingCartObj.Description,
+                        HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
+                        HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
                         ShoppingCart = customerShoppingCart
                     }
                 );
@@ -234,72 +251,7 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(q => (q.Email == at.Email && q.Password == at.Password)).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Reference(c => c.CustomerToken).Load();
-                    if(existingCustomer.CustomerToken != null) // hatman moghe AddNewCustomer sakhte shode hast
-                    {
-                        if(DateTime.UtcNow > existingCustomer.CustomerToken.ValidTo)
-                        {
-                            // token re-creation process -----------------------------------------------------------------
-                            var tokenHandler = new JwtSecurityTokenHandler();
-                            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-                            var tokenDescriptor = new SecurityTokenDescriptor
-                            {
-                                Subject = new ClaimsIdentity(new Claim[] 
-                                {
-                                    new Claim(ClaimTypes.Name, "C"+existingCustomer.CustomerId.ToString())
-                                }),
-                                Expires = DateTime.UtcNow.AddDays(1),
-                                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                            };
-                            var token = tokenHandler.CreateToken(tokenDescriptor);
-                            // ----------------------------------------------------------------------------------------
-                            existingCustomer.CustomerToken.Token = tokenHandler.WriteToken(token);
-                            existingCustomer.CustomerToken.ValidFrom = DateTime.UtcNow;
-                            existingCustomer.CustomerToken.ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1);
-                            existingCustomer.CustomerToken.TokenRefreshRequests++; // afzoodane tedade dafaate avaz kardane token
-                            db.SaveChanges();
-                        }
-                        existingCustomer.CustomerToken.LoginRequests++; // afzoodane tedade dafaate login
-                        db.SaveChanges();
-
-                        return new TokenTemplate {
-                            Token = existingCustomer.CustomerToken.Token,
-                            Expires = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
-                        };
-                    }
-                    else // agar token pharmacy null bud
-                    {
-                        // adding new token
-                        // token re-creation process -----------------------------------------------------------------
-                        var tokenHandler = new JwtSecurityTokenHandler();
-                        var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-                        var tokenDescriptor = new SecurityTokenDescriptor
-                        {
-                            Subject = new ClaimsIdentity(new Claim[] 
-                            {
-                                new Claim(ClaimTypes.Name, "C"+existingCustomer.CustomerId.ToString())
-                            }),
-                            Expires = DateTime.UtcNow.AddDays(1),
-                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                        };
-                        var token = tokenHandler.CreateToken(tokenDescriptor);
-                        var newCustomerToken = new Models.CustomerToken
-                        {
-                            Token = tokenHandler.WriteToken(token),
-                            ValidFrom = DateTime.UtcNow,
-                            ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
-                            Customer = existingCustomer,
-                            IsValid = true,
-                            IsAvailableInSignalR = false
-                        };
-                        db.CustomerTokens.Add(newCustomerToken);
-                        db.SaveChanges();
-
-                        return new TokenTemplate {
-                            Token = newCustomerToken.Token,
-                            Expires = DateTimeOffset.Parse(newCustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
-                        };
-                    }
+                    return LoginHandler(existingCustomer, appSettings);
                     // throw new UnauthorizedAccessException(); TODO: uncomment this and remove the else scope
                 }
                 throw new LoginVerificationFailedException(ErrorCodes.LoginVerificationFailedExceptionMsg);
@@ -310,30 +262,6 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings)
-        {
-            // 24 hour - 3 maximum sms - 2 minutes in between same request
-            try
-            {
-                var existingCustomer = db.Customers.Where(q => q.Phone == abp.Phone).FirstOrDefault();
-                if(existingCustomer != null)
-                {
-                    db.Entry(existingCustomer).Reference(c => c.TextMessage).Load();
-                    var textMessage = existingCustomer.TextMessage;
-                    if(textMessage != null)
-                    {
-                        
-                    }
-                }
-
-                // un-satisfying result
-                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
-            }
-            catch(DbUpdateException)
-            {
-                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
-            }
-        }
         public bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee)
         {
             try
@@ -373,23 +301,6 @@ namespace NoskheAPI_Beta.Services
                 if(responses != null) return responses.ToArray();
                 
                 throw new NoCosmeticsAvailabeException(ErrorCodes.NoCosmeticsAvailabeExceptionMsg);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public int GetCustomerId()
-        {
-            try
-            {
-                // agar peida shod va valid bud vali timesh tamum shode bud -> SecurityToken"Expired"Exception
-                // agar peida nashod -> "Unauthorized"AccessException
-                var customer = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
-                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
-                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
-                return customer.CustomerId;
             }
             catch
             {
@@ -631,40 +542,6 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public bool RequestSmsForForgetPassword()
-        {
-            try
-            {
-                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                throw new NotImplementedException();
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public bool VerifySmsCodeForForgetPassword()
-        {
-            try
-            {
-                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                throw new NotImplementedException();
-            }
-            catch
-            {
-                throw;
-            }
-            // catch(SmsVerificationFailedException vfe)
-            // {
-            //     throw new SmsVerificationFailedException(vfe.Message);
-            // }
-            // catch(SmsVerificationExpiredException vee)
-            // {
-            //     throw new SmsVerificationExpiredException(vee.Message);
-            // }
-        }
-
         public List<DistanceObj> PharmaciesNearCustomer(int shoppingCartId)
         {
             try
@@ -791,12 +668,13 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public NoskheForFirstNotificationOnDesktop PrepareObject(int shoppingCartId)
+        public NoskheForFirstNotificationOnDesktop PrepareObject(int shoppingCartId) // TODO: TRY CATCH, SAVE IN DATABASE FOR FURTHER USE AND NEXT PHARMACY RECEPTION
         {
             var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
             db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
             db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
-            db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
+            var notation = db.Notations.Where(n => n.ShoppingCartId == existingShoppingCart.ShoppingCartId).FirstOrDefault();
+            // db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
             db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
                 .Include(msc => msc.Medicine).Load();
             db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
@@ -839,10 +717,383 @@ namespace NoskheAPI_Beta.Services
                 Cosmetics = cosmetics,
                 Medicines = medicines,
                 Picture_Urls = picUrls,
-                Notation = existingShoppingCart.Notation
+                Notation = notation
             };
             newItem.Notation.ShoppingCart = null; // if not -> message is not going to be sent to pharmacy through signalr
             return newItem;
+        }
+
+        public ResponseTemplate RequestPhoneLogin(PhoneTemplate pt)
+        {
+            try
+            {
+                var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
+                if(existingCustomer != null)
+                {
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                        where record.Type == CustomerTextMessageType.Login
+                        select record;
+                    if(existingLoginRequests != null)
+                    {
+                        var lastMessage = existingLoginRequests.Last();
+                        var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
+                        if(difference < 2)
+                        {
+                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsExceptionMsg);
+                        }
+                    }
+                    Random code = new Random();
+                    db.CustomerTextMessages.Add(
+                        new CustomerTextMessage {
+                            Customer = existingCustomer,
+                            Message = code.Next(11111,99999).ToString(),
+                            Date = DateTime.Now,
+                            Type = CustomerTextMessageType.Login,
+                            Validated = false
+                        }
+                    );
+                    db.SaveChanges();
+                    // TODO: (*) sms
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public TokenTemplate VerifyPhoneLogin(VerifyPhoneTemplate vpt, AppSettings appSettings)
+        {
+            try
+            {
+                var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
+                if(existingCustomer != null)
+                {
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                        where record.Type == CustomerTextMessageType.Login
+                        select record;
+                    if(existingLoginRequests != null)
+                    {
+                        var lastMessage = existingLoginRequests.Last();
+                        var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
+                        if(difference < 2)
+                        {
+                            if(vpt.VerificationCode == lastMessage.Message)
+                            {
+                                lastMessage.Validated = true;
+                                db.SaveChanges();
+                                return LoginHandler(existingCustomer, appSettings);
+                            }
+                            lastMessage.NumberOfAttempts++;
+                            db.SaveChanges();
+                            throw new TextMessageVerificationFailedException(ErrorCodes.TextMessageVerificationFailedExceptionMsg);
+                        }
+                        throw new TextMessageVerificationTimeExpiredException(ErrorCodes.TextMessageVerificationTimeExpiredExceptionMsg);
+                    }
+                    throw new UnauthorizedAccessException(); // if there is no request for phone login : odd one!
+                }
+                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate RequestResetPassword(PhoneTemplate pt)
+        {
+            try
+            {
+                var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
+                if(existingCustomer != null)
+                {
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                        where record.Type == CustomerTextMessageType.ForgetPassword
+                        select record;
+                    if(existingLoginRequests != null)
+                    {
+                        var lastMessage = existingLoginRequests.Last();
+                        var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
+                        var numberOfRequestsPerDay = 0;
+                        foreach (var textMessageRequest in existingLoginRequests)
+                        {
+                            if(DateTime.Now.Subtract(textMessageRequest.Date).TotalHours < 24) numberOfRequestsPerDay++;
+                        }
+                        if(difference < 30)
+                        {
+                            throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsExceptionMsg);
+                        }
+                        if(lastMessage.NumberOfAttempts > 4)
+                        {
+                            throw new NumberOfTextMessageTriesExceededException(ErrorCodes.NumberOfTextMessageTriesExceededExceptionMsg);
+                        }
+                        if(numberOfRequestsPerDay > 3)
+                        {
+                            throw new UnauthorizedAccessException();
+                        }
+                    }
+                    Random code = new Random();
+                    db.CustomerTextMessages.Add(
+                        new CustomerTextMessage {
+                            Customer = existingCustomer,
+                            Message = code.Next(11111,99999).ToString(),
+                            Date = DateTime.Now,
+                            Type = CustomerTextMessageType.ForgetPassword,
+                            Validated = false
+                        }
+                    );
+                    db.SaveChanges();
+                    // TODO: (*) sms
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public TokenTemplate VerifyResetPassword(VerifyPhoneTemplate vpt, AppSettings appSettings)
+        {
+            try
+            {
+                var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
+                if(existingCustomer != null)
+                {
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                        where record.Type == CustomerTextMessageType.ForgetPassword
+                        select record;
+                    if(existingLoginRequests != null)
+                    {
+                        var lastMessage = existingLoginRequests.Last();
+                        var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
+                        if(difference < 2)
+                        {
+                            if(vpt.VerificationCode == lastMessage.Message)
+                            {
+                                lastMessage.Validated = true;
+                                db.SaveChanges();
+                                return ResetPasswordHandler(existingCustomer, appSettings);
+                            }
+                            lastMessage.NumberOfAttempts++;
+                            db.SaveChanges();
+                            throw new TextMessageVerificationFailedException(ErrorCodes.TextMessageVerificationFailedExceptionMsg);
+                        }
+                        throw new TextMessageVerificationTimeExpiredException(ErrorCodes.TextMessageVerificationTimeExpiredExceptionMsg);
+                    }
+                    throw new UnauthorizedAccessException();
+                }
+                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate ResetPassword(ResetPasswordTemplate rpt)
+        {
+            try
+            {
+                ResetPasswordTokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerResetPasswordId()).FirstOrDefault();
+                existingCustomer.Password = rpt.NewPassword;
+                db.SaveChanges();
+                return new ResponseTemplate {
+                    Success = true
+                };
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate VerifyPhoneNumber(VerifyPhoneTemplate vpt)
+        {
+            try
+            {
+                var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
+                if(existingCustomer != null)
+                {
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                        where record.Type == CustomerTextMessageType.VerifyPhoneNumber
+                        select record;
+                    if(existingLoginRequests != null)
+                    {
+                        var lastMessage = existingLoginRequests.Last();
+                        var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
+                        if(difference < 2)
+                        {
+                            if(vpt.VerificationCode == lastMessage.Message)
+                            {
+                                lastMessage.Validated = true;
+                                // verify ok
+                                existingCustomer.IsPhoneValidated = true;
+                                db.SaveChanges();
+                            }
+                            lastMessage.NumberOfAttempts++;
+                            db.SaveChanges();
+                            throw new TextMessageVerificationFailedException(ErrorCodes.TextMessageVerificationFailedExceptionMsg);
+                        }
+                        throw new TextMessageVerificationTimeExpiredException(ErrorCodes.TextMessageVerificationTimeExpiredExceptionMsg);
+                    }
+                    throw new UnauthorizedAccessException();
+                }
+                throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public TokenTemplate ResetPasswordHandler(Models.Customer existingCustomer, AppSettings appSettings)
+        {
+            db.Entry(existingCustomer).Reference(c => c.CustomerResetPasswordToken).Load();
+            if(existingCustomer.CustomerResetPasswordToken != null) // hatman moghe AddNewCustomer sakhte shode hast
+            {
+                if(DateTime.UtcNow > existingCustomer.CustomerResetPasswordToken.ValidTo)
+                {
+                    // token re-creation process -----------------------------------------------------------------
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[] 
+                        {
+                            new Claim(ClaimTypes.Name, "CRP" + existingCustomer.CustomerId.ToString()) // customer reset password
+                        }),
+                        Expires = DateTime.UtcNow.AddMinutes(2),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    // ----------------------------------------------------------------------------------------
+                    existingCustomer.CustomerResetPasswordToken.Token = tokenHandler.WriteToken(token);
+                    existingCustomer.CustomerResetPasswordToken.ValidFrom = DateTime.UtcNow;
+                    existingCustomer.CustomerResetPasswordToken.ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddMinutes(2);
+                    existingCustomer.CustomerResetPasswordToken.TokenRefreshRequests++; // afzoodane tedade dafaate avaz kardane token
+                    db.SaveChanges();
+                }
+
+                return new TokenTemplate {
+                    Token = existingCustomer.CustomerResetPasswordToken.Token,
+                    Expires = DateTimeOffset.Parse(existingCustomer.CustomerResetPasswordToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                };
+            }
+            else // agar token null bud
+            {
+                // adding new token
+                // token re-creation process -----------------------------------------------------------------
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[] 
+                    {
+                        new Claim(ClaimTypes.Name, "CRP" + existingCustomer.CustomerId.ToString()) // customer reset password
+                    }),
+                    Expires = DateTime.UtcNow.AddMinutes(2),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var newCustomerResetPasswordToken = new Models.CustomerResetPasswordToken
+                {
+                    Token = tokenHandler.WriteToken(token),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddMinutes(2),
+                    Customer = existingCustomer,
+                    IsValid = true,
+                };
+                db.CustomerResetPasswordToken.Add(newCustomerResetPasswordToken);
+                db.SaveChanges();
+
+                return new TokenTemplate {
+                    Token = newCustomerResetPasswordToken.Token,
+                    Expires = DateTimeOffset.Parse(newCustomerResetPasswordToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                };
+            }
+        }
+
+        public TokenTemplate LoginHandler(Models.Customer existingCustomer, AppSettings appSettings)
+        {
+            db.Entry(existingCustomer).Reference(c => c.CustomerToken).Load();
+            if(existingCustomer.CustomerToken != null) // hatman moghe AddNewCustomer sakhte shode hast
+            {
+                if(DateTime.UtcNow > existingCustomer.CustomerToken.ValidTo)
+                {
+                    // token re-creation process -----------------------------------------------------------------
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[] 
+                        {
+                            new Claim(ClaimTypes.Name, "C" + existingCustomer.CustomerId.ToString())
+                        }),
+                        Expires = DateTime.UtcNow.AddDays(1),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    // ----------------------------------------------------------------------------------------
+                    existingCustomer.CustomerToken.Token = tokenHandler.WriteToken(token);
+                    existingCustomer.CustomerToken.ValidFrom = DateTime.UtcNow;
+                    existingCustomer.CustomerToken.ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1);
+                    existingCustomer.CustomerToken.TokenRefreshRequests++; // afzoodane tedade dafaate avaz kardane token
+                    db.SaveChanges();
+                }
+                existingCustomer.CustomerToken.LoginRequests++; // afzoodane tedade dafaate login
+                db.SaveChanges();
+
+                return new TokenTemplate {
+                    Token = existingCustomer.CustomerToken.Token,
+                    Expires = DateTimeOffset.Parse(existingCustomer.CustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                };
+            }
+            else // agar token pharmacy null bud
+            {
+                // adding new token
+                // token re-creation process -----------------------------------------------------------------
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[] 
+                    {
+                        new Claim(ClaimTypes.Name, "C" + existingCustomer.CustomerId.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(1),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var newCustomerToken = new Models.CustomerToken
+                {
+                    Token = tokenHandler.WriteToken(token),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
+                    Customer = existingCustomer,
+                    IsValid = true,
+                };
+                db.CustomerTokens.Add(newCustomerToken);
+                db.SaveChanges();
+
+                return new TokenTemplate {
+                    Token = newCustomerToken.Token,
+                    Expires = DateTimeOffset.Parse(newCustomerToken.ValidTo.ToString()).ToUnixTimeSeconds()
+                };
+            }
         }
 
         public void TokenValidationHandler()
@@ -864,6 +1115,62 @@ namespace NoskheAPI_Beta.Services
             {
                 throw;
                 // throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+            }
+        }
+
+        public void ResetPasswordTokenValidationHandler()
+        {
+            // agar token dar db bud -> invalid ya expired
+            // agar token dar db nabud -> customer vojud nadarad
+            // ------
+            // invalid YA namojud (null) --> unauthorized exception midahad
+            // expired --> token expired exception midahad
+            // ------
+            // pas digar sharte null budane customer dar edame code fayde nadarad va az ghabl hame chiz malum hast
+            try
+            {
+                var customer = db.CustomerResetPasswordToken.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+            }
+            catch 
+            {
+                throw;
+                // throw new APIUnhandledException(ErrorCodes.APIUnhandledExceptionMsg);
+            }
+        }
+
+        public int GetCustomerId()
+        {
+            try
+            {
+                // agar peida shod va valid bud vali timesh tamum shode bud -> SecurityToken"Expired"Exception
+                // agar peida nashod -> "Unauthorized"AccessException
+                var customer = db.CustomerTokens.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+                return customer.CustomerId;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public int GetCustomerResetPasswordId()
+        {
+            try
+            {
+                // agar peida shod va valid bud vali timesh tamum shode bud -> SecurityToken"Expired"Exception
+                // agar peida nashod -> "Unauthorized"AccessException
+                var customer = db.CustomerResetPasswordToken.Where(ct => ct.Token == RequestToken).FirstOrDefault();
+                if(customer == null || customer.IsValid == false) throw new UnauthorizedAccessException();
+                if(DateTime.UtcNow > customer.ValidTo) throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+                return customer.CustomerId;
+            }
+            catch
+            {
+                throw;
             }
         }
     }

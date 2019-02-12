@@ -531,6 +531,49 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
+        // GET: desktop-api/pharmacy/logout
+        [HttpGet(Labels.Logout)]
+        public ActionResult Logout()
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_pharmacyService.Logout());
+            }
+            catch(PendingRequestInProgressException pripe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pripe.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

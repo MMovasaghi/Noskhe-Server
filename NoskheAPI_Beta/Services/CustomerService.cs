@@ -555,6 +555,7 @@ namespace NoskheAPI_Beta.Services
                 List<DistanceObj> nearPharmacies = new List<DistanceObj>();
                 GeoCoordinate shLoc = new GeoCoordinate(existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude);
                 GeoCoordinate phLoc = new GeoCoordinate();
+
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
                     phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
@@ -573,6 +574,8 @@ namespace NoskheAPI_Beta.Services
                 // check if the trustedPharmacy is not available in found pharmacy list, in order to 
                 if(sorted.Where(p => p.PharmacyId == trustedPharmacy.PharmacyId).FirstOrDefault() == null) sorted.Add(new DistanceObj { PharmacyId = trustedPharmacy.PharmacyId, Distance = shLoc.GetDistanceTo(new GeoCoordinate(trustedPharmacy.AddressLatitude, trustedPharmacy.AddressLongitude)) });
                 
+                if(sorted.Count == 0) throw new NoPharmaciesAreProvidingServiceException(ErrorCodes.NoPharmaciesAreProvidingServiceExceptionMsg);
+
                 if(sorted.Count > 9)
                 {
                     sorted.RemoveRange(9, sorted.Count - 7);

@@ -34,6 +34,7 @@ namespace NoskheAPI_Beta.Services
         ResponseTemplate SetANewSettle(Models.Minimals.Input.Settle settle);
         IEnumerable<Models.Minimals.Output.Score> GetTopFivePharmacies();
         TokenTemplate LoginWithEmailAndPass(string[] credential, AppSettings appSettings);
+        ResponseTemplate Logout();
         ResponseTemplate ToggleStateOfPharmacy();
         IEnumerable<float> NumberOfOrdersInThisWeek();
         IEnumerable<float> AverageTimeOfPackingInThisWeek();
@@ -820,11 +821,12 @@ namespace NoskheAPI_Beta.Services
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var existingOrder = db.Orders.Where(o => o.ShoppingCartId == invoice.ShoppingCartId).FirstOrDefault();
                 var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == invoice.ShoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
                 if(existingServiceMapping == null) {
                     throw new UnauthorizedAccessException();
                 }
+
+                var existingOrder = db.Orders.Where(o => o.ShoppingCartId == invoice.ShoppingCartId).FirstOrDefault();
                 db.Entry(existingOrder).Reference(o => o.ShoppingCart).Query()
                     .Include(s => s.Prescription)
                     .Include(s => s.Customer)
@@ -865,6 +867,11 @@ namespace NoskheAPI_Beta.Services
                     }
                 }
                 existingOrder.Price = totalPriceWithoutShippingCost + 1000; // TODO: mohasebeye hazine safar bar asase fasele
+                
+                // decrement pending requests
+                var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                existingPharmacy.PendingRequests--;
+
                 db.SaveChanges();
                 // (2)
                 // (3)
@@ -894,6 +901,26 @@ namespace NoskheAPI_Beta.Services
         public decimal GetCurrentWalletCredit(int customerId)
         {
             return db.Customers.Where(c => c.CustomerId == customerId).FirstOrDefault().Money;
+        }
+
+        public ResponseTemplate Logout()
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingPharmacy = db.Pharmacies.Where(q => q.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                if(existingPharmacy.PendingRequests != 0) throw new PendingRequestInProgressException(ErrorCodes.PendingRequestInProgressExceptionMsg);
+                existingPharmacy.IsAvailableNow = false;
+                db.SaveChanges();
+                
+                return new ResponseTemplate {
+                    Success = true
+                };
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
         }
 
         public void TokenValidationHandler()

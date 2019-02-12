@@ -20,7 +20,8 @@ namespace NoskheAPI_Beta.Settings.Routing.Pharmacy
         public const string AverageTimeOfPackingInThisWeek = "packings-average-time-in-week"; // "Get-Weekly-Packing-Average-Time"
         public const string GetTopFivePharmacies = "top-five"; // "Get-Top-Five"
         // new functions goes here
-        public const string ServiceResponse = "service-response"; // "Get-Top-Five"
-        public const string InvoiceDetails = "invoice-details"; // "Get-Top-Five"
+        public const string ServiceResponse = "service-response";
+        public const string InvoiceDetails = "invoice-details";
+        public const string Logout = "logout";
     }
 }

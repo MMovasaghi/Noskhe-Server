@@ -35,5 +35,6 @@ namespace NoskheAPI_Beta.Settings.Routing.Customer
         public const string AddCreditToWallet = "add-credit";
         public const string WalletInquiry = "wallet";
         public const string RequestService = "request-service";
+        public const string Logout = "logout";
     }
 }

@@ -622,7 +622,7 @@ namespace NoskheAPI_Beta.Services
                         foundPharmaciesString += (pharmacy.PharmacyId + ",");
                     }
                     // remove last comma
-                    foundPharmaciesString = foundPharmaciesString.Remove(foundPharmaciesString.Length - 1);
+                    if(foundPharmaciesString != "") foundPharmaciesString = foundPharmaciesString.Remove(foundPharmaciesString.Length - 1);
 
                     db.ServiceMappings.Add(
                         new ServiceMapping {
@@ -821,11 +821,11 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Load();
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.ForgetPassword
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
@@ -878,11 +878,11 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Load();
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.ForgetPassword
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;

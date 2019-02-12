@@ -159,7 +159,7 @@ namespace NoskheAPI_Beta.Services
 
                 var customerShoppingCart =
                     new Models.ShoppingCart {
-                            USCI = "someUSCI", // TODO: USCI generator
+                            USCI = "testUSCI", // TODO: USCI generator
                             Date = DateTime.Now,
                             AddressLatitude = ansc.ShoppingCartObj.AddressLatitude,
                             AddressLongitude = ansc.ShoppingCartObj.AddressLongitude,
@@ -167,7 +167,6 @@ namespace NoskheAPI_Beta.Services
                             HasBeenRequested = false,
                             Customer = foundCustomer
                         };
-
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
@@ -192,7 +191,7 @@ namespace NoskheAPI_Beta.Services
                 foreach (var id in ansc.ShoppingCartObj.CosmeticIds)
                 {
                     try
-                    {    
+                    {
                         db.CosmeticShoppingCarts.Add(
                             new CosmeticShoppingCart {
                                 Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id).FirstOrDefault(),
@@ -208,18 +207,6 @@ namespace NoskheAPI_Beta.Services
                 }
 
                 // TODO: MAYBE INPUT IS NULL
-                db.Notations.Add(
-                    new Notation {
-                        BrandPreference = ansc.ShoppingCartObj.BrandPreference,
-                        Description = ansc.ShoppingCartObj.Description,
-                        HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
-                        HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
-                        ShoppingCart = customerShoppingCart
-                    }
-                );
-                db.SaveChanges();
-
-                // TODO: MAYBE INPUT IS NULL
                 db.Prescriptions.Add(
                     new Prescription {
                         HasBeenAcceptedByPharmacy = false,
@@ -227,6 +214,18 @@ namespace NoskheAPI_Beta.Services
                         PictureUrl_2 = ansc.ShoppingCartObj.PictureUrl_2,
                         PictureUrl_3 = ansc.ShoppingCartObj.PictureUrl_3, 
                         PicturesUploadDate = DateTime.Now,
+                        ShoppingCart = customerShoppingCart
+                    }
+                );
+                db.SaveChanges();
+
+                // TODO: MAYBE INPUT IS NULL
+                db.Notations.Add(
+                    new Notation {
+                        BrandPreference = ansc.ShoppingCartObj.BrandPreference,
+                        Description = ansc.ShoppingCartObj.Description,
+                        HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
+                        HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
                         ShoppingCart = customerShoppingCart
                     }
                 );
@@ -252,7 +251,7 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(q => (q.Email == at.Email && q.Password == at.Password)).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    LoginHandler(existingCustomer, appSettings);
+                    return LoginHandler(existingCustomer, appSettings);
                     // throw new UnauthorizedAccessException(); TODO: uncomment this and remove the else scope
                 }
                 throw new LoginVerificationFailedException(ErrorCodes.LoginVerificationFailedExceptionMsg);
@@ -674,7 +673,8 @@ namespace NoskheAPI_Beta.Services
             var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
             db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
             db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
-            db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
+            var notation = db.Notations.Where(n => n.ShoppingCartId == existingShoppingCart.ShoppingCartId).FirstOrDefault();
+            // db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
             db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
                 .Include(msc => msc.Medicine).Load();
             db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
@@ -717,7 +717,7 @@ namespace NoskheAPI_Beta.Services
                 Cosmetics = cosmetics,
                 Medicines = medicines,
                 Picture_Urls = picUrls,
-                Notation = existingShoppingCart.Notation
+                Notation = notation
             };
             newItem.Notation.ShoppingCart = null; // if not -> message is not going to be sent to pharmacy through signalr
             return newItem;
@@ -788,7 +788,7 @@ namespace NoskheAPI_Beta.Services
                             {
                                 lastMessage.Validated = true;
                                 db.SaveChanges();
-                                LoginHandler(existingCustomer, appSettings);
+                                return LoginHandler(existingCustomer, appSettings);
                             }
                             lastMessage.NumberOfAttempts++;
                             db.SaveChanges();
@@ -884,7 +884,7 @@ namespace NoskheAPI_Beta.Services
                             {
                                 lastMessage.Validated = true;
                                 db.SaveChanges();
-                                ResetPasswordHandler(existingCustomer, appSettings);
+                                return ResetPasswordHandler(existingCustomer, appSettings);
                             }
                             lastMessage.NumberOfAttempts++;
                             db.SaveChanges();

@@ -435,13 +435,6 @@ namespace NoskheAPI_Beta.Controllers
                             HasOtherDiseases = false,
                             Description = "NotationD_5",
                             ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_005").FirstOrDefault()
-                        },
-                        new Notation {
-                            BrandPreference = BrandType.Local,
-                            HasPregnancy = false,
-                            HasOtherDiseases = false,
-                            Description = "NotationD_6",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_006").FirstOrDefault()
                         }
                     );
                     db.SaveChanges();

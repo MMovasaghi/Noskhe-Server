@@ -753,7 +753,8 @@ namespace NoskheAPI_Beta.Services
                         existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.FirstStepAcceptance;
                         Models.Order newOrder = new Models.Order {
                             ShoppingCartId = shoppingCartId,
-                            Courier = null, // TODO: a function to choose what to do
+                            // Courier = null, // TODO: a function to choose what to do
+                            CourierId = 1,
                             HasBeenAcceptedByCustomer = false,
                             PharmacyId = GetPharmacyId(),
                             UOI = "someShit", // TODO

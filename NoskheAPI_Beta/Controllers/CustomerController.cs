@@ -453,6 +453,13 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(await _customerService.RequestService(_notificationService, _hubContext, shoppingCartId));
             }
+            catch(ExistingShoppingCartHasBeenRequestedEarlierException eschbree)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = eschbree.Message
+                });
+            }
             catch(DatabaseFailureException dfe)
             {
                 return BadRequest(new ResponseTemplate {

@@ -23,6 +23,7 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string EmailAndPhoneAreNullExceptionMsg = "CEC18";
         public static string TextMessageVerificationFailedExceptionMsg = "CEC19";
         public static string NumberOfTextMessageTriesExceededExceptionMsg = "CEC20";
+        public static string ExistingShoppingCartHasBeenRequestedEarlierExceptionMsg = "CEC21";
         // C# Standard Exception Error Code Messages
         public static string SecurityTokenExpiredExceptionMsg = "CEC0";
     }

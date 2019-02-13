@@ -574,6 +574,85 @@ namespace NoskheAPI_Beta.Controllers
             }
         }
 
+        // GET: mobile-api/customer/latest
+        [HttpGet(Labels.LatestNotifications)]
+        public ActionResult LatestNotifications()
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_pharmacyService.LatestNotifications(_notificationService, _hubContext));
+            }
+            catch(NoNotificationsMatchedByIdException nnmbie)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = nnmbie.Message
+                });
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
+        // GET: mobile-api/customer/notification-response
+        [HttpGet(Labels.NotificationResponse)]
+        public ActionResult NotificationResponse(int notificationId)
+        {
+            try
+            {
+                GrabTokenFromHeader();
+                return Ok(_pharmacyService.NotificationResponse(notificationId));
+            }
+            catch(DatabaseFailureException dfe)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = dfe.Message
+                });
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch(SecurityTokenExpiredException stee)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = stee.Message
+                });
+            }
+            catch
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = ErrorCodes.APIUnhandledExceptionMsg
+                });
+            }
+        }
+
         private void GrabTokenFromHeader()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString();

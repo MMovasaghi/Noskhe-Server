@@ -25,8 +25,10 @@ namespace NoskheAPI_Beta.Models
         */
         public List<ShoppingCart> ShoppingCarts { get; set; }
         public List<CustomerTextMessage> CustomerTextMessages { get; set; }
+        public List<WalletTransactionHistory> WalletTransactionHistories { get; set; }
         public CustomerToken CustomerToken { get; set; }
         public CustomerResetPasswordToken CustomerResetPasswordToken { get; set; }
-        public CustomerNotificationMap CustomerNotificationMap { get; set; } // TODO: remove
+        public CustomerHubMap CustomerHubMap { get; set; } // TODO: not needed for now, after mvp
+        public CustomerNotification CustomerNotification { get; set; } // should it not be sent to customer, he or she will check and get the latest notifications
     }
 }

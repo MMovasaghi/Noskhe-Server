@@ -22,6 +22,7 @@ using GeoCoordinatePortable;
 using Microsoft.AspNetCore.SignalR;
 using NoskheAPI_Beta.Classes.Communication;
 using NoskheAPI_Beta.Models.Android;
+using System.Net.Http;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -45,7 +46,7 @@ namespace NoskheAPI_Beta.Services
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         CreditTemplate WalletInquiry();
-        Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
+        Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
         ResponseTemplate RequestPhoneLogin(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyPhoneLogin(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
@@ -53,10 +54,14 @@ namespace NoskheAPI_Beta.Services
         TokenTemplate VerifyResetPassword(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
         ResponseTemplate ResetPassword(ResetPasswordTemplate rp);        
         ResponseTemplate VerifyPhoneNumber(Models.Android.VerifyPhoneTemplate vpt);
+        CustomerLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext);        
+        ResponseTemplate NotificationResponse(int notificationId);        
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
     {
+        public static string KAVENEGAR_SMS_TOKEN = "3463437075492B4E4E4453565136542B684156365559716C556572476250716A";
+        public static string AUTHRIZATION_TEMPLATE_NAME = "ntest";
         private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         public string RequestToken { get; set; }
 
@@ -101,17 +106,22 @@ namespace NoskheAPI_Beta.Services
                     db.Customers.Add(newUser);
                     db.SaveChanges(); // TODO: agar usere jadid add shod vali add kardane token expception dad bayad che konim?
                     
-                    Random code = new Random();
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = newUser,
                             Date = DateTime.Now,
-                            Message = code.Next(11111, 99999).ToString(),
+                            Message = code.ToString(),
                             Type = CustomerTextMessageType.VerifyPhoneNumber,
                             Validated = false
                         }
                     );
                     // TODO: (*) sms
+                    // var client = new HttpClient();
+                    // var response = new HttpResponseMessage();
+                    // response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={newUser.FirstName} {newUser.LastName}&token2={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+
 
                     // adding new token
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -543,7 +553,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public List<DistanceObj> PharmaciesNearCustomer(int shoppingCartId)
+        public List<DistanceObj> PharmaciesNearCustomer(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId)
         {
             try
             {
@@ -558,15 +568,19 @@ namespace NoskheAPI_Beta.Services
 
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
+                    // // check availablity of pharmacies
+                    // await notificationService.P_CheckAvailablity(hubContext, pharmacyLocation.PharmacyId);
+
                     phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
                     nearPharmacies.Add(new DistanceObj { Distance = shLoc.GetDistanceTo(phLoc), PharmacyId = pharmacyLocation.PharmacyId, Name = pharmacyLocation.Name });
                 }
                 var sorted = nearPharmacies.OrderBy(p => p.Distance).ToList();
                 
-                // for (int i = 0; i < sorted.Count; i++)
+                // foreach (var item in sorted)
                 // {
-                //     if(sorted[i].Distance > 10)
-                //         sorted.RemoveAt(i);
+                //     // if the pharmacy response is
+                //     var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == item.PharmacyId).FirstOrDefault();
+                //     if(existingPharmacy.IsAvailableNow == false) sorted.Remove(item);
                 // }
 
                 // sorted.RemoveAll(item => item.Distance > 100000); // TODO: tehran values for appropriate measurements
@@ -611,7 +625,7 @@ namespace NoskheAPI_Beta.Services
                 // (1)
                 if(existingServiceMapping == null)
                 {
-                    var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
+                    var pharmaciesQueue = PharmaciesNearCustomer(notificationService, hubContext, shoppingCartId);
                 
                     var firstPharmacy = db.Pharmacies.Where(p => p.PharmacyId == pharmaciesQueue.First().PharmacyId).FirstOrDefault(); // TODO: decrement and increment control
                     firstPharmacy.PendingRequests++;
@@ -633,10 +647,18 @@ namespace NoskheAPI_Beta.Services
                         }
                     );
                     db.SaveChanges();
+                    // // save notifaction record
+                    // var newPharmacyNotification = new PharmacyNotification {
+                    //         PharmacyId = pharmaciesQueue.First().PharmacyId,
+                    //         HasRecieved = false,
+                    //         Date = DateTime.Now,
+                    //         Type = PharmacyNotificationType.PharmacyReception
+                    //     };
+                    // db.PharmacyNotifications.Add(newPharmacyNotification);
+                    // db.SaveChanges();
                     // (2)
                     var newItem = PrepareObject(shoppingCartId);
                     await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
-                    // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2", Birthday = DateTime.Now, Email = "shit", Gender = Gender.Male, Phone = "some othe shit", ProfilePictureUrl = "shity shit!" }, Cosmetics = new List<Models.Minimals.Output.Cosmetic> { new Models.Minimals.Output.Cosmetic { CosmeticId = 1, Name = "some cosmetic", Number = 2, Price = 100, ProductPictureUrl = "url" } }, Medicines = new List<Models.Minimals.Output.Medicine> { new Models.Minimals.Output.Medicine { MedicineId = 1, Name = "s", Number = 3, Price = 20, ProductPictureUrl = "ss" } }, Notation = new Notation { BrandPreference = BrandType.Global, Description = "s", HasOtherDiseases = false, HasPregnancy = false, NotationId = 1, ShoppingCartId = 3 } });
                     // (3)
                     return new ResponseTemplate {
                         Success = true
@@ -656,11 +678,22 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
+
+                // add a record to wallet history
+                var newWalletHistory = new WalletTransactionHistory {
+                        Customer = foundCustomer,
+                        Date = DateTime.Now,
+                        Price = credit,
+                        IsSuccessful = false
+                    };
+                db.WalletTransactionHistories.Add(newWalletHistory);
+                db.SaveChanges();
+
                 string gender = foundCustomer.Gender == Models.Gender.Male ? "آقای" : "خانم";
                 string description = $"شارژ کیف پول کاربر {gender} {foundCustomer.FirstName} {foundCustomer.LastName} - اپلیکیشن نسخه";
                 ServicePointManager.Expect100Continue = false;
                 PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", credit, description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", credit, description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/{newWalletHistory.WalletTransactionHistoryId}/Wallet");
                 string paymentUrl = "";
                 if (request.Body.Status == 100)
                     paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
@@ -961,6 +994,100 @@ namespace NoskheAPI_Beta.Services
                     throw new UnauthorizedAccessException();
                 }
                 throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public CustomerLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var latestNotifications = db.CustomerNotifications.Where(cn => cn.CustomerId == GetCustomerId() && cn.HasRecieved == false).ToList();
+                var latestNotificationsTemplate = new CustomerLatestNotificationsTemplate();
+                if(latestNotifications.Count != 0)
+                {
+                    latestNotificationsTemplate.Any = true; // there is at least one notification
+                    foreach (var notification in latestNotifications)
+                    {
+                        switch (notification.Type)
+                        {
+                            case CustomerNotificationType.CancellationReport:
+                                latestNotificationsTemplate.CancellationReportObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.CourierDetail:
+                                latestNotificationsTemplate.CourierDetailObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.InvoiceDetails:
+                                latestNotificationsTemplate.InvoiceDetailsObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.PharmacyInquiry:
+                                latestNotificationsTemplate.PharmacyInquiryObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                        }
+                        notification.HasRecieved = true;
+                    }
+                    db.SaveChanges();
+                }
+                latestNotificationsTemplate.Any = false; // there is no unread notifications available
+                return latestNotificationsTemplate;
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate NotificationResponse(int notificationId)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingNotification = db.CustomerNotifications.Where(cn => cn.CustomerNotificationId == notificationId).FirstOrDefault();
+                if(existingNotification != null)
+                {
+                    existingNotification.HasRecieved = true;
+                    db.SaveChanges();
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new NoNotificationsMatchedByIdException(ErrorCodes.NoNotificationsMatchedByIdExceptionMsg);
             }
             catch(DbUpdateException)
             {

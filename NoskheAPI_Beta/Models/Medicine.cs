@@ -7,7 +7,7 @@ namespace NoskheAPI_Beta.Models
     {
         public int MedicineId { get; set; }
         public string Name { get; set; }
-        public decimal Price { get; set; }
+        public int Price { get; set; }
         public string ProductPictureUrl { get; set; }
         public DateTime ProductPictureUploadDate { get; set; }
         public MedicineType Type { get; set; }

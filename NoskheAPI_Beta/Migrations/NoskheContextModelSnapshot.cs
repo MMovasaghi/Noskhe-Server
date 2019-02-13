@@ -44,7 +44,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<decimal>("Price");
+                    b.Property<int>("Price");
 
                     b.Property<DateTime>("ProductPictureUploadDate");
 
@@ -164,9 +164,9 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotificationMap", b =>
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerHubMap", b =>
                 {
-                    b.Property<int>("CustomerNotificationMapId")
+                    b.Property<int>("CustomerHubMapId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Connected");
@@ -175,12 +175,45 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<int>("CustomerId");
 
-                    b.HasKey("CustomerNotificationMapId");
+                    b.HasKey("CustomerHubMapId");
 
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("CustomerNotificationMap");
+                    b.ToTable("CustomerHubMap");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotification", b =>
+                {
+                    b.Property<int>("CustomerNotificationId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Arg1");
+
+                    b.Property<string>("Arg2");
+
+                    b.Property<string>("Arg3");
+
+                    b.Property<string>("Arg4");
+
+                    b.Property<string>("Arg5");
+
+                    b.Property<string>("Arg6");
+
+                    b.Property<int>("CustomerId");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<bool>("HasRecieved");
+
+                    b.Property<int>("Type");
+
+                    b.HasKey("CustomerNotificationId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("CustomerNotifications");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerResetPasswordToken", b =>
@@ -296,7 +329,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<decimal>("Price");
+                    b.Property<int>("Price");
 
                     b.Property<DateTime>("ProductPictureUploadDate");
 
@@ -403,7 +436,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<int>("PharmacyId");
 
-                    b.Property<decimal>("Price");
+                    b.Property<int>("Price");
 
                     b.Property<DateTime>("SettlementDate");
 
@@ -465,9 +498,9 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("Pharmacies");
                 });
 
-            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotificationMap", b =>
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyHubMap", b =>
                 {
-                    b.Property<int>("PharmacyNotificationMapId")
+                    b.Property<int>("PharmacyHubMapId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Connected");
@@ -476,12 +509,33 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<int>("PharmacyId");
 
-                    b.HasKey("PharmacyNotificationMapId");
+                    b.HasKey("PharmacyHubMapId");
 
                     b.HasIndex("PharmacyId")
                         .IsUnique();
 
-                    b.ToTable("PharmacyNotificationMap");
+                    b.ToTable("PharmacyHubMap");
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotification", b =>
+                {
+                    b.Property<int>("PharmacyNotificationId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<bool>("HasRecieved");
+
+                    b.Property<int>("PharmacyId");
+
+                    b.Property<int>("Type");
+
+                    b.HasKey("PharmacyNotificationId");
+
+                    b.HasIndex("PharmacyId")
+                        .IsUnique();
+
+                    b.ToTable("PharmacyNotifications");
                 });
 
             modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyToken", b =>
@@ -545,7 +599,7 @@ namespace NoskheAPI_Beta.Migrations
 
                     b.Property<int>("PrescriptionId");
 
-                    b.Property<decimal>("Price");
+                    b.Property<int>("Price");
 
                     b.Property<int>("Quantity");
 
@@ -660,6 +714,26 @@ namespace NoskheAPI_Beta.Migrations
                     b.ToTable("ShoppingCarts");
                 });
 
+            modelBuilder.Entity("NoskheAPI_Beta.Models.WalletTransactionHistory", b =>
+                {
+                    b.Property<int>("WalletTransactionHistoryId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CustomerId");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<bool>("IsSuccessful");
+
+                    b.Property<int>("Price");
+
+                    b.HasKey("WalletTransactionHistoryId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("WalletTransactionHistories");
+                });
+
             modelBuilder.Entity("NoskheAPI_Beta.Models.Account", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
@@ -689,11 +763,19 @@ namespace NoskheAPI_Beta.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotificationMap", b =>
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerHubMap", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
-                        .WithOne("CustomerNotificationMap")
-                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerNotificationMap", "CustomerId")
+                        .WithOne("CustomerHubMap")
+                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerHubMap", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.CustomerNotification", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithOne("CustomerNotification")
+                        .HasForeignKey("NoskheAPI_Beta.Models.CustomerNotification", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -776,11 +858,19 @@ namespace NoskheAPI_Beta.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotificationMap", b =>
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyHubMap", b =>
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
-                        .WithOne("PharmacyNotificationMap")
-                        .HasForeignKey("NoskheAPI_Beta.Models.PharmacyNotificationMap", "PharmacyId")
+                        .WithOne("PharmacyHubMap")
+                        .HasForeignKey("NoskheAPI_Beta.Models.PharmacyHubMap", "PharmacyId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.PharmacyNotification", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Pharmacy", "Pharmacy")
+                        .WithOne("PharmacyNotification")
+                        .HasForeignKey("NoskheAPI_Beta.Models.PharmacyNotification", "PharmacyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -836,6 +926,14 @@ namespace NoskheAPI_Beta.Migrations
                 {
                     b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
                         .WithMany("ShoppingCarts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NoskheAPI_Beta.Models.WalletTransactionHistory", b =>
+                {
+                    b.HasOne("NoskheAPI_Beta.Models.Customer", "Customer")
+                        .WithMany("WalletTransactionHistories")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

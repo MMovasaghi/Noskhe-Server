@@ -1,8 +1,8 @@
 namespace NoskheAPI_Beta.Models
 {
-    public class CustomerNotificationMap
+    public class CustomerHubMap
     {
-        public int CustomerNotificationMapId { get; set; }
+        public int CustomerHubMapId { get; set; }
         public string ConnectionID { get; set; }
         public bool Connected { get; set; }
         // nav

@@ -1,8 +1,8 @@
 namespace NoskheAPI_Beta.Models
 {
-    public class PharmacyNotificationMap
+    public class PharmacyHubMap
     {
-        public int PharmacyNotificationMapId { get; set; }
+        public int PharmacyHubMapId { get; set; }
         public string ConnectionID { get; set; }
         public bool Connected { get; set; }
         // nav

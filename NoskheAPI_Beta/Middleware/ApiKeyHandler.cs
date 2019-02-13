@@ -64,7 +64,7 @@ namespace NoskheAPI_Beta.Middleware
                     }
                 }
             }
-            else if (context.Request.Path.Value.Contains("/Transaction/Report")) ValidKey = true;
+            else if (context.Request.Path.Value.Contains("/Transaction")) ValidKey = true;
             else if (context.Request.Path.Value.Contains("/NotificationHub")) ValidKey = true;
             else if (context.Request.Path.Value.Contains("/api/db/init")) ValidKey = true; // felan bekhatere por kardane db
 

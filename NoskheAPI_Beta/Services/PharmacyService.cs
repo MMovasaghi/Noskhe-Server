@@ -42,6 +42,8 @@ namespace NoskheAPI_Beta.Services
         int GetPharmacyId();
         Task<ResponseTemplate> ServiceResponse(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId, bool accepted, Models.PharmacyCancellationReason reason);
         Task<ResponseTemplate> InvoiceDetails(INotificationService notificationService, IHubContext<NotificationHub> hubContext, HostString hostIp, PrescriptionInvoice invoice);
+        PharmacyLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext);        
+        ResponseTemplate NotificationResponse(int notificationId);        
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class PharmacyService : IPharmacyService
@@ -762,35 +764,67 @@ namespace NoskheAPI_Beta.Services
                 if(existingServiceMapping == null) {
                     throw new UnauthorizedAccessException();
                 }
+                if(existingServiceMapping.ShoppingCart == null) db.Entry(existingServiceMapping).Reference(sm => sm.ShoppingCart).Load();
                 // if no more pharmacies availbale, let customer know that the request was cancelled
                 db.Entry(existingServiceMapping).Reference(sm => sm.ShoppingCart).Load();
                 switch (accepted)
                 {
                     // (1)
                     case true:
+                        // TODO: find courier
                         existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.FirstStepAcceptance;
                         Models.Order newOrder = new Models.Order {
                             ShoppingCartId = shoppingCartId,
-                            // Courier = null, // TODO: a function to choose what to do
-                            CourierId = 1,
+                            Courier = db.Couriers.Where(c => c.CourierId == 1).FirstOrDefault(), // TODO: a function to choose what to do
                             HasBeenAcceptedByCustomer = false,
-                            PharmacyId = GetPharmacyId(),
+                            PharmacyId = existingServiceMapping.PrimativePharmacyId,
                             UOI = "someShit", // TODO
                             Date = DateTime.Now
                         };
                         db.Orders.Add(newOrder);
+                        
+                        var pharmacyName = db.Pharmacies.Where(p => p.PharmacyId == existingServiceMapping.PrimativePharmacyId).FirstOrDefault().Name;
+                        // // save notifaction record
+                        // var newCustomerNotificationInquiry = new Models.CustomerNotification {
+                        //     CustomerId = existingServiceMapping.ShoppingCart.CustomerId,
+                        //     HasRecieved = false,
+                        //     Date = DateTime.Now,
+                        //     Type = Models.CustomerNotificationType.PharmacyInquiry,
+                        //     Arg1 = pharmacyName,
+                        //     Arg2 = newOrder.Courier.FirstName + " " + newOrder.Courier.LastName,
+                        //     Arg3 = newOrder.Courier.Phone
+                        // };
+                        // db.CustomerNotifications.Add(newCustomerNotificationInquiry);
+                        // db.SaveChanges();
+
+                        await notificationService.C_PharmacyInquiry(hubContext, /*newCustomerNotificationInquiry.CustomerNotificationId, */ existingServiceMapping.ShoppingCart.CustomerId, pharmacyName, newOrder.Courier.FirstName + " " + newOrder.Courier.LastName, newOrder.Courier.Phone);
                         break;
                     case false:
                         // TODO: sabt dar yek table marbut be kanceli ha (using => Models.PharmacyCancellationReason reason)
                         // existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Rejected;
                         // existingServiceMapping.PharmacyCancellationDate = DateTime.Now;
                         // existingServiceMapping.PharmacyCancellationReason = reason;
+                        
+                        // decrement pending requests
+                        var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                        if(existingPharmacy.PendingRequests != 0) existingPharmacy.PendingRequests--;
+
                         var foundPharmacyIds = existingServiceMapping.FoundPharmacies.Split(',').ToList();
                         var index = foundPharmacyIds.FindIndex(x => x == GetPharmacyId().ToString());
                         if(foundPharmacyIds.Count == index + 1)
                         {
                             // TODO: SMS
-                            await notificationService.C_CancellationReport(hubContext, existingServiceMapping.ShoppingCart.CustomerId);
+                            // save notifaction record
+                            var newCustomerNotificationCancellation = new Models.CustomerNotification {
+                                CustomerId = existingServiceMapping.ShoppingCart.CustomerId,
+                                HasRecieved = false,
+                                Date = DateTime.Now,
+                                Type = Models.CustomerNotificationType.CancellationReport,
+                            };
+                            db.CustomerNotifications.Add(newCustomerNotificationCancellation);
+                            db.SaveChanges();
+
+                            await notificationService.C_CancellationReport(hubContext, newCustomerNotificationCancellation.CustomerNotificationId, existingServiceMapping.ShoppingCart.CustomerId);
                             break;
                         }
                         existingServiceMapping.PrimativePharmacyId = int.Parse(foundPharmacyIds[index + 1]);
@@ -798,7 +832,18 @@ namespace NoskheAPI_Beta.Services
                         // (2)
                         CustomerService customerService = new CustomerService();
                         var newItem = customerService.PrepareObject(shoppingCartId);
-                        await notificationService.P_PharmacyReception(hubContext, existingServiceMapping.PrimativePharmacyId, newItem);
+
+                        // // save notifaction record
+                        // var newPharmacyReception = new Models.PharmacyNotification {
+                        //     PharmacyId = existingServiceMapping.ShoppingCart.CustomerId,
+                        //     HasRecieved = false,
+                        //     Date = DateTime.Now,
+                        //     Type = Models.PharmacyNotificationType.PharmacyReception
+                        // };
+                        // db.PharmacyNotifications.Add(newPharmacyReception);
+                        // db.SaveChanges();
+
+                        await notificationService.P_PharmacyReception(hubContext, /* newPharmacyReception.PharmacyNotificationId, */existingServiceMapping.PrimativePharmacyId, newItem);
                         break;
                 }
                 db.SaveChanges();
@@ -844,7 +889,7 @@ namespace NoskheAPI_Beta.Services
                 existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.SecondStepAcceptance;
                 db.SaveChanges();
                 // (1)
-                decimal totalPriceWithoutShippingCost = 0;
+                int totalPriceWithoutShippingCost = 0;
                 if(existingOrder.ShoppingCart.MedicineShoppingCarts != null)
                 {
                     foreach (var medicine in existingOrder.ShoppingCart.MedicineShoppingCarts)
@@ -870,7 +915,7 @@ namespace NoskheAPI_Beta.Services
                 
                 // decrement pending requests
                 var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
-                existingPharmacy.PendingRequests--;
+                if(existingPharmacy.PendingRequests != 0) existingPharmacy.PendingRequests--;
 
                 db.SaveChanges();
                 // (2)
@@ -879,7 +924,7 @@ namespace NoskheAPI_Beta.Services
                 string description = $"پرداخت باقیمانده هزینه سفارش به کد {existingOrder.UOI} به نام {gender} {existingOrder.ShoppingCart.Customer.FirstName} {existingOrder.ShoppingCart.Customer.LastName} - اپلیکیشن نسخه";
                 ServicePointManager.Expect100Continue = false;
                 PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(Math.Abs(existingOrder.Price - GetCurrentWalletCredit(existingOrder.ShoppingCart.CustomerId))), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(Math.Abs(existingOrder.Price - GetCurrentWalletCredit(existingOrder.ShoppingCart.CustomerId))), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/{existingOrder.OrderId}/Order");
                 string paymentUrl = "";
                 if (request.Body.Status == 100)
                     paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
@@ -887,7 +932,20 @@ namespace NoskheAPI_Beta.Services
                     throw new PaymentGatewayFailureException(ErrorCodes.PaymentGatewayFailureExceptionMsg);
 
                 
-                await notificationService.C_InvoiceDetails(hubContext, existingOrder.ShoppingCart.CustomerId, totalPriceWithoutShippingCost, 1000, paymentUrl); // TODO: mohasebeye hazine safar bar asase fasele
+                // save notifaction record
+                var newCustomerNotificationDetails = new Models.CustomerNotification {
+                    CustomerId = existingServiceMapping.ShoppingCart.CustomerId,
+                    HasRecieved = false,
+                    Date = DateTime.Now,
+                    Type = Models.CustomerNotificationType.CourierDetail,
+                    Arg1 = totalPriceWithoutShippingCost.ToString(),
+                    Arg2 = 1000.ToString(),
+                    Arg3 = paymentUrl
+                };
+                db.CustomerNotifications.Add(newCustomerNotificationDetails);
+                db.SaveChanges();
+                
+                await notificationService.C_InvoiceDetails(hubContext, newCustomerNotificationDetails.CustomerNotificationId, existingOrder.ShoppingCart.CustomerId, totalPriceWithoutShippingCost, 1000, paymentUrl); // TODO: mohasebeye hazine safar bar asase fasele
                 return new ResponseTemplate {
                     Success = true
                 };
@@ -898,7 +956,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public decimal GetCurrentWalletCredit(int customerId)
+        public int GetCurrentWalletCredit(int customerId)
         {
             return db.Customers.Where(c => c.CustomerId == customerId).FirstOrDefault().Money;
         }
@@ -916,6 +974,63 @@ namespace NoskheAPI_Beta.Services
                 return new ResponseTemplate {
                     Success = true
                 };
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        // TODO: NotImplemented()! plz implement after mvp
+        public PharmacyLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var latestNotifications = db.PharmacyNotifications.Where(cn => cn.PharmacyId == GetPharmacyId() && cn.HasRecieved == false).ToList();
+                var latestNotificationsTemplate = new PharmacyLatestNotificationsTemplate();
+                if(latestNotifications.Count != 0)
+                {
+                    latestNotificationsTemplate.Any = true; // there is at least one notification
+                    foreach (var notification in latestNotifications)
+                    {
+                        switch (notification.Type)
+                        {
+                            case Models.PharmacyNotificationType.PharmacyReception:
+                                latestNotificationsTemplate.PharmacyReceptionObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        // add other things
+                                    });
+                                break;
+                        }
+                        notification.HasRecieved = true;
+                    }
+                    db.SaveChanges();
+                }
+                latestNotificationsTemplate.Any = false; // there is no unread notifications available
+                return latestNotificationsTemplate;
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate NotificationResponse(int notificationId)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingNotification = db.CustomerNotifications.Where(cn => cn.CustomerNotificationId == notificationId).FirstOrDefault();
+                if(existingNotification != null)
+                {
+                    existingNotification.HasRecieved = true;
+                    db.SaveChanges();
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new NoNotificationsMatchedByIdException(ErrorCodes.NoNotificationsMatchedByIdExceptionMsg);
             }
             catch(DbUpdateException)
             {

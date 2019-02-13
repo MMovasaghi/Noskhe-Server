@@ -206,6 +206,7 @@ namespace NoskheAPI_Beta.Services
                     }
                 }
 
+                // var sh = db.ShoppingCarts.Where(s => s.Date == customerShoppingCart.Date).FirstOrDefault();
                 // TODO: MAYBE INPUT IS NULL
                 db.Prescriptions.Add(
                     new Prescription {
@@ -214,7 +215,7 @@ namespace NoskheAPI_Beta.Services
                         PictureUrl_2 = ansc.ShoppingCartObj.PictureUrl_2,
                         PictureUrl_3 = ansc.ShoppingCartObj.PictureUrl_3, 
                         PicturesUploadDate = DateTime.Now,
-                        ShoppingCart = customerShoppingCart
+                        ShoppingCartId = customerShoppingCart.ShoppingCartId
                     }
                 );
                 db.SaveChanges();
@@ -226,7 +227,7 @@ namespace NoskheAPI_Beta.Services
                         Description = ansc.ShoppingCartObj.Description,
                         HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
                         HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
-                        ShoppingCart = customerShoppingCart
+                        ShoppingCartId = customerShoppingCart.ShoppingCartId
                     }
                 );
                 db.SaveChanges();
@@ -554,6 +555,7 @@ namespace NoskheAPI_Beta.Services
                 List<DistanceObj> nearPharmacies = new List<DistanceObj>();
                 GeoCoordinate shLoc = new GeoCoordinate(existingShoppingCart.AddressLatitude, existingShoppingCart.AddressLongitude);
                 GeoCoordinate phLoc = new GeoCoordinate();
+
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
                     phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
@@ -568,10 +570,12 @@ namespace NoskheAPI_Beta.Services
                 // }
 
                 // sorted.RemoveAll(item => item.Distance > 100000); // TODO: tehran values for appropriate measurements
-                
                 var trustedPharmacy = db.Pharmacies.Where(p => p.Name == "PharmacyN_1").FirstOrDefault(); // todo: whatif it was null :||
-                sorted.Add(new DistanceObj { PharmacyId = trustedPharmacy.PharmacyId, Distance = shLoc.GetDistanceTo(new GeoCoordinate(trustedPharmacy.AddressLatitude, trustedPharmacy.AddressLongitude)) });
+                // check if the trustedPharmacy is not available in found pharmacy list, in order to 
+                if(sorted.Where(p => p.PharmacyId == trustedPharmacy.PharmacyId).FirstOrDefault() == null) sorted.Add(new DistanceObj { PharmacyId = trustedPharmacy.PharmacyId, Distance = shLoc.GetDistanceTo(new GeoCoordinate(trustedPharmacy.AddressLatitude, trustedPharmacy.AddressLongitude)) });
                 
+                if(sorted.Count == 0) throw new NoPharmaciesAreProvidingServiceException(ErrorCodes.NoPharmaciesAreProvidingServiceExceptionMsg);
+
                 if(sorted.Count > 9)
                 {
                     sorted.RemoveRange(9, sorted.Count - 7);
@@ -584,7 +588,6 @@ namespace NoskheAPI_Beta.Services
 
                 throw;
             }
-            throw new NotImplementedException();
         }
 
         public CreditTemplate WalletInquiry()
@@ -604,36 +607,42 @@ namespace NoskheAPI_Beta.Services
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingServiceMapping = db.ServiceMappings.Where(sm => sm.ShoppingCartId == shoppingCartId).FirstOrDefault();
                 // (1)
-                var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
-                
-                var firstPharmacy = db.Pharmacies.Where(p => p.PharmacyId == pharmaciesQueue.First().PharmacyId).FirstOrDefault(); // TODO: decrement and increment control
-                firstPharmacy.PendingRequests++;
-
-                string foundPharmaciesString = "";
-                foreach (var pharmacy in pharmaciesQueue)
+                if(existingServiceMapping == null)
                 {
-                    foundPharmaciesString += (pharmacy.PharmacyId + ",");
-                }
-
-                db.ServiceMappings.Add(
-                    new ServiceMapping {
-                        ShoppingCartId = shoppingCartId,
-                        FoundPharmacies = foundPharmaciesString,
-                        PrimativePharmacyId = pharmaciesQueue.First().PharmacyId,
-                        PharmacyServiceStatus = PharmacyServiceStatus.Pending
-                    }
-                );
-                db.SaveChanges();
+                    var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
                 
-                // (2)
-                var newItem = PrepareObject(shoppingCartId);
-                await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
-                // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2", Birthday = DateTime.Now, Email = "shit", Gender = Gender.Male, Phone = "some othe shit", ProfilePictureUrl = "shity shit!" }, Cosmetics = new List<Models.Minimals.Output.Cosmetic> { new Models.Minimals.Output.Cosmetic { CosmeticId = 1, Name = "some cosmetic", Number = 2, Price = 100, ProductPictureUrl = "url" } }, Medicines = new List<Models.Minimals.Output.Medicine> { new Models.Minimals.Output.Medicine { MedicineId = 1, Name = "s", Number = 3, Price = 20, ProductPictureUrl = "ss" } }, Notation = new Notation { BrandPreference = BrandType.Global, Description = "s", HasOtherDiseases = false, HasPregnancy = false, NotationId = 1, ShoppingCartId = 3 } });
-                // (3)
-                return new ResponseTemplate {
-                    Success = true
-                };
+                    var firstPharmacy = db.Pharmacies.Where(p => p.PharmacyId == pharmaciesQueue.First().PharmacyId).FirstOrDefault(); // TODO: decrement and increment control
+                    firstPharmacy.PendingRequests++;
+
+                    string foundPharmaciesString = "";
+                    foreach (var pharmacy in pharmaciesQueue)
+                    {
+                        foundPharmaciesString += (pharmacy.PharmacyId + ",");
+                    }
+                    // remove last comma
+                    if(foundPharmaciesString != "") foundPharmaciesString = foundPharmaciesString.Remove(foundPharmaciesString.Length - 1);
+
+                    db.ServiceMappings.Add(
+                        new ServiceMapping {
+                            ShoppingCartId = shoppingCartId,
+                            FoundPharmacies = foundPharmaciesString,
+                            PrimativePharmacyId = pharmaciesQueue.First().PharmacyId,
+                            PharmacyServiceStatus = PharmacyServiceStatus.Pending
+                        }
+                    );
+                    db.SaveChanges();
+                    // (2)
+                    var newItem = PrepareObject(shoppingCartId);
+                    await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
+                    // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2", Birthday = DateTime.Now, Email = "shit", Gender = Gender.Male, Phone = "some othe shit", ProfilePictureUrl = "shity shit!" }, Cosmetics = new List<Models.Minimals.Output.Cosmetic> { new Models.Minimals.Output.Cosmetic { CosmeticId = 1, Name = "some cosmetic", Number = 2, Price = 100, ProductPictureUrl = "url" } }, Medicines = new List<Models.Minimals.Output.Medicine> { new Models.Minimals.Output.Medicine { MedicineId = 1, Name = "s", Number = 3, Price = 20, ProductPictureUrl = "ss" } }, Notation = new Notation { BrandPreference = BrandType.Global, Description = "s", HasOtherDiseases = false, HasPregnancy = false, NotationId = 1, ShoppingCartId = 3 } });
+                    // (3)
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new ExistingShoppingCartHasBeenRequestedEarlierException(ErrorCodes.ExistingShoppingCartHasBeenRequestedEarlierExceptionMsg);
             }
             catch(DbUpdateException)
             {
@@ -671,13 +680,12 @@ namespace NoskheAPI_Beta.Services
         public NoskheForFirstNotificationOnDesktop PrepareObject(int shoppingCartId) // TODO: TRY CATCH, SAVE IN DATABASE FOR FURTHER USE AND NEXT PHARMACY RECEPTION
         {
             var existingShoppingCart = db.ShoppingCarts.Where(sc => sc.ShoppingCartId == shoppingCartId).FirstOrDefault();
-            db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
-            db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
-            var notation = db.Notations.Where(n => n.ShoppingCartId == existingShoppingCart.ShoppingCartId).FirstOrDefault();
-            // db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
-            db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
+            if(existingShoppingCart.Customer == null) db.Entry(existingShoppingCart).Reference(sc => sc.Customer).Load();
+            if(existingShoppingCart.Prescription == null)db.Entry(existingShoppingCart).Reference(sc => sc.Prescription).Load();
+            if(existingShoppingCart.Notation == null) db.Entry(existingShoppingCart).Reference(sc => sc.Notation).Load();
+            if(existingShoppingCart.MedicineShoppingCarts == null) db.Entry(existingShoppingCart).Collection(sc => sc.MedicineShoppingCarts).Query()
                 .Include(msc => msc.Medicine).Load();
-            db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
+            if(existingShoppingCart.CosmeticShoppingCarts == null) db.Entry(existingShoppingCart).Collection(sc => sc.CosmeticShoppingCarts).Query()
                 .Include(msc => msc.Cosmetic).Load();
             
             var cosmetics = new List<Models.Minimals.Output.Cosmetic>();
@@ -717,7 +725,7 @@ namespace NoskheAPI_Beta.Services
                 Cosmetics = cosmetics,
                 Medicines = medicines,
                 Picture_Urls = picUrls,
-                Notation = notation
+                Notation = existingShoppingCart.Notation
             };
             newItem.Notation.ShoppingCart = null; // if not -> message is not going to be sent to pharmacy through signalr
             return newItem;
@@ -813,11 +821,11 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Load();
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.ForgetPassword
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
@@ -870,11 +878,11 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Load();
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.ForgetPassword
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;

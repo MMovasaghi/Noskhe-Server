@@ -14,6 +14,7 @@ namespace NoskheAPI_Beta.Services
         Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized); // for real time process
         Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);
         Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone); // not needed now
+        Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int customerId);
     }
     class NotificationService : INotificationService
     {
@@ -46,6 +47,11 @@ namespace NoskheAPI_Beta.Services
         public Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int customerId)
+        {
+            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("CancellationReport");
         }
     }
 }

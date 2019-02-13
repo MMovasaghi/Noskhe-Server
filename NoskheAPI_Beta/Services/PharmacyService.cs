@@ -34,6 +34,7 @@ namespace NoskheAPI_Beta.Services
         ResponseTemplate SetANewSettle(Models.Minimals.Input.Settle settle);
         IEnumerable<Models.Minimals.Output.Score> GetTopFivePharmacies();
         TokenTemplate LoginWithEmailAndPass(string[] credential, AppSettings appSettings);
+        ResponseTemplate Logout();
         ResponseTemplate ToggleStateOfPharmacy();
         IEnumerable<float> NumberOfOrdersInThisWeek();
         IEnumerable<float> AverageTimeOfPackingInThisWeek();
@@ -228,7 +229,14 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
-                db.Entry(existingPharmacy).Collection(p => p.Orders).Load();
+                db.Entry(existingPharmacy).Collection(p => p.Orders).Query()
+                    .Include(o => o.ShoppingCart)
+                        .ThenInclude(sc => sc.Customer)
+                    .Include(o => o.ShoppingCart)
+                        .ThenInclude(sc => sc.Notation)
+                    .Include(o => o.ShoppingCart)
+                        .ThenInclude(sc => sc.Prescription).Load();
+                    
                 
                 List<Models.Minimals.Output.Order> ListOfOrders = new List<Models.Minimals.Output.Order>();
 
@@ -293,14 +301,22 @@ namespace NoskheAPI_Beta.Services
                     tempOrder.CourierName = /* order.Courier.FirstName ?? */"Mr. NoName" + " " + /* order.Courier.LastName ?? */"NoLastName"; // TODO: Fix bug #4
                     tempOrder.Address = order.ShoppingCart.Address;
                     tempOrder.Email = order.ShoppingCart.Customer.Email;
-                    tempOrder.BrandPreference = order.ShoppingCart.Notation.BrandPreference;
-                    tempOrder.HasPregnancy = order.ShoppingCart.Notation.HasPregnancy;
-                    tempOrder.HasOtherDiseases = order.ShoppingCart.Notation.HasOtherDiseases;
-                    tempOrder.Description = order.ShoppingCart.Notation.Description;
-                    tempOrder.HasBeenAcceptedByPharmacy = order.ShoppingCart.Prescription.HasBeenAcceptedByPharmacy;
-                    tempOrder.PictureUrl_1 = order.ShoppingCart.Prescription.PictureUrl_1;
-                    tempOrder.PictureUrl_2 = order.ShoppingCart.Prescription.PictureUrl_2;
-                    tempOrder.PictureUrl_3 = order.ShoppingCart.Prescription.PictureUrl_3;
+                    
+                    if(order.ShoppingCart.Notation != null)
+                    {
+                        tempOrder.BrandPreference = order.ShoppingCart.Notation.BrandPreference;
+                        tempOrder.HasPregnancy = order.ShoppingCart.Notation.HasPregnancy;
+                        tempOrder.HasOtherDiseases = order.ShoppingCart.Notation.HasOtherDiseases;
+                        tempOrder.Description = order.ShoppingCart.Notation.Description;
+                    }
+
+                    if(order.ShoppingCart.Prescription != null)
+                    {
+                        tempOrder.HasBeenAcceptedByPharmacy = order.ShoppingCart.Prescription.HasBeenAcceptedByPharmacy;
+                        tempOrder.PictureUrl_1 = order.ShoppingCart.Prescription.PictureUrl_1;
+                        tempOrder.PictureUrl_2 = order.ShoppingCart.Prescription.PictureUrl_2;
+                        tempOrder.PictureUrl_3 = order.ShoppingCart.Prescription.PictureUrl_3;
+                    }
 
                     var ListOfCosmetics =
                         from record in db.CosmeticShoppingCarts
@@ -744,8 +760,10 @@ namespace NoskheAPI_Beta.Services
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == shoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
                 if(existingServiceMapping == null) {
-                    throw new SecurityTokenExpiredException(ErrorCodes.SecurityTokenExpiredExceptionMsg);
+                    throw new UnauthorizedAccessException();
                 }
+                // if no more pharmacies availbale, let customer know that the request was cancelled
+                db.Entry(existingServiceMapping).Reference(sm => sm.ShoppingCart).Load();
                 switch (accepted)
                 {
                     // (1)
@@ -767,8 +785,15 @@ namespace NoskheAPI_Beta.Services
                         // existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Rejected;
                         // existingServiceMapping.PharmacyCancellationDate = DateTime.Now;
                         // existingServiceMapping.PharmacyCancellationReason = reason;
-                        var index = existingServiceMapping.FoundPharmacies.Split(',').ToList().FindIndex(x => x == GetPharmacyId().ToString());
-                        existingServiceMapping.PrimativePharmacyId = int.Parse(existingServiceMapping.FoundPharmacies.Split(',')[index + 1]);
+                        var foundPharmacyIds = existingServiceMapping.FoundPharmacies.Split(',').ToList();
+                        var index = foundPharmacyIds.FindIndex(x => x == GetPharmacyId().ToString());
+                        if(foundPharmacyIds.Count == index + 1)
+                        {
+                            // TODO: SMS
+                            await notificationService.C_CancellationReport(hubContext, existingServiceMapping.ShoppingCart.CustomerId);
+                            break;
+                        }
+                        existingServiceMapping.PrimativePharmacyId = int.Parse(foundPharmacyIds[index + 1]);
                         existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Pending;
                         // (2)
                         CustomerService customerService = new CustomerService();
@@ -796,11 +821,12 @@ namespace NoskheAPI_Beta.Services
             try
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
-                var existingOrder = db.Orders.Where(o => o.ShoppingCartId == invoice.ShoppingCartId).FirstOrDefault();
                 var existingServiceMapping = db.ServiceMappings.Where(sm => (sm.ShoppingCartId == invoice.ShoppingCartId && sm.PrimativePharmacyId == GetPharmacyId())).FirstOrDefault();
                 if(existingServiceMapping == null) {
                     throw new UnauthorizedAccessException();
                 }
+
+                var existingOrder = db.Orders.Where(o => o.ShoppingCartId == invoice.ShoppingCartId).FirstOrDefault();
                 db.Entry(existingOrder).Reference(o => o.ShoppingCart).Query()
                     .Include(s => s.Prescription)
                     .Include(s => s.Customer)
@@ -841,6 +867,11 @@ namespace NoskheAPI_Beta.Services
                     }
                 }
                 existingOrder.Price = totalPriceWithoutShippingCost + 1000; // TODO: mohasebeye hazine safar bar asase fasele
+                
+                // decrement pending requests
+                var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                existingPharmacy.PendingRequests--;
+
                 db.SaveChanges();
                 // (2)
                 // (3)
@@ -870,6 +901,26 @@ namespace NoskheAPI_Beta.Services
         public decimal GetCurrentWalletCredit(int customerId)
         {
             return db.Customers.Where(c => c.CustomerId == customerId).FirstOrDefault().Money;
+        }
+
+        public ResponseTemplate Logout()
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingPharmacy = db.Pharmacies.Where(q => q.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                if(existingPharmacy.PendingRequests != 0) throw new PendingRequestInProgressException(ErrorCodes.PendingRequestInProgressExceptionMsg);
+                existingPharmacy.IsAvailableNow = false;
+                db.SaveChanges();
+                
+                return new ResponseTemplate {
+                    Success = true
+                };
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
         }
 
         public void TokenValidationHandler()

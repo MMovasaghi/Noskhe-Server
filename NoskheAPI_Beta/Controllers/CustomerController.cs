@@ -453,6 +453,20 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(await _customerService.RequestService(_notificationService, _hubContext, shoppingCartId));
             }
+            catch(NoPharmaciesAreProvidingServiceException npapse)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = npapse.Message
+                });
+            }
+            catch(ExistingShoppingCartHasBeenRequestedEarlierException eschbree)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = eschbree.Message
+                });
+            }
             catch(DatabaseFailureException dfe)
             {
                 return BadRequest(new ResponseTemplate {
@@ -754,6 +768,42 @@ namespace NoskheAPI_Beta.Controllers
                 });
             }
         }
+
+        // // GET: mobile-api/customer/logout
+        // [HttpGet(Labels.Logout)]
+        // public ActionResult Logout()
+        // {
+        //     try
+        //     {
+        //         GrabTokenFromHeader();
+        //         return Ok(_customerService.Logout());
+        //     }
+        //     catch(DatabaseFailureException dfe)
+        //     {
+        //         return BadRequest(new ResponseTemplate {
+        //             Success = false,
+        //             Error = dfe.Message
+        //         });
+        //     }
+        //     catch(UnauthorizedAccessException)
+        //     {
+        //         return Unauthorized();
+        //     }
+        //     catch(SecurityTokenExpiredException stee)
+        //     {
+        //         return BadRequest(new ResponseTemplate {
+        //             Success = false,
+        //             Error = stee.Message
+        //         });
+        //     }
+        //     catch
+        //     {
+        //         return BadRequest(new ResponseTemplate {
+        //             Success = false,
+        //             Error = ErrorCodes.APIUnhandledExceptionMsg
+        //         });
+        //     }
+        // }
 
         private void GrabTokenFromHeader()
         {

@@ -10,6 +10,7 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Pharmacy
         public static string NoInformationExceptionMsg = "PEC5";
         public static string PaymentGatewayFailureExceptionMsg = "PEC6";
         public static string PendingRequestInProgressExceptionMsg = "PEC7";
+        public static string NoNotificationsMatchedByIdExceptionMsg = "PEC8"; // TODO: add to postman
         // C# Standard Exception Error Code Messages
         public static string SecurityTokenExpiredExceptionMsg = "PEC0";
     }

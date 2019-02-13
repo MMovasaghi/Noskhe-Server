@@ -25,6 +25,7 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string NumberOfTextMessageTriesExceededExceptionMsg = "CEC20";
         public static string ExistingShoppingCartHasBeenRequestedEarlierExceptionMsg = "CEC21";
         public static string NoPharmaciesAreProvidingServiceExceptionMsg = "CEC22";
+        public static string NoNotificationsMatchedByIdExceptionMsg = "CEC23"; // TODO: add to postman
         // C# Standard Exception Error Code Messages
         public static string SecurityTokenExpiredExceptionMsg = "CEC0";
     }

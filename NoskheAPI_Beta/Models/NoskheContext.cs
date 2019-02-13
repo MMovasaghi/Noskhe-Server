@@ -59,5 +59,9 @@ namespace NoskheAPI_Beta.Models
         public DbSet<CustomerResetPasswordToken> CustomerResetPasswordToken { get; set; }
         public DbSet<PharmacyToken> PharmacyTokens { get; set; }
         public DbSet<ServiceMapping> ServiceMappings { get; set; }
+        public DbSet<CustomerHubMap> CustomerHubMap { get; set; }
+        public DbSet<PharmacyHubMap> PharmacyHubMap { get; set; }
+        public DbSet<CustomerNotification> CustomerNotifications { get; set; }
+        public DbSet<PharmacyNotification> PharmacyNotifications { get; set; }
     }
 }

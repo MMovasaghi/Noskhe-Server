@@ -23,5 +23,7 @@ namespace NoskheAPI_Beta.Settings.Routing.Pharmacy
         public const string ServiceResponse = "service-response";
         public const string InvoiceDetails = "invoice-details";
         public const string Logout = "logout";
+        public const string LatestNotifications = "latest";
+        public const string NotificationResponse = "notification-response";
     }
 }

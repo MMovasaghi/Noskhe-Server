@@ -9,12 +9,12 @@ namespace NoskheAPI_Beta.Services
     public interface INotificationService
     {
         // Pharmacy SignalR
-        Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, NoskheForFirstNotificationOnDesktop prescriptionDetails);   
+        Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, int nofiticationId, NoskheForFirstNotificationOnDesktop prescriptionDetails);   
         // Customer SignalR
-        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized); // for real time process
-        Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);
-        Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone); // not needed now
-        Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int customerId);
+        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string pharmacyName, string courierName, string phone); // for real time process
+        Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);
+        Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string courierName, string phone); // not needed now
+        Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int nofiticationId, int customerId);
     }
     class NotificationService : INotificationService
     {
@@ -29,27 +29,27 @@ namespace NoskheAPI_Beta.Services
             
         }
 
-        public async Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, NoskheForFirstNotificationOnDesktop prescriptionDetails)
+        public async Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, int nofiticationId, NoskheForFirstNotificationOnDesktop prescriptionDetails)
         {
-            await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("PharmacyReception", prescriptionDetails);
+            await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("PharmacyReception", nofiticationId, prescriptionDetails);
         }
 
-        public Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, string pharmacyName, string courierName, string phone, bool finalized)
+        public async Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string pharmacyName, string courierName, string phone)
+        {
+            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("PharmacyInquiry", nofiticationId, pharmacyName, courierName, phone);
+        }
+
+        public async Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl)
+        {
+            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("InvoiceDetails", nofiticationId, priceWithoutShippingCost, shippingCost, paymentUrl);
+        }
+
+        public Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string courierName, string phone)
         {
             throw new System.NotImplementedException();
         }
 
-        public async Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl)
-        {
-            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("InvoiceDetails", priceWithoutShippingCost, shippingCost, paymentUrl);
-        }
-
-        public Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, string courierName, string phone)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public async Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int customerId)
+        public async Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int nofiticationId, int customerId)
         {
             await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("CancellationReport");
         }

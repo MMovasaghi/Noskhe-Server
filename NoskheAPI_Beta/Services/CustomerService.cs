@@ -45,7 +45,7 @@ namespace NoskheAPI_Beta.Services
         string RequestToken { get; set; } // motmaeninm hatman toye controller moeghdaresh set shode
         int GetCustomerId();
         CreditTemplate WalletInquiry();
-        Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext,int shoppingCartId);
+        Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
         ResponseTemplate RequestPhoneLogin(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyPhoneLogin(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
@@ -53,6 +53,8 @@ namespace NoskheAPI_Beta.Services
         TokenTemplate VerifyResetPassword(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
         ResponseTemplate ResetPassword(ResetPasswordTemplate rp);        
         ResponseTemplate VerifyPhoneNumber(Models.Android.VerifyPhoneTemplate vpt);
+        CustomerLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext);        
+        ResponseTemplate NotificationResponse(int notificationId);        
         void TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
     }
     class CustomerService : ICustomerService
@@ -633,10 +635,18 @@ namespace NoskheAPI_Beta.Services
                         }
                     );
                     db.SaveChanges();
+                    // save notifaction record
+                    var newPharmacyNotification = new PharmacyNotification {
+                            PharmacyId = pharmaciesQueue.First().PharmacyId,
+                            HasRecieved = false,
+                            Date = DateTime.Now,
+                            Type = PharmacyNotificationType.PharmacyReception
+                        };
+                    db.PharmacyNotifications.Add(newPharmacyNotification);
+                    db.SaveChanges();
                     // (2)
                     var newItem = PrepareObject(shoppingCartId);
-                    await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
-                    // await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, new NoskheForFirstNotificationOnDesktop { Picture_Urls = new List<string> { "url1", "url2", "url3" }, Customer = new Models.Minimals.Output.Customer { FirstName = "test1", LastName = "test2", Birthday = DateTime.Now, Email = "shit", Gender = Gender.Male, Phone = "some othe shit", ProfilePictureUrl = "shity shit!" }, Cosmetics = new List<Models.Minimals.Output.Cosmetic> { new Models.Minimals.Output.Cosmetic { CosmeticId = 1, Name = "some cosmetic", Number = 2, Price = 100, ProductPictureUrl = "url" } }, Medicines = new List<Models.Minimals.Output.Medicine> { new Models.Minimals.Output.Medicine { MedicineId = 1, Name = "s", Number = 3, Price = 20, ProductPictureUrl = "ss" } }, Notation = new Notation { BrandPreference = BrandType.Global, Description = "s", HasOtherDiseases = false, HasPregnancy = false, NotationId = 1, ShoppingCartId = 3 } });
+                    await notificationService.P_PharmacyReception(hubContext, newPharmacyNotification.PharmacyNotificationId, pharmaciesQueue.First().PharmacyId, newItem);
                     // (3)
                     return new ResponseTemplate {
                         Success = true
@@ -961,6 +971,100 @@ namespace NoskheAPI_Beta.Services
                     throw new UnauthorizedAccessException();
                 }
                 throw new NoCustomersMatchedByPhoneException(ErrorCodes.NoCustomersMatchedByPhoneExceptionMsg);
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public CustomerLatestNotificationsTemplate LatestNotifications(INotificationService notificationService, IHubContext<NotificationHub> hubContext)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var latestNotifications = db.CustomerNotifications.Where(cn => cn.CustomerId == GetCustomerId() && cn.HasRecieved == false).ToList();
+                var latestNotificationsTemplate = new CustomerLatestNotificationsTemplate();
+                if(latestNotifications.Count != 0)
+                {
+                    latestNotificationsTemplate.Any = true; // there is at least one notification
+                    foreach (var notification in latestNotifications)
+                    {
+                        switch (notification.Type)
+                        {
+                            case CustomerNotificationType.CancellationReport:
+                                latestNotificationsTemplate.CancellationReportObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.CourierDetail:
+                                latestNotificationsTemplate.CourierDetailObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.InvoiceDetails:
+                                latestNotificationsTemplate.InvoiceDetailsObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                            case CustomerNotificationType.PharmacyInquiry:
+                                latestNotificationsTemplate.PharmacyInquiryObj.Content.Add(new string[] {
+                                        notification.Date.ToString(),
+                                        notification.Arg1 ?? "",
+                                        notification.Arg2 ?? "",
+                                        notification.Arg3 ?? "",
+                                        notification.Arg4 ?? "",
+                                        notification.Arg5 ?? "",
+                                        notification.Arg6 ?? "",
+                                    });
+                                break;
+                        }
+                        notification.HasRecieved = true;
+                    }
+                    db.SaveChanges();
+                }
+                latestNotificationsTemplate.Any = false; // there is no unread notifications available
+                return latestNotificationsTemplate;
+            }
+            catch(DbUpdateException)
+            {
+                throw new DatabaseFailureException(ErrorCodes.DatabaseFailureExceptionMsg);
+            }
+        }
+
+        public ResponseTemplate NotificationResponse(int notificationId)
+        {
+            try
+            {
+                TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
+                var existingNotification = db.CustomerNotifications.Where(cn => cn.CustomerNotificationId == notificationId).FirstOrDefault();
+                if(existingNotification != null)
+                {
+                    existingNotification.HasRecieved = true;
+                    db.SaveChanges();
+                    return new ResponseTemplate {
+                        Success = true
+                    };
+                }
+                throw new NoNotificationsMatchedByIdException(ErrorCodes.NoNotificationsMatchedByIdExceptionMsg);
             }
             catch(DbUpdateException)
             {

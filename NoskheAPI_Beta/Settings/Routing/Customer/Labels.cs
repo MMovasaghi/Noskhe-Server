@@ -36,5 +36,7 @@ namespace NoskheAPI_Beta.Settings.Routing.Customer
         public const string WalletInquiry = "wallet";
         public const string RequestService = "request-service";
         public const string Logout = "logout";
+        public const string LatestNotifications = "latest";
+        public const string NotificationResponse = "notification-response";
     }
 }

@@ -333,19 +333,19 @@ namespace NoskheAPI_Beta.Controllers
                     db.Medicines.AddRange(
                         new Medicine {
                             Name = "Medicine_1",
-                            Price = 3.82M,
+                            Price = 700,
                             ProductPictureUrl = "Medicine_1.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         },
                         new Medicine {
                             Name = "Medicine_2",
-                            Price = 4.82M,
+                            Price = 800,
                             ProductPictureUrl = "Medicine_2.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         },
                         new Medicine {
                             Name = "Medicine_3",
-                            Price = 5.82M,
+                            Price = 23300,
                             ProductPictureUrl = "Medicine_3.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         }
@@ -368,19 +368,19 @@ namespace NoskheAPI_Beta.Controllers
                     db.Cosmetics.AddRange(
                         new Cosmetic {
                             Name = "Cosmetic_1",
-                            Price = 3.82M,
+                            Price = 500,
                             ProductPictureUrl = "test1.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         },
                         new Cosmetic {
                             Name = "Cosmetic_2",
-                            Price = 4.82M,
+                            Price = 400,
                             ProductPictureUrl = "test2.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         },
                         new Cosmetic {
                             Name = "Cosmetic_3",
-                            Price = 5.82M,
+                            Price = 600,
                             ProductPictureUrl = "test3.jpg",
                             ProductPictureUploadDate = DateTime.Now
                         }
@@ -568,55 +568,55 @@ namespace NoskheAPI_Beta.Controllers
                         new PrescriptionItem {
                             Name = "PrescriptionItem_1",
                             Quantity = 4,
-                            Price = 4.82M,
+                            Price = 45000,
                             Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_2",
                             Quantity = 1,
-                            Price = 5.82M,
+                            Price = 2300,
                             Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_3",
                             Quantity = 3,
-                            Price = 6.82M,
+                            Price = 5000,
                             Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_4",
                             Quantity = 2,
-                            Price = 7.82M,
+                            Price = 950,
                             Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_2.jpg").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_5",
                             Quantity = 1,
-                            Price = 8.82M,
+                            Price = 80400,
                             Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_2.jpg").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_6",
                             Quantity = 5,
-                            Price = 9.82M,
+                            Price = 93200,
                             Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_4").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_7",
                             Quantity = 3,
-                            Price = 11.82M,
+                            Price = 11500,
                             Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_4").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_8",
                             Quantity = 4,
-                            Price = 14.82M,
+                            Price = 1400,
                             Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_3").FirstOrDefault()
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_9",
                             Quantity = 2,
-                            Price = 41.82M,
+                            Price = 11350,
                             Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_2").FirstOrDefault()
                         }
                     );
@@ -639,7 +639,7 @@ namespace NoskheAPI_Beta.Controllers
                         new Order {
                             UOI = "OrderUOI_1",
                             Date = DateTime.Now,
-                            Price = 232.26M,
+                            Price = 232,
                             HasPrescription = true,
                             HasBeenSetToACourier = true,
                             HasBeenAcceptedByCustomer = true,
@@ -655,7 +655,7 @@ namespace NoskheAPI_Beta.Controllers
                         new Order {
                             UOI = "OrderUOI_2",
                             Date = DateTime.Now,
-                            Price = 233.26M,
+                            Price = 233,
                             HasPrescription = true,
                             HasBeenSetToACourier = true,
                             HasBeenAcceptedByCustomer = true,
@@ -671,7 +671,7 @@ namespace NoskheAPI_Beta.Controllers
                         new Order {
                             UOI = "OrderUOI_3",
                             Date = DateTime.Now,
-                            Price = 234.26M,
+                            Price = 234,
                             HasPrescription = true,
                             HasBeenSetToACourier = true,
                             HasBeenAcceptedByCustomer = true,
@@ -687,7 +687,7 @@ namespace NoskheAPI_Beta.Controllers
                         new Order {
                             UOI = "OrderUOI_4",
                             Date = DateTime.Now,
-                            Price = 235.26M,
+                            Price = 235,
                             HasPrescription = true,
                             HasBeenSetToACourier = true,
                             HasBeenAcceptedByCustomer = true,
@@ -703,7 +703,7 @@ namespace NoskheAPI_Beta.Controllers
                         new Order {
                             UOI = "OrderUOI_5",
                             Date = DateTime.Now,
-                            Price = 236.26M,
+                            Price = 236,
                             HasPrescription = true,
                             HasBeenSetToACourier = true,
                             HasBeenAcceptedByCustomer = true,

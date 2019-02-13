@@ -63,5 +63,6 @@ namespace NoskheAPI_Beta.Models
         public DbSet<PharmacyHubMap> PharmacyHubMap { get; set; }
         public DbSet<CustomerNotification> CustomerNotifications { get; set; }
         public DbSet<PharmacyNotification> PharmacyNotifications { get; set; }
+        public DbSet<WalletTransactionHistory> WalletTransactionHistories { get; set; }
     }
 }

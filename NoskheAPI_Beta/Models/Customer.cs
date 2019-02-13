@@ -25,6 +25,7 @@ namespace NoskheAPI_Beta.Models
         */
         public List<ShoppingCart> ShoppingCarts { get; set; }
         public List<CustomerTextMessage> CustomerTextMessages { get; set; }
+        public List<WalletTransactionHistory> WalletTransactionHistories { get; set; }
         public CustomerToken CustomerToken { get; set; }
         public CustomerResetPasswordToken CustomerResetPasswordToken { get; set; }
         public CustomerHubMap CustomerHubMap { get; set; } // TODO: not needed for now, after mvp

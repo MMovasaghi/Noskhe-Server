@@ -23,6 +23,12 @@ namespace NoskheAPI_Beta.Classes.Communication
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             string name = Context.User.Identity.Name;
+            using(var db = new NoskheAPI_Beta.Models.NoskheContext())
+            {
+                var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == int.Parse(name.Substring(1,name.Length - 1))).FirstOrDefault();
+                existingPharmacy.IsAvailableNow = false;
+                db.SaveChanges();
+            }
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, name);
             await base.OnDisconnectedAsync(exception);
         }

@@ -22,6 +22,7 @@ using GeoCoordinatePortable;
 using Microsoft.AspNetCore.SignalR;
 using NoskheAPI_Beta.Classes.Communication;
 using NoskheAPI_Beta.Models.Android;
+using System.Net.Http;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -59,6 +60,8 @@ namespace NoskheAPI_Beta.Services
     }
     class CustomerService : ICustomerService
     {
+        public static string KAVENEGAR_SMS_TOKEN = "3463437075492B4E4E4453565136542B684156365559716C556572476250716A";
+        public static string AUTHRIZATION_TEMPLATE_NAME = "ntest";
         private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         public string RequestToken { get; set; }
 
@@ -103,17 +106,22 @@ namespace NoskheAPI_Beta.Services
                     db.Customers.Add(newUser);
                     db.SaveChanges(); // TODO: agar usere jadid add shod vali add kardane token expception dad bayad che konim?
                     
-                    Random code = new Random();
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = newUser,
                             Date = DateTime.Now,
-                            Message = code.Next(11111, 99999).ToString(),
+                            Message = code.ToString(),
                             Type = CustomerTextMessageType.VerifyPhoneNumber,
                             Validated = false
                         }
                     );
                     // TODO: (*) sms
+                    // var client = new HttpClient();
+                    // var response = new HttpResponseMessage();
+                    // response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={newUser.FirstName} {newUser.LastName}&token2={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+
 
                     // adding new token
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -639,18 +647,18 @@ namespace NoskheAPI_Beta.Services
                         }
                     );
                     db.SaveChanges();
-                    // save notifaction record
-                    var newPharmacyNotification = new PharmacyNotification {
-                            PharmacyId = pharmaciesQueue.First().PharmacyId,
-                            HasRecieved = false,
-                            Date = DateTime.Now,
-                            Type = PharmacyNotificationType.PharmacyReception
-                        };
-                    db.PharmacyNotifications.Add(newPharmacyNotification);
-                    db.SaveChanges();
+                    // // save notifaction record
+                    // var newPharmacyNotification = new PharmacyNotification {
+                    //         PharmacyId = pharmaciesQueue.First().PharmacyId,
+                    //         HasRecieved = false,
+                    //         Date = DateTime.Now,
+                    //         Type = PharmacyNotificationType.PharmacyReception
+                    //     };
+                    // db.PharmacyNotifications.Add(newPharmacyNotification);
+                    // db.SaveChanges();
                     // (2)
                     var newItem = PrepareObject(shoppingCartId);
-                    await notificationService.P_PharmacyReception(hubContext, newPharmacyNotification.PharmacyNotificationId, pharmaciesQueue.First().PharmacyId, newItem);
+                    await notificationService.P_PharmacyReception(hubContext, pharmaciesQueue.First().PharmacyId, newItem);
                     // (3)
                     return new ResponseTemplate {
                         Success = true
@@ -670,11 +678,22 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(c => c.CustomerId == GetCustomerId()).FirstOrDefault();
+
+                // add a record to wallet history
+                var newWalletHistory = new WalletTransactionHistory {
+                        Customer = foundCustomer,
+                        Date = DateTime.Now,
+                        Price = credit,
+                        IsSuccessful = false
+                    };
+                db.WalletTransactionHistories.Add(newWalletHistory);
+                db.SaveChanges();
+
                 string gender = foundCustomer.Gender == Models.Gender.Male ? "آقای" : "خانم";
                 string description = $"شارژ کیف پول کاربر {gender} {foundCustomer.FirstName} {foundCustomer.LastName} - اپلیکیشن نسخه";
                 ServicePointManager.Expect100Continue = false;
                 PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", credit, description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", credit, description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/{newWalletHistory.WalletTransactionHistoryId}/Wallet");
                 string paymentUrl = "";
                 if (request.Body.Status == 100)
                     paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;

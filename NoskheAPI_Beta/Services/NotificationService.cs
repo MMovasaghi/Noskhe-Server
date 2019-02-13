@@ -9,10 +9,10 @@ namespace NoskheAPI_Beta.Services
     public interface INotificationService
     {
         // Pharmacy SignalR
-        Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, int nofiticationId, NoskheForFirstNotificationOnDesktop prescriptionDetails);   
+        Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, /* int nofiticationId,*/ NoskheForFirstNotificationOnDesktop prescriptionDetails);   
         Task P_CheckAvailablity(IHubContext<NotificationHub> hubContext, int pharmacyId);   
         // Customer SignalR
-        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string pharmacyName, string courierName, string phone); // for real time process
+        Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, /*int nofiticationId, */ string pharmacyName, string courierName, string phone); // for real time process
         Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);
         Task C_CourierDetail(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string courierName, string phone); // not needed now
         Task C_CancellationReport(IHubContext<NotificationHub> hubContext, int nofiticationId, int customerId);
@@ -30,9 +30,9 @@ namespace NoskheAPI_Beta.Services
             
         }
 
-        public async Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, int nofiticationId, NoskheForFirstNotificationOnDesktop prescriptionDetails)
+        public async Task P_PharmacyReception(IHubContext<NotificationHub> hubContext, int pharmacyId, /*int nofiticationId, */ NoskheForFirstNotificationOnDesktop prescriptionDetails)
         {
-            await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("PharmacyReception", nofiticationId, prescriptionDetails);
+            await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("PharmacyReception", /*nofiticationId, */ prescriptionDetails);
         }
 
         public async Task P_CheckAvailablity(IHubContext<NotificationHub> hubContext, int pharmacyId)
@@ -40,9 +40,9 @@ namespace NoskheAPI_Beta.Services
             await hubContext.Clients.Group("P" + pharmacyId.ToString()).SendAsync("CheckAvailablity");
         }
 
-        public async Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, string pharmacyName, string courierName, string phone)
+        public async Task C_PharmacyInquiry(IHubContext<NotificationHub> hubContext, int customerId, /*int nofiticationId, */ string pharmacyName, string courierName, string phone)
         {
-            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("PharmacyInquiry", nofiticationId, pharmacyName, courierName, phone);
+            await hubContext.Clients.Group("C" + customerId.ToString()).SendAsync("PharmacyInquiry", /*nofiticationId, */ pharmacyName, courierName, phone);
         }
 
         public async Task C_InvoiceDetails(IHubContext<NotificationHub> hubContext, int customerId, int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl)

@@ -7,7 +7,7 @@ namespace NoskheAPI_Beta.Models
         public int OrderId { get; set; }
         public string UOI { get; set; }
         public DateTime Date { get; set; }
-        public decimal Price { get; set; }
+        public int Price { get; set; }
         public bool HasPrescription { get; set; }
         public bool HasBeenSetToACourier { get; set; }
         public bool HasBeenAcceptedByCustomer { get; set; } // ok budan ba poolesh

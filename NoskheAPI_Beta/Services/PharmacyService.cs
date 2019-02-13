@@ -784,20 +784,20 @@ namespace NoskheAPI_Beta.Services
                         db.Orders.Add(newOrder);
                         
                         var pharmacyName = db.Pharmacies.Where(p => p.PharmacyId == existingServiceMapping.PrimativePharmacyId).FirstOrDefault().Name;
-                        // save notifaction record
-                        var newCustomerNotificationInquiry = new Models.CustomerNotification {
-                            CustomerId = existingServiceMapping.ShoppingCart.CustomerId,
-                            HasRecieved = false,
-                            Date = DateTime.Now,
-                            Type = Models.CustomerNotificationType.PharmacyInquiry,
-                            Arg1 = pharmacyName,
-                            Arg2 = newOrder.Courier.FirstName + " " + newOrder.Courier.LastName,
-                            Arg3 = newOrder.Courier.Phone
-                        };
-                        db.CustomerNotifications.Add(newCustomerNotificationInquiry);
-                        db.SaveChanges();
+                        // // save notifaction record
+                        // var newCustomerNotificationInquiry = new Models.CustomerNotification {
+                        //     CustomerId = existingServiceMapping.ShoppingCart.CustomerId,
+                        //     HasRecieved = false,
+                        //     Date = DateTime.Now,
+                        //     Type = Models.CustomerNotificationType.PharmacyInquiry,
+                        //     Arg1 = pharmacyName,
+                        //     Arg2 = newOrder.Courier.FirstName + " " + newOrder.Courier.LastName,
+                        //     Arg3 = newOrder.Courier.Phone
+                        // };
+                        // db.CustomerNotifications.Add(newCustomerNotificationInquiry);
+                        // db.SaveChanges();
 
-                        await notificationService.C_PharmacyInquiry(hubContext, newCustomerNotificationInquiry.CustomerNotificationId, existingServiceMapping.ShoppingCart.CustomerId, pharmacyName, newOrder.Courier.FirstName + " " + newOrder.Courier.LastName, newOrder.Courier.Phone);
+                        await notificationService.C_PharmacyInquiry(hubContext, /*newCustomerNotificationInquiry.CustomerNotificationId, */ existingServiceMapping.ShoppingCart.CustomerId, pharmacyName, newOrder.Courier.FirstName + " " + newOrder.Courier.LastName, newOrder.Courier.Phone);
                         break;
                     case false:
                         // TODO: sabt dar yek table marbut be kanceli ha (using => Models.PharmacyCancellationReason reason)
@@ -807,7 +807,7 @@ namespace NoskheAPI_Beta.Services
                         
                         // decrement pending requests
                         var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
-                        existingPharmacy.PendingRequests--;
+                        if(existingPharmacy.PendingRequests != 0) existingPharmacy.PendingRequests--;
 
                         var foundPharmacyIds = existingServiceMapping.FoundPharmacies.Split(',').ToList();
                         var index = foundPharmacyIds.FindIndex(x => x == GetPharmacyId().ToString());
@@ -833,17 +833,17 @@ namespace NoskheAPI_Beta.Services
                         CustomerService customerService = new CustomerService();
                         var newItem = customerService.PrepareObject(shoppingCartId);
 
-                        // save notifaction record
-                        var newPharmacyReception = new Models.PharmacyNotification {
-                            PharmacyId = existingServiceMapping.ShoppingCart.CustomerId,
-                            HasRecieved = false,
-                            Date = DateTime.Now,
-                            Type = Models.PharmacyNotificationType.PharmacyReception
-                        };
-                        db.PharmacyNotifications.Add(newPharmacyReception);
-                        db.SaveChanges();
+                        // // save notifaction record
+                        // var newPharmacyReception = new Models.PharmacyNotification {
+                        //     PharmacyId = existingServiceMapping.ShoppingCart.CustomerId,
+                        //     HasRecieved = false,
+                        //     Date = DateTime.Now,
+                        //     Type = Models.PharmacyNotificationType.PharmacyReception
+                        // };
+                        // db.PharmacyNotifications.Add(newPharmacyReception);
+                        // db.SaveChanges();
 
-                        await notificationService.P_PharmacyReception(hubContext, newPharmacyReception.PharmacyNotificationId, existingServiceMapping.PrimativePharmacyId, newItem);
+                        await notificationService.P_PharmacyReception(hubContext, /* newPharmacyReception.PharmacyNotificationId, */existingServiceMapping.PrimativePharmacyId, newItem);
                         break;
                 }
                 db.SaveChanges();
@@ -889,7 +889,7 @@ namespace NoskheAPI_Beta.Services
                 existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.SecondStepAcceptance;
                 db.SaveChanges();
                 // (1)
-                decimal totalPriceWithoutShippingCost = 0;
+                int totalPriceWithoutShippingCost = 0;
                 if(existingOrder.ShoppingCart.MedicineShoppingCarts != null)
                 {
                     foreach (var medicine in existingOrder.ShoppingCart.MedicineShoppingCarts)
@@ -915,7 +915,7 @@ namespace NoskheAPI_Beta.Services
                 
                 // decrement pending requests
                 var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
-                existingPharmacy.PendingRequests--;
+                if(existingPharmacy.PendingRequests != 0) existingPharmacy.PendingRequests--;
 
                 db.SaveChanges();
                 // (2)
@@ -924,7 +924,7 @@ namespace NoskheAPI_Beta.Services
                 string description = $"پرداخت باقیمانده هزینه سفارش به کد {existingOrder.UOI} به نام {gender} {existingOrder.ShoppingCart.Customer.FirstName} {existingOrder.ShoppingCart.Customer.LastName} - اپلیکیشن نسخه";
                 ServicePointManager.Expect100Continue = false;
                 PaymentGatewayImplementationServicePortTypeClient zp = new PaymentGatewayImplementationServicePortTypeClient();
-                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(Math.Abs(existingOrder.Price - GetCurrentWalletCredit(existingOrder.ShoppingCart.CustomerId))), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/Report");
+                var request = await zp.PaymentRequestAsync("9c82812c-08c8-11e8-ad5e-005056a205be", (int)(Math.Abs(existingOrder.Price - GetCurrentWalletCredit(existingOrder.ShoppingCart.CustomerId))), description, "amirmohammad.biuki@gmail.com", "09102116894", $"http://{hostIp}/Transaction/{existingOrder.OrderId}/Order");
                 string paymentUrl = "";
                 if (request.Body.Status == 100)
                     paymentUrl = "https://zarinpal.com/pg/StartPay/" + request.Body.Authority;
@@ -956,7 +956,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public decimal GetCurrentWalletCredit(int customerId)
+        public int GetCurrentWalletCredit(int customerId)
         {
             return db.Customers.Where(c => c.CustomerId == customerId).FirstOrDefault().Money;
         }

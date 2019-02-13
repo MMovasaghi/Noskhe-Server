@@ -804,6 +804,11 @@ namespace NoskheAPI_Beta.Services
                         // existingServiceMapping.PharmacyServiceStatus = Models.PharmacyServiceStatus.Rejected;
                         // existingServiceMapping.PharmacyCancellationDate = DateTime.Now;
                         // existingServiceMapping.PharmacyCancellationReason = reason;
+                        
+                        // decrement pending requests
+                        var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == GetPharmacyId()).FirstOrDefault();
+                        existingPharmacy.PendingRequests--;
+
                         var foundPharmacyIds = existingServiceMapping.FoundPharmacies.Split(',').ToList();
                         var index = foundPharmacyIds.FindIndex(x => x == GetPharmacyId().ToString());
                         if(foundPharmacyIds.Count == index + 1)

@@ -545,7 +545,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public List<DistanceObj> PharmaciesNearCustomer(int shoppingCartId)
+        public List<DistanceObj> PharmaciesNearCustomer(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId)
         {
             try
             {
@@ -560,15 +560,19 @@ namespace NoskheAPI_Beta.Services
 
                 foreach (var pharmacyLocation in pharmaciesLocation)
                 {
+                    // // check availablity of pharmacies
+                    // await notificationService.P_CheckAvailablity(hubContext, pharmacyLocation.PharmacyId);
+
                     phLoc = new GeoCoordinate(pharmacyLocation.Lat, pharmacyLocation.Lon);
                     nearPharmacies.Add(new DistanceObj { Distance = shLoc.GetDistanceTo(phLoc), PharmacyId = pharmacyLocation.PharmacyId, Name = pharmacyLocation.Name });
                 }
                 var sorted = nearPharmacies.OrderBy(p => p.Distance).ToList();
                 
-                // for (int i = 0; i < sorted.Count; i++)
+                // foreach (var item in sorted)
                 // {
-                //     if(sorted[i].Distance > 10)
-                //         sorted.RemoveAt(i);
+                //     // if the pharmacy response is
+                //     var existingPharmacy = db.Pharmacies.Where(p => p.PharmacyId == item.PharmacyId).FirstOrDefault();
+                //     if(existingPharmacy.IsAvailableNow == false) sorted.Remove(item);
                 // }
 
                 // sorted.RemoveAll(item => item.Distance > 100000); // TODO: tehran values for appropriate measurements
@@ -613,7 +617,7 @@ namespace NoskheAPI_Beta.Services
                 // (1)
                 if(existingServiceMapping == null)
                 {
-                    var pharmaciesQueue = PharmaciesNearCustomer(shoppingCartId);
+                    var pharmaciesQueue = PharmaciesNearCustomer(notificationService, hubContext, shoppingCartId);
                 
                     var firstPharmacy = db.Pharmacies.Where(p => p.PharmacyId == pharmaciesQueue.First().PharmacyId).FirstOrDefault(); // TODO: decrement and increment control
                     firstPharmacy.PendingRequests++;

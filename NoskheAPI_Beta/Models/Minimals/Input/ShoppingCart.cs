@@ -14,8 +14,8 @@ namespace NoskheAPI_Beta.Models.Minimals.Input
         public double AddressLongitude { get; set; }
         public double AddressLatitude { get; set; }
         public string Address { get; set; }
-        public List<int> MedicineIds { get; set; }
-        public List<int> CosmeticIds { get; set; }
+        public Dictionary<int, int> MedicineIds { get; set; }
+        public Dictionary<int, int> CosmeticIds { get; set; }
         public bool HasBeenRequested { get; set; } // true: search for pharmacy, false: save
     }
 }

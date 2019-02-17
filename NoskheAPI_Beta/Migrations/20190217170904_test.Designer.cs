@@ -9,7 +9,7 @@ using NoskheAPI_Beta.Models;
 namespace NoskheAPI_Beta.Migrations
 {
     [DbContext(typeof(NoskheContext))]
-    [Migration("20190217152155_test")]
+    [Migration("20190217170904_test")]
     partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

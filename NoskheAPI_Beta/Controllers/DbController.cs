@@ -15,28 +15,27 @@ namespace NoskheAPI_Beta.Controllers
         private static NoskheContext db = new NoskheContext();
         // GET api/values
         [HttpGet("init")]
-        public ActionResult<IEnumerable<string>> init(string name)
+        public ActionResult<string> init(string name)
         {
-            return new List<string> {
-                $"CustomerInit(): {CustomerInit()}",
-                $"CourierInit(): {CourierInit()}",
-                $"MedicineInit(): {MedicineInit()}",
-                $"CosmeticInit(): {CosmeticInit()}",
-                $"ManagerInit(): {ManagerInit()}",
-                $"PharmacyInit(): {PharmacyInit()}",
-                $"ShoppingCartInit(): {ShoppingCartInit()}",
-                $"NotationInit(): {NotationInit()}",
-                $"PrescriptionInit(): {PrescriptionInit()}",
-                $"PrescriptionItemInit(): {PrescriptionItemInit()}",
-                $"OrderInit(): {OrderInit()}",
-                $"MedicineShoppingCartInit(): {MedicineShoppingCartInit()}",
-                $"CosmeticShoppingCartInit(): {CosmeticShoppingCartInit()}",
-                $"ScoreInit(): {ScoreInit()}",
-                $"OccurrenceInit(): {OccurrenceInit()}",
-                $"AccountInit(): {AccountInit()}",
-                $"SettleInit(): {SettleInit()}",         
-                $"TextMessageInit(): {TextMessageInit()}"
-            };
+            var a = $"CustomerInit(): {CustomerInit()}";
+            var b = $"ManagerInit(): {ManagerInit()}";
+            var c = $"PharmacyInit(): {PharmacyInit()}";
+            var d = $"CourierInit(): {CourierInit()}";
+            var e = $"MedicineInit(): {MedicineInit()}";
+            var f = $"CosmeticInit(): {CosmeticInit()}";
+            var g = $"ShoppingCartInit(): {ShoppingCartInit()}";
+            var h = $"NotationInit(): {NotationInit()}";
+            var i = $"PrescriptionInit(): {PrescriptionInit()}";
+            var j = $"PrescriptionItemInit(): {PrescriptionItemInit()}";
+            var k = $"OrderInit(): {OrderInit()}";
+            var n = $"ScoreInit(): {ScoreInit()}";
+            var o = $"OccurrenceInit(): {OccurrenceInit()}";
+            var p = $"AccountInit(): {AccountInit()}";
+            var q = $"SettleInit(): {SettleInit()}";
+            var r = $"TextMessageInit(): {TextMessageInit()}";
+            var l = $"MedicineShoppingCartInit(): {MedicineShoppingCartInit()}";
+            var m = $"CosmeticShoppingCartInit(): {CosmeticShoppingCartInit()}";
+            return $"{a}\n{b}\n{c}\n{d}\n{e}\n{f}\n{g}\n{h}\n{i}\n{j}\n{k}\n{l}\n{m}\n{n}\n{o}\n{p}\n{q}\n{r}";
         }
 
 
@@ -59,6 +58,7 @@ namespace NoskheAPI_Beta.Controllers
                             ProfilePictureUrl = "CustomerPP1.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
                             Money = 0,
+                            IsPhoneValidated = true
                         },
                         new Customer {
                             FirstName = "اشکان",
@@ -71,7 +71,8 @@ namespace NoskheAPI_Beta.Controllers
                             Phone = "CustomerPh2",
                             ProfilePictureUrl = "CustomerPP2.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
-                            Money = 3500
+                            Money = 3500,
+                            IsPhoneValidated = true
                         },
                         new Customer {
                             FirstName = "پدرام",
@@ -84,7 +85,8 @@ namespace NoskheAPI_Beta.Controllers
                             Phone = "CustomerPh3",
                             ProfilePictureUrl = "CustomerPP3.jpg",
                             ProfilePictureUploadDate = DateTime.Now,
-                            Money = 4000
+                            Money = 4000,
+                            IsPhoneValidated = true
                         }
                     );
                     db.SaveChanges();
@@ -260,7 +262,7 @@ namespace NoskheAPI_Beta.Controllers
             {
                 return false;
             }
-            return false;
+            return true;
         }
         private bool CourierInit()
         {
@@ -406,35 +408,35 @@ namespace NoskheAPI_Beta.Controllers
                             HasPregnancy = true,
                             HasOtherDiseases = true,
                             Description = "NotationD_1",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_001").FirstOrDefault()
+                            ShoppingCartId = 1
                         },
                         new Notation {
                             BrandPreference = BrandType.Global,
                             HasPregnancy = false,
                             HasOtherDiseases = true,
                             Description = "NotationD_2",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault()
+                            ShoppingCartId = 2
                         },
                         new Notation {
                             BrandPreference = BrandType.Global,
                             HasPregnancy = false,
                             HasOtherDiseases = false,
                             Description = "NotationD_3",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault()
+                            ShoppingCartId = 3
                         },
                         new Notation {
                             BrandPreference = BrandType.Local,
                             HasPregnancy = true,
                             HasOtherDiseases = true,
                             Description = "NotationD_4",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_004").FirstOrDefault()
+                            ShoppingCartId = 4
                         },
                         new Notation {
                             BrandPreference = BrandType.Global,
                             HasPregnancy = false,
                             HasOtherDiseases = false,
                             Description = "NotationD_5",
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_005").FirstOrDefault()
+                            ShoppingCartId = 3
                         }
                     );
                     db.SaveChanges();
@@ -460,7 +462,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 23.12,
                             Address = "ShoppingCartA_1",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@1.com").FirstOrDefault()
+                            CustomerId = 1
                         },
                         new ShoppingCart {
                             USCI = "ShoppingCartUSCI_002",
@@ -469,7 +471,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 21.12,
                             Address = "ShoppingCartA_2",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@2.com").FirstOrDefault()
+                            CustomerId = 2
                         },
                         new ShoppingCart {
                             USCI = "ShoppingCartUSCI_003",
@@ -478,7 +480,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 20.12,
                             Address = "ShoppingCartA_3",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@1.com").FirstOrDefault()
+                            CustomerId = 3
                         },
                         new ShoppingCart {
                             USCI = "ShoppingCartUSCI_004",
@@ -487,7 +489,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 19.12,
                             Address = "ShoppingCartA_4",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@3.com").FirstOrDefault()
+                            CustomerId = 3
                         },
                         new ShoppingCart {
                             USCI = "ShoppingCartUSCI_005",
@@ -496,7 +498,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 18.12,
                             Address = "ShoppingCartA_5",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@2.com").FirstOrDefault()
+                            CustomerId = 3
                         },
                         new ShoppingCart {
                             USCI = "ShoppingCartUSCI_006",
@@ -505,7 +507,7 @@ namespace NoskheAPI_Beta.Controllers
                             AddressLatitude = 17.12,
                             Address = "ShoppingCartA_6",
                             HasBeenRequested = true,
-                            Customer = db.Customers.Where(s => s.Email == "CustomerE@1.com").FirstOrDefault()
+                            CustomerId = 2
                         }
                     );
                     db.SaveChanges();
@@ -528,25 +530,25 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenAcceptedByPharmacy = true,
                             PictureUrl_1 = "PrescriptionP_1.jpg",
                             PicturesUploadDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_001").FirstOrDefault()
+                            ShoppingCartId = 1
                         },
                         new Prescription {
                             HasBeenAcceptedByPharmacy = false,
                             PictureUrl_1 = "PrescriptionP_2.jpg",
                             PicturesUploadDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault()
+                            ShoppingCartId = 2
                         },
                         new Prescription {
                             HasBeenAcceptedByPharmacy = true,
                             PictureUrl_1 = "PrescriptionP_3.jpg",
                             PicturesUploadDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault()
+                            ShoppingCartId = 3
                         },
                         new Prescription {
                             HasBeenAcceptedByPharmacy = false,
                             PictureUrl_1 = "PrescriptionP_4.jpg",
                             PicturesUploadDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_004").FirstOrDefault()
+                            ShoppingCartId = 4
                         }
                     );
                     db.SaveChanges();
@@ -569,55 +571,55 @@ namespace NoskheAPI_Beta.Controllers
                             Name = "PrescriptionItem_1",
                             Quantity = 4,
                             Price = 45000,
-                            Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
+                            PrescriptionId = 1
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_2",
                             Quantity = 1,
                             Price = 2300,
-                            Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
+                            PrescriptionId = 2
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_3",
                             Quantity = 3,
                             Price = 5000,
-                            Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_1.jpg").FirstOrDefault()
+                            PrescriptionId = 3
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_4",
                             Quantity = 2,
                             Price = 950,
-                            Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_2.jpg").FirstOrDefault()
+                            PrescriptionId = 4
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_5",
                             Quantity = 1,
                             Price = 80400,
-                            Prescription = db.Prescriptions.Where(s => s.PictureUrl_1 == "PrescriptionP_2.jpg").FirstOrDefault()
+                            PrescriptionId = 1
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_6",
                             Quantity = 5,
                             Price = 93200,
-                            Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_4").FirstOrDefault()
+                            PrescriptionId = 2
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_7",
                             Quantity = 3,
                             Price = 11500,
-                            Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_4").FirstOrDefault()
+                            PrescriptionId = 3
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_8",
                             Quantity = 4,
                             Price = 1400,
-                            Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_3").FirstOrDefault()
+                            PrescriptionId = 4
                         },
                         new PrescriptionItem {
                             Name = "PrescriptionItem_9",
                             Quantity = 2,
                             Price = 11350,
-                            Prescription = db.Prescriptions.Where(s => s.ShoppingCart.Address == "ShoppingCartA_2").FirstOrDefault()
+                            PrescriptionId = 1
                         }
                     );
                     db.SaveChanges();
@@ -648,9 +650,9 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenSettled = false,
                             HasBeenPaid = true,
                             SettlementDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_001").FirstOrDefault(), // magar inke ye kode bezarim barash
-                            Courier = db.Couriers.Where(s => s.Email == "CourierE@1.com").FirstOrDefault(),
-                            Pharmacy = db.Pharmacies.Where(s => s.Email == "PharmacyE@1.com").FirstOrDefault()
+                            ShoppingCartId = 1,
+                            CourierId = 1,
+                            PharmacyId = 1
                         },
                         new Order {
                             UOI = "OrderUOI_2",
@@ -664,9 +666,9 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenSettled = false,
                             HasBeenPaid = true,
                             SettlementDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault(), // magar inke ye kode bezarim barash
-                            Courier = db.Couriers.Where(s => s.Email == "CourierE@2.com").FirstOrDefault(),
-                            Pharmacy = db.Pharmacies.Where(s => s.Email == "PharmacyE@1.com").FirstOrDefault()
+                            ShoppingCartId = 2,
+                            CourierId = 2,
+                            PharmacyId = 2
                         },
                         new Order {
                             UOI = "OrderUOI_3",
@@ -680,9 +682,9 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenSettled = false,
                             HasBeenPaid = false,
                             SettlementDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(), // magar inke ye kode bezarim barash
-                            Courier = db.Couriers.Where(s => s.Email == "CourierE@3.com").FirstOrDefault(),
-                            Pharmacy = db.Pharmacies.Where(s => s.Email == "PharmacyE@2.com").FirstOrDefault()
+                            ShoppingCartId = 3,
+                            CourierId = 3,
+                            PharmacyId = 3
                         },
                         new Order {
                             UOI = "OrderUOI_4",
@@ -696,9 +698,9 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenSettled = false,
                             HasBeenPaid = false,
                             SettlementDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_004").FirstOrDefault(), // magar inke ye kode bezarim barash
-                            Courier = db.Couriers.Where(s => s.Email == "CourierE@3.com").FirstOrDefault(),
-                            Pharmacy = db.Pharmacies.Where(s => s.Email == "PharmacyE@2.com").FirstOrDefault()
+                            ShoppingCartId = 1,
+                            CourierId = 1,
+                            PharmacyId = 1
                         },
                         new Order {
                             UOI = "OrderUOI_5",
@@ -712,9 +714,9 @@ namespace NoskheAPI_Beta.Controllers
                             HasBeenSettled = true,
                             HasBeenPaid = true,
                             SettlementDate = DateTime.Now,
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_005").FirstOrDefault(), // magar inke ye kode bezarim barash
-                            Courier = db.Couriers.Where(s => s.Email == "CourierE@2.com").FirstOrDefault(),
-                            Pharmacy = db.Pharmacies.Where(s => s.Email == "PharmacyE@3.com").FirstOrDefault()
+                            ShoppingCartId = 2,
+                            CourierId = 2,
+                            PharmacyId = 2
                         }
                     );
                     db.SaveChanges();
@@ -734,44 +736,39 @@ namespace NoskheAPI_Beta.Controllers
                 {
                     db.MedicineShoppingCarts.AddRange(
                         new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_001").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_1").FirstOrDefault(),
+                            ShoppingCartId = 1,
+                            MedicineId = 2,
+                            Quantity = 1
+                        },
+                        new MedicineShoppingCart {
+                            ShoppingCartId = 2,
+                            MedicineId = 2,
+                            Quantity = 2
+                        },
+                        new MedicineShoppingCart {
+                            ShoppingCartId = 3,
+                            MedicineId = 2,
                             Quantity = 3
                         },
                         new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_2").FirstOrDefault(),
+                            ShoppingCartId = 2,
+                            MedicineId = 1,
+                            Quantity = 4
+                        },
+                        new MedicineShoppingCart {
+                            ShoppingCartId = 3,
+                            MedicineId = 3,
                             Quantity = 3
                         },
                         new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_3").FirstOrDefault(),
-                            Quantity = 3
+                            ShoppingCartId = 2,
+                            MedicineId = 3,
+                            Quantity = 2
                         },
                         new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_2").FirstOrDefault(),
-                            Quantity = 3
-                        },
-                        new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_1").FirstOrDefault(),
-                            Quantity = 3
-                        },
-                        new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_3").FirstOrDefault(),
-                            Quantity = 3
-                        },
-                        new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_004").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_3").FirstOrDefault(),
-                            Quantity = 3
-                        },
-                        new MedicineShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_006").FirstOrDefault(),
-                            Medicine = db.Medicines.Where(s => s.Name == "Medicine_1").FirstOrDefault(),
-                            Quantity = 3
+                            ShoppingCartId = 1,
+                            MedicineId = 1,
+                            Quantity = 1
                         }
                     );
                     db.SaveChanges();
@@ -791,44 +788,44 @@ namespace NoskheAPI_Beta.Controllers
                 {
                     db.CosmeticShoppingCarts.AddRange(
                         new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_001").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_1").FirstOrDefault(),
+                            ShoppingCartId = 3,
+                            CosmeticId = 3,
+                            Quantity = 1
+                        },
+                        new CosmeticShoppingCart {
+                            ShoppingCartId = 1,
+                            CosmeticId = 3,
+                            Quantity = 2
+                        },
+                        new CosmeticShoppingCart {
+                            ShoppingCartId = 3,
+                            CosmeticId = 1,
+                            Quantity = 3
+                        },
+                        new CosmeticShoppingCart {
+                            ShoppingCartId = 2,
+                            CosmeticId = 3,
                             Quantity = 4
                         },
                         new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_2").FirstOrDefault(),
+                            ShoppingCartId = 3,
+                            CosmeticId = 2,
                             Quantity = 4
                         },
                         new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_002").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_3").FirstOrDefault(),
-                            Quantity = 4
+                            ShoppingCartId = 1,
+                            CosmeticId = 2,
+                            Quantity = 3
                         },
                         new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_2").FirstOrDefault(),
-                            Quantity = 4
+                            ShoppingCartId = 2,
+                            CosmeticId = 1,
+                            Quantity = 2
                         },
                         new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_1").FirstOrDefault(),
-                            Quantity = 4
-                        },
-                        new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_003").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_3").FirstOrDefault(),
-                            Quantity = 4
-                        },
-                        new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_004").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_3").FirstOrDefault(),
-                            Quantity = 4
-                        },
-                        new CosmeticShoppingCart {
-                            ShoppingCart = db.ShoppingCarts.Where(s => s.USCI == "ShoppingCartUSCI_006").FirstOrDefault(),
-                            Cosmetic = db.Cosmetics.Where(s => s.Name == "Cosmetic_1").FirstOrDefault(),
-                            Quantity = 4
+                            ShoppingCartId = 2,
+                            CosmeticId = 2,
+                            Quantity = 1
                         }
                     );
                     db.SaveChanges();
@@ -852,19 +849,19 @@ namespace NoskheAPI_Beta.Controllers
                             CustomerSatisfaction = 1,
                             PackingAverageTimeInSeconds = 14,
                             RankAmongPharmacies = 1,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_1").FirstOrDefault()
+                            PharmacyId = 1
                         },
                         new Score {
                             CustomerSatisfaction = 2,
                             PackingAverageTimeInSeconds = 13,
                             RankAmongPharmacies = 2,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_2").FirstOrDefault()
+                            PharmacyId = 2
                         },
                         new Score {
                             CustomerSatisfaction = 5,
                             PackingAverageTimeInSeconds = 12,
                             RankAmongPharmacies = 3,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_3").FirstOrDefault()
+                            PharmacyId = 3
                         }
                     );
                     db.SaveChanges();
@@ -886,23 +883,23 @@ namespace NoskheAPI_Beta.Controllers
                     db.Occurrences.AddRange(
                         new Occurrence {
                             CustomerHasRequestedOrderOn = DateTime.Now,
-                            Order = db.Orders.Where(p => p.UOI == "OrderUOI_1").FirstOrDefault()
+                            OrderId = 1
                         },
                         new Occurrence {
                             CustomerHasRequestedOrderOn = DateTime.Now,
-                            Order = db.Orders.Where(p => p.UOI == "OrderUOI_2").FirstOrDefault()
+                            OrderId = 2
                         },
                         new Occurrence {
                             CustomerHasRequestedOrderOn = DateTime.Now,
-                            Order = db.Orders.Where(p => p.UOI == "OrderUOI_3").FirstOrDefault()
+                            OrderId = 3
                         },
                         new Occurrence {
                             CustomerHasRequestedOrderOn = DateTime.Now,
-                            Order = db.Orders.Where(p => p.UOI == "OrderUOI_4").FirstOrDefault()
+                            OrderId = 3
                         },
                         new Occurrence {
                             CustomerHasRequestedOrderOn = DateTime.Now,
-                            Order = db.Orders.Where(p => p.UOI == "OrderUOI_5").FirstOrDefault()
+                            OrderId = 1
                         }
                     );
                     db.SaveChanges();
@@ -926,37 +923,37 @@ namespace NoskheAPI_Beta.Controllers
                             IBAN = "IBAN_1",
                             AccountOwnerName = "AccountOwnerName_1",
                             BankName = "BankName_1",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_1").FirstOrDefault()
+                            PharmacyId = 1
                         },
                         new Account {
                             IBAN = "IBAN_2",
                             AccountOwnerName = "AccountOwnerName_2",
                             BankName = "BankName_2",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_2").FirstOrDefault()
+                            PharmacyId = 2
                         },
                         new Account {
                             IBAN = "IBAN_3",
                             AccountOwnerName = "AccountOwnerName_3",
                             BankName = "BankName_3",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_3").FirstOrDefault()
+                            PharmacyId = 3
                         },
                         new Account {
                             IBAN = "IBAN_4",
                             AccountOwnerName = "AccountOwnerName_4",
                             BankName = "BankName_4",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_4").FirstOrDefault()
+                            PharmacyId = 3
                         },
                         new Account {
                             IBAN = "IBAN_5",
                             AccountOwnerName = "AccountOwnerName_5",
                             BankName = "BankName_5",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_5").FirstOrDefault()
+                            PharmacyId = 1
                         },
                         new Account {
                             IBAN = "IBAN_6",
                             AccountOwnerName = "AccountOwnerName_6",
                             BankName = "BankName_6",
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_6").FirstOrDefault()
+                            PharmacyId = 3
                         }
                     );
                     
@@ -982,7 +979,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.04,
                             Date = DateTime.Now,
                             NumberOfOrders = 42,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_1").FirstOrDefault(),
+                            PharmacyId = 2,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -990,7 +987,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.05,
                             Date = DateTime.Now,
                             NumberOfOrders = 12,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_5").FirstOrDefault(),
+                            PharmacyId = 1,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -998,7 +995,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.06,
                             Date = DateTime.Now,
                             NumberOfOrders = 23,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_1").FirstOrDefault(),
+                            PharmacyId = 3,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -1006,7 +1003,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.07,
                             Date = DateTime.Now,
                             NumberOfOrders = 62,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_3").FirstOrDefault(),
+                            PharmacyId = 2,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -1014,7 +1011,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.08,
                             Date = DateTime.Now,
                             NumberOfOrders = 21,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_6").FirstOrDefault(),
+                            PharmacyId = 3,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -1022,7 +1019,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.09,
                             Date = DateTime.Now,
                             NumberOfOrders = 30,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_2").FirstOrDefault(),
+                            PharmacyId = 1,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -1030,7 +1027,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.1,
                             Date = DateTime.Now,
                             NumberOfOrders = 16,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_2").FirstOrDefault(),
+                            PharmacyId = 3,
                             HasBeenSettled = false
                         },
                         new Settle {
@@ -1038,7 +1035,7 @@ namespace NoskheAPI_Beta.Controllers
                             CommissionCoefficient = 0.11,
                             Date = DateTime.Now,
                             NumberOfOrders = 19,
-                            Pharmacy = db.Pharmacies.Where(p => p.UPI == "PharmacyUPI_3").FirstOrDefault(),
+                            PharmacyId = 2,
                             HasBeenSettled = false
                         }
                     );
@@ -1061,17 +1058,17 @@ namespace NoskheAPI_Beta.Controllers
                     db.CustomerTextMessages.AddRange(
                         new CustomerTextMessage {
                             Date = DateTime.Now,
-                            Customer = db.Customers.Where(q => q.Email == "CustomerE@1.com").FirstOrDefault(),
+                            CustomerId = 1,
                             Message = "VerificationCode_1"
                         },
                         new CustomerTextMessage {
                             Date = DateTime.Now,
-                            Customer = db.Customers.Where(q => q.Email == "CustomerE@2.com").FirstOrDefault(),
+                            CustomerId = 2,
                             Message = "VerificationCode_2"
                         },
                         new CustomerTextMessage {
                             Date = DateTime.Now,
-                            Customer = db.Customers.Where(q => q.Email == "CustomerE@3.com").FirstOrDefault(),
+                            CustomerId = 3,
                             Message = "VerificationCode_3"
                         }
                     );

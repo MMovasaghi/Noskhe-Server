@@ -204,22 +204,22 @@ namespace NoskheAPI_Beta.Services
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
-                List<int> medIds = new List<int>();
-                List<int> cosmIds = new List<int>();
+                Dictionary<int, int> medIds = new Dictionary<int, int>();
+                Dictionary<int, int> cosmIds = new Dictionary<int, int>();
                 foreach (var id in ansc.ShoppingCartObj.MedicineIds)
                 {
-                    if(db.Medicines.Find(id) != null)
+                    if(db.Medicines.Find(id.Key) != null)
                     {
-                        medIds.Add(id);
+                        medIds.Add(id.Key, id.Value);
                     }
                     else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
 
                 foreach (var id in ansc.ShoppingCartObj.CosmeticIds)
                 {
-                    if(db.Cosmetics.Find(id) != null)
+                    if(db.Cosmetics.Find(id.Key) != null)
                     {
-                        cosmIds.Add(id);
+                        cosmIds.Add(id.Key, id.Value);
                     }
                     else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
@@ -228,8 +228,9 @@ namespace NoskheAPI_Beta.Services
                 {
                     db.MedicineShoppingCarts.Add(
                         new MedicineShoppingCart {
-                            Medicine = db.Medicines.Where(e => e.MedicineId == id).FirstOrDefault(),
-                            ShoppingCartId = customerShoppingCart.ShoppingCartId
+                            Medicine = db.Medicines.Where(e => e.MedicineId == id.Key).FirstOrDefault(),
+                            ShoppingCartId = customerShoppingCart.ShoppingCartId,
+                            Quantity = id.Value
                         }
                     );
                 }
@@ -237,8 +238,9 @@ namespace NoskheAPI_Beta.Services
                 {
                     db.CosmeticShoppingCarts.Add(
                         new CosmeticShoppingCart {
-                            Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id).FirstOrDefault(),
-                            ShoppingCartId = customerShoppingCart.ShoppingCartId
+                            Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id.Key).FirstOrDefault(),
+                            ShoppingCartId = customerShoppingCart.ShoppingCartId,
+                            Quantity = id.Value
                         }
                     );
                 }
@@ -1455,11 +1457,11 @@ namespace NoskheAPI_Beta.Services
                     return match.Groups[1].Value + domainName;
                 }
             }
-            catch (RegexMatchTimeoutException e)
+            catch (RegexMatchTimeoutException)
             {
                 return false;
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return false;
             }

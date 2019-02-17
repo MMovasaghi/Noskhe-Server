@@ -226,6 +226,13 @@ namespace NoskheAPI_Beta.Controllers
             {
                 return Ok(_customerService.LoginWithEmailAndPass(at, _appSettings));
             }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
+            }
             catch(LoginVerificationFailedException vfe)
             {
                 return BadRequest(new ResponseTemplate {
@@ -256,11 +263,11 @@ namespace NoskheAPI_Beta.Controllers
         // POST: mobile-api/customer/new-customer
         [AllowAnonymous]
         [HttpPost(Labels.AddNewCustomer)]
-        public ActionResult<TokenTemplate> AddNewCustomer([FromBody] Models.Android.AddNewTemplate an)
+        public async Task<ActionResult<TokenTemplate>> AddNewCustomer([FromBody] Models.Android.AddNewTemplate an)
         {
             try
             {
-                return Ok(_customerService.AddNewCustomer(an, _appSettings));
+                return Ok(await _customerService.AddNewCustomer(an, _appSettings));
             }
             catch(DuplicateCustomerException dce)
             {
@@ -269,11 +276,18 @@ namespace NoskheAPI_Beta.Controllers
                     Error = dce.Message
                 });
             }
-            catch(EmailAndPhoneAreNullException eapane)
+            catch(EmailIsNotValidException einv)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = eapane.Message
+                    Error = einv.Message
+                });
+            }
+            catch(RegistrationRuleException rre)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = rre.Message
                 });
             }
             catch(DatabaseFailureException dfe)
@@ -337,18 +351,11 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(_customerService.AddNewShoppingCart(ansc));
             }
-            catch(InvalidCosmeticIDFoundException icife)
+            catch(InvalidItemIdFoundException niie)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = icife.Message // TODO: ADD THIS TO DOC
-                });
-            }
-            catch(InvalidMedicineIDFoundException imife)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = imife.Message // TODO: ADD THIS TO DOC
+                    Error = niie.Message // TODO: ADD THIS TO DOC
                 });
             }
             catch(DatabaseFailureException dfe)
@@ -502,6 +509,13 @@ namespace NoskheAPI_Beta.Controllers
             try
             {
                 return Ok(_customerService.RequestPhoneLogin(pt));
+            }
+            catch(PhoneNumberIsNotVerifiedException pnive)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pnive.Message
+                });
             }
             catch(RepeatedTextMessageRequestsException rtmte)
             {

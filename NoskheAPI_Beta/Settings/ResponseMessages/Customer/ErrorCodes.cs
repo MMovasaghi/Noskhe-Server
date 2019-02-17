@@ -18,8 +18,8 @@ namespace NoskheAPI_Beta.Settings.ResponseMessages.Customer
         public static string NoShoppingCartsFoundExceptionMsg = "CEC13";
         public static string PaymentGatewayFailureExceptionMsg = "CEC14";
         public static string LoginVerificationFailedExceptionMsg = "CEC15";
-        public static string SmsVerificationExpiredExceptionMsg = "CEC16";
-        public static string SmsVerificationFailedExceptionMsg = "CEC17";
+        public static string EditProfileRuleExceptionMsg = "CEC16";
+        public static string SmsVerificationFailedExceptionMsg = "CEC17"; // todo: remove this
         public static string RegistrationRuleExceptionMsg = "CEC18";
         public static string TextMessageVerificationFailedExceptionMsg = "CEC19";
         public static string NumberOfTextMessageTriesExceededExceptionMsg = "CEC20";

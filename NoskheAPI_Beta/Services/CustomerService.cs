@@ -50,9 +50,9 @@ namespace NoskheAPI_Beta.Services
         CreditTemplate WalletInquiry();
         Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
-        ResponseTemplate RequestPhoneLogin(Models.Android.PhoneTemplate pt);
+        Task<ResponseTemplate> RequestPhoneLogin(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyPhoneLogin(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
-        ResponseTemplate RequestResetPassword(Models.Android.PhoneTemplate pt);
+        Task<ResponseTemplate> RequestResetPassword(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyResetPassword(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
         ResponseTemplate ResetPassword(ResetPasswordTemplate rp);        
         ResponseTemplate VerifyPhoneNumber(Models.Android.VerifyPhoneTemplate vpt);
@@ -65,6 +65,7 @@ namespace NoskheAPI_Beta.Services
         public static string KAVENEGAR_SMS_TOKEN = "3463437075492B4E4E4453565136542B684156365559716C556572476250716A";
         public static string DEFUALT_PROFILE_PIC_URL = "http://www.someweb.com/MY_PROFILE_PIC.jpg";
         public static string AUTHRIZATION_TEMPLATE_NAME = "verify";
+        public static string LOGIN_TEMPLATE_NAME = "login";
         private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         public string RequestToken { get; set; }
 
@@ -141,9 +142,9 @@ namespace NoskheAPI_Beta.Services
                         }
                     );
                     // // (*) sms
-                    // var client = new HttpClient();
-                    // var response = new HttpResponseMessage();
-                    // response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
 
 
                     // adding new token
@@ -203,13 +204,13 @@ namespace NoskheAPI_Beta.Services
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
-                int[] medIds = {};
-                int[] cosmIds = {};
+                List<int> medIds = new List<int>();
+                List<int> cosmIds = new List<int>();
                 foreach (var id in ansc.ShoppingCartObj.MedicineIds)
                 {
                     if(db.Medicines.Find(id) != null)
                     {
-                        medIds.Append(id);
+                        medIds.Add(id);
                     }
                     else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
@@ -218,7 +219,7 @@ namespace NoskheAPI_Beta.Services
                 {
                     if(db.Cosmetics.Find(id) != null)
                     {
-                        cosmIds.Append(id);
+                        cosmIds.Add(id);
                     }
                     else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
@@ -305,6 +306,45 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
+                if(!foundCustomer.IsPhoneValidated) throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
+                
+                if(string.IsNullOrEmpty(ee.CustomerObj.Phone) || string.IsNullOrEmpty(ee.CustomerObj.Password))
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+                
+                if(!string.IsNullOrEmpty(ee.CustomerObj.Email))
+                {
+                    if(!IsValidEmail(ee.CustomerObj.Email))
+                    {
+                        throw new EmailIsNotValidException(ErrorCodes.EmailIsNotValidExceptionMsg);
+                    }
+                }
+
+                try
+                {
+                    long.Parse(ee.CustomerObj.Phone);
+                }
+                catch
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+
+                if(ee.CustomerObj.Phone.Length != 11)
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+                // duplicate email
+                if(!string.IsNullOrEmpty(ee.CustomerObj.Email))
+                {
+                    var foundCustomerByEmail = db.Customers.Where(c => c.Email == ee.CustomerObj.Email && c.CustomerId != GetCustomerId()).FirstOrDefault();
+                    if(foundCustomerByEmail != null) throw new DuplicateCustomerException(ErrorCodes.DuplicateCustomerExceptionMsg);
+                    foundCustomerByEmail = null;
+                }
+                
+                if(ee.CustomerObj.Phone != foundCustomer.Phone) foundCustomer.IsPhoneValidated = false;
+                if(ee.CustomerObj.Email != foundCustomer.Email) foundCustomer.IsEmailValidated = false;
+
                 foundCustomer.FirstName = ee.CustomerObj.FirstName;
                 foundCustomer.LastName = ee.CustomerObj.LastName;
                 foundCustomer.Gender = ee.CustomerObj.Gender;
@@ -351,6 +391,9 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var response = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
+                
+                if(!response.IsPhoneValidated) throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
+
                 return new Models.Minimals.Output.Customer {
                     FirstName = response.FirstName,
                     LastName = response.LastName,
@@ -790,10 +833,24 @@ namespace NoskheAPI_Beta.Services
             return newItem;
         }
 
-        public ResponseTemplate RequestPhoneLogin(PhoneTemplate pt)
+        public async Task<ResponseTemplate> RequestPhoneLogin(PhoneTemplate pt)
         {
             try
             {
+                try
+                {
+                    long.Parse(pt.Phone);
+                }
+                catch
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
+                if(pt.Phone.Length != 11)
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
                 var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
@@ -812,18 +869,24 @@ namespace NoskheAPI_Beta.Services
                         }
                     }
                     
-                    Random code = new Random();
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = existingCustomer,
-                            Message = code.Next(11111,99999).ToString(),
+                            Message = code.ToString(),
                             Date = DateTime.Now,
                             Type = CustomerTextMessageType.Login,
                             Validated = false
                         }
                     );
                     db.SaveChanges();
+
                     // TODO: (*) sms
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={existingCustomer.Phone}&token={code}&template={LOGIN_TEMPLATE_NAME}");
+
                     return new ResponseTemplate {
                         Success = true
                     };
@@ -840,6 +903,20 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
+                try
+                {
+                    long.Parse(vpt.Phone);
+                }
+                catch
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
+                if(vpt.Phone.Length != 11)
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
                 var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
@@ -875,7 +952,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public ResponseTemplate RequestResetPassword(PhoneTemplate pt)
+        public async Task<ResponseTemplate> RequestResetPassword(PhoneTemplate pt)
         {
             try
             {
@@ -908,18 +985,24 @@ namespace NoskheAPI_Beta.Services
                             throw new UnauthorizedAccessException();
                         }
                     }
-                    Random code = new Random();
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = existingCustomer,
-                            Message = code.Next(11111,99999).ToString(),
+                            Message = code.ToString(),
                             Date = DateTime.Now,
                             Type = CustomerTextMessageType.ForgetPassword,
                             Validated = false
                         }
                     );
                     db.SaveChanges();
+                    
                     // TODO: (*) sms
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={existingCustomer.Phone}&token={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+
                     return new ResponseTemplate {
                         Success = true
                     };
@@ -1013,6 +1096,8 @@ namespace NoskheAPI_Beta.Services
                                 // verify ok
                                 lastMessage.Validated = true;
                                 existingCustomer.IsPhoneValidated = true;
+                                lastMessage.NumberOfAttempts++;
+
                                 db.SaveChanges();
 
                                 return new ResponseTemplate {

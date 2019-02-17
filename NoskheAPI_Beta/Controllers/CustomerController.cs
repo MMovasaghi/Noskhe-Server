@@ -51,6 +51,13 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(_customerService.GetProfileInformation());
             }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
+            }
             catch(UnauthorizedAccessException)
             {
                 return Unauthorized();
@@ -314,6 +321,27 @@ namespace NoskheAPI_Beta.Controllers
             {
                 GrabTokenFromHeader();
                 return Ok(_customerService.EditExistingCustomerProfile(ee));
+            }            
+            catch(EditProfileRuleException epre)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = epre.Message
+                });
+            }
+            catch(EmailIsNotValidException einve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = einve.Message
+                });
+            }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
             }
             catch(DatabaseFailureException dfe)
             {
@@ -504,11 +532,11 @@ namespace NoskheAPI_Beta.Controllers
         [AllowAnonymous]
         // POST: mobile-api/customer/request-phone-login
         [HttpPost(Labels.RequestPhoneLogin)]
-        public ActionResult RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
+        public async Task<ActionResult> RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
         {
             try
             {
-                return Ok(_customerService.RequestPhoneLogin(pt));
+                return Ok(await _customerService.RequestPhoneLogin(pt));
             }
             catch(PhoneNumberIsNotVerifiedException pnive)
             {
@@ -600,11 +628,11 @@ namespace NoskheAPI_Beta.Controllers
         [AllowAnonymous]
         // POST: mobile-api/customer/request-reset-password
         [HttpPost(Labels.RequestResetPassword)]
-        public ActionResult RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
+        public async Task<ActionResult> RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
         {
             try
             {
-                return Ok(_customerService.RequestResetPassword(pt));
+                return Ok(await _customerService.RequestResetPassword(pt));
             }            
             catch(NoCustomersMatchedByPhoneException ncmbpe)
             {
@@ -834,6 +862,13 @@ namespace NoskheAPI_Beta.Controllers
             {
                 GrabTokenFromHeader();
                 return Ok(_customerService.NotificationResponse(notificationId));
+            }
+            catch(NoNotificationsMatchedByIdException nnmbie)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = nnmbie.Message
+                });
             }
             catch(DatabaseFailureException dfe)
             {

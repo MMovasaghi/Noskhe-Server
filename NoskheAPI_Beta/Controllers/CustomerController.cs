@@ -51,6 +51,13 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(_customerService.GetProfileInformation());
             }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
+            }
             catch(UnauthorizedAccessException)
             {
                 return Unauthorized();
@@ -226,6 +233,13 @@ namespace NoskheAPI_Beta.Controllers
             {
                 return Ok(_customerService.LoginWithEmailAndPass(at, _appSettings));
             }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
+            }
             catch(LoginVerificationFailedException vfe)
             {
                 return BadRequest(new ResponseTemplate {
@@ -256,11 +270,11 @@ namespace NoskheAPI_Beta.Controllers
         // POST: mobile-api/customer/new-customer
         [AllowAnonymous]
         [HttpPost(Labels.AddNewCustomer)]
-        public ActionResult<TokenTemplate> AddNewCustomer([FromBody] Models.Android.AddNewTemplate an)
+        public async Task<ActionResult<TokenTemplate>> AddNewCustomer([FromBody] Models.Android.AddNewTemplate an)
         {
             try
             {
-                return Ok(_customerService.AddNewCustomer(an, _appSettings));
+                return Ok(await _customerService.AddNewCustomer(an, _appSettings));
             }
             catch(DuplicateCustomerException dce)
             {
@@ -269,11 +283,18 @@ namespace NoskheAPI_Beta.Controllers
                     Error = dce.Message
                 });
             }
-            catch(EmailAndPhoneAreNullException eapane)
+            catch(EmailIsNotValidException einv)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = eapane.Message
+                    Error = einv.Message
+                });
+            }
+            catch(RegistrationRuleException rre)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = rre.Message
                 });
             }
             catch(DatabaseFailureException dfe)
@@ -300,6 +321,27 @@ namespace NoskheAPI_Beta.Controllers
             {
                 GrabTokenFromHeader();
                 return Ok(_customerService.EditExistingCustomerProfile(ee));
+            }            
+            catch(EditProfileRuleException epre)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = epre.Message
+                });
+            }
+            catch(EmailIsNotValidException einve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = einve.Message
+                });
+            }
+            catch(PhoneNumberIsNotVerifiedException pninve)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pninve.Message
+                });
             }
             catch(DatabaseFailureException dfe)
             {
@@ -337,18 +379,11 @@ namespace NoskheAPI_Beta.Controllers
                 GrabTokenFromHeader();
                 return Ok(_customerService.AddNewShoppingCart(ansc));
             }
-            catch(InvalidCosmeticIDFoundException icife)
+            catch(InvalidItemIdFoundException niie)
             {
                 return BadRequest(new ResponseTemplate {
                     Success = false,
-                    Error = icife.Message // TODO: ADD THIS TO DOC
-                });
-            }
-            catch(InvalidMedicineIDFoundException imife)
-            {
-                return BadRequest(new ResponseTemplate {
-                    Success = false,
-                    Error = imife.Message // TODO: ADD THIS TO DOC
+                    Error = niie.Message // TODO: ADD THIS TO DOC
                 });
             }
             catch(DatabaseFailureException dfe)
@@ -497,11 +532,18 @@ namespace NoskheAPI_Beta.Controllers
         [AllowAnonymous]
         // POST: mobile-api/customer/request-phone-login
         [HttpPost(Labels.RequestPhoneLogin)]
-        public ActionResult RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
+        public async Task<ActionResult> RequestPhoneLogin([FromBody] Models.Android.PhoneTemplate pt)
         {
             try
             {
-                return Ok(_customerService.RequestPhoneLogin(pt));
+                return Ok(await _customerService.RequestPhoneLogin(pt));
+            }
+            catch(PhoneNumberIsNotVerifiedException pnive)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = pnive.Message
+                });
             }
             catch(RepeatedTextMessageRequestsException rtmte)
             {
@@ -586,11 +628,11 @@ namespace NoskheAPI_Beta.Controllers
         [AllowAnonymous]
         // POST: mobile-api/customer/request-reset-password
         [HttpPost(Labels.RequestResetPassword)]
-        public ActionResult RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
+        public async Task<ActionResult> RequestResetPassword([FromBody] Models.Android.PhoneTemplate pt)
         {
             try
             {
-                return Ok(_customerService.RequestResetPassword(pt));
+                return Ok(await _customerService.RequestResetPassword(pt));
             }            
             catch(NoCustomersMatchedByPhoneException ncmbpe)
             {
@@ -820,6 +862,13 @@ namespace NoskheAPI_Beta.Controllers
             {
                 GrabTokenFromHeader();
                 return Ok(_customerService.NotificationResponse(notificationId));
+            }
+            catch(NoNotificationsMatchedByIdException nnmbie)
+            {
+                return BadRequest(new ResponseTemplate {
+                    Success = false,
+                    Error = nnmbie.Message
+                });
             }
             catch(DatabaseFailureException dfe)
             {

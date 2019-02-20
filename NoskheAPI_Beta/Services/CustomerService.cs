@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.SignalR;
 using NoskheAPI_Beta.Classes.Communication;
 using NoskheAPI_Beta.Models.Android;
 using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace NoskheAPI_Beta.Services
 {
@@ -39,7 +41,7 @@ namespace NoskheAPI_Beta.Services
         // ResponseTemplate LoginWithPhoneNumber(Models.Android.AuthenticateByPhoneTemplate abp, AppSettings appSettings); // TODO: Login with phone -> *Will be fixed #3*
         // bool RequestSmsForForgetPassword();
         // bool VerifySmsCodeForForgetPassword();
-        TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
+        Task<TokenTemplate> AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings);
         bool EditExistingCustomerProfile(Models.Android.EditExistingTemplate ee);
         StatusAndIdTemplate AddNewShoppingCart(Models.Android.AddNewShoppingCartTemplate ansc);
         // Task<string> CreatePaymentUrlForOrder(int id, HostString hostIp); // TODO: Check konim ke in id male customer hast ya na // kolan lazem nist
@@ -48,9 +50,9 @@ namespace NoskheAPI_Beta.Services
         CreditTemplate WalletInquiry();
         Task<ResponseTemplate> RequestService(INotificationService notificationService, IHubContext<NotificationHub> hubContext, int shoppingCartId);
         Task<AddCreditTemplate> AddCreditToWallet(int credit, HostString hostIp);
-        ResponseTemplate RequestPhoneLogin(Models.Android.PhoneTemplate pt);
+        Task<ResponseTemplate> RequestPhoneLogin(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyPhoneLogin(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
-        ResponseTemplate RequestResetPassword(Models.Android.PhoneTemplate pt);
+        Task<ResponseTemplate> RequestResetPassword(Models.Android.PhoneTemplate pt);
         TokenTemplate VerifyResetPassword(Models.Android.VerifyPhoneTemplate vpt, AppSettings appSettings);
         ResponseTemplate ResetPassword(ResetPasswordTemplate rp);        
         ResponseTemplate VerifyPhoneNumber(Models.Android.VerifyPhoneTemplate vpt);
@@ -61,33 +63,54 @@ namespace NoskheAPI_Beta.Services
     class CustomerService : ICustomerService
     {
         public static string KAVENEGAR_SMS_TOKEN = "3463437075492B4E4E4453565136542B684156365559716C556572476250716A";
-        public static string AUTHRIZATION_TEMPLATE_NAME = "ntest";
+        public static string DEFUALT_PROFILE_PIC_URL = "http://www.someweb.com/MY_PROFILE_PIC.jpg";
+        public static string AUTHRIZATION_TEMPLATE_NAME = "verify";
+        public static string LOGIN_TEMPLATE_NAME = "login";
         private static NoskheAPI_Beta.Models.NoskheContext db = new NoskheAPI_Beta.Models.NoskheContext();
         public string RequestToken { get; set; }
 
-        public TokenTemplate AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings)
+        public async Task<TokenTemplate> AddNewCustomer(Models.Android.AddNewTemplate an, AppSettings appSettings)
         {
             try
             {
                 Models.Customer foundCustomer;
-                // raveshe tabahide sabte nam
-                if(an.CustomerObj.Email == null && an.CustomerObj.Phone == null)
+                // empty password or phone
+                if(string.IsNullOrEmpty(an.CustomerObj.Phone) || string.IsNullOrEmpty(an.CustomerObj.Password))
                 {
-                    throw new EmailAndPhoneAreNullException(ErrorCodes.EmailAndPhoneAreNullExceptionMsg);
+                    throw new RegistrationRuleException(ErrorCodes.RegistrationRuleExceptionMsg);
                 }
-                // ravesh haye mokhtalefe sabte nam
-                if(an.CustomerObj.Email == null) // sabtenam be raveshe "by email"
+                
+                if(!string.IsNullOrEmpty(an.CustomerObj.Email))
                 {
-                    foundCustomer = db.Customers.Where(q => (q.Phone == an.CustomerObj.Phone)).FirstOrDefault();
+                    if(!IsValidEmail(an.CustomerObj.Email))
+                    {
+                        throw new EmailIsNotValidException(ErrorCodes.EmailIsNotValidExceptionMsg);
+                    }
                 }
-                else if(an.CustomerObj.Phone == null) // sabtenam be raveshe "by phone"
+
+                try
                 {
-                    foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email)).FirstOrDefault();
+                    long.Parse(an.CustomerObj.Phone);
                 }
-                else // sabte name kamel (email & phone : bi karbord dar barname)
+                catch
                 {
-                    foundCustomer = db.Customers.Where(q => (q.Email == an.CustomerObj.Email && q.Phone == an.CustomerObj.Phone)).FirstOrDefault();
+                    throw new RegistrationRuleException(ErrorCodes.RegistrationRuleExceptionMsg);
                 }
+
+                if(an.CustomerObj.Phone.Length != 11)
+                {
+                    throw new RegistrationRuleException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+                // duplicate email
+                if(!string.IsNullOrEmpty(an.CustomerObj.Email))
+                {
+                    foundCustomer = db.Customers.Where(c => c.Email == an.CustomerObj.Email).FirstOrDefault();
+                    if(foundCustomer != null) throw new DuplicateCustomerException(ErrorCodes.DuplicateCustomerExceptionMsg);
+                    foundCustomer = null;
+                }
+
+                foundCustomer = db.Customers.Where(c => c.Phone == an.CustomerObj.Phone).FirstOrDefault();
+
                 if(foundCustomer == null)
                 {
                     // adding new user
@@ -96,15 +119,16 @@ namespace NoskheAPI_Beta.Services
                             LastName = an.CustomerObj.LastName,
                             Gender = an.CustomerObj.Gender,
                             Birthday = an.CustomerObj.Birthday,
-                            Email = an.CustomerObj.Email,
+                            Email = an.CustomerObj.Email ?? "",
                             Password = an.CustomerObj.Password,
                             Phone = an.CustomerObj.Phone,
-                            ProfilePictureUrl = an.CustomerObj.ProfilePictureUrl,
-                            // server-side decisions
-                            RegisterationDate = DateTime.Now
+                            ProfilePictureUrl = DEFUALT_PROFILE_PIC_URL,
+                            RegisterationDate = DateTime.Now,
+                            IsPhoneValidated = false,
+                            IsEmailValidated = false
                         };
                     db.Customers.Add(newUser);
-                    db.SaveChanges(); // TODO: agar usere jadid add shod vali add kardane token expception dad bayad che konim?
+                    // db.SaveChanges(); // TODO: agar usere jadid add shod vali add kardane token expception dad bayad che konim?
                     
                     Random rnd = new Random();
                     var code = rnd.Next(11111, 99999);
@@ -117,10 +141,10 @@ namespace NoskheAPI_Beta.Services
                             Validated = false
                         }
                     );
-                    // TODO: (*) sms
-                    // var client = new HttpClient();
-                    // var response = new HttpResponseMessage();
-                    // response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={newUser.FirstName} {newUser.LastName}&token2={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+                    // // (*) sms
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={newUser.Phone}&token={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
 
 
                     // adding new token
@@ -132,14 +156,14 @@ namespace NoskheAPI_Beta.Services
                         {
                             new Claim(ClaimTypes.Name, "C" + newUser.CustomerId.ToString())
                         }),
-                        Expires = DateTime.UtcNow.AddDays(1),
+                        Expires = DateTime.UtcNow.AddDays(7),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
                     var token = tokenHandler.CreateToken(tokenDescriptor);
                     var newCustomerToken = new CustomerToken {
                         Token = tokenHandler.WriteToken(token),
                         ValidFrom = DateTime.UtcNow,
-                        ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
+                        ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(7),
                         Customer = newUser,
                         IsValid = true,
                     };
@@ -169,7 +193,7 @@ namespace NoskheAPI_Beta.Services
 
                 var customerShoppingCart =
                     new Models.ShoppingCart {
-                            USCI = "testUSCI", // TODO: USCI generator
+                            USCI = "someUSCI", // TODO: USCI generator
                             Date = DateTime.Now,
                             AddressLatitude = ansc.ShoppingCartObj.AddressLatitude,
                             AddressLongitude = ansc.ShoppingCartObj.AddressLongitude,
@@ -180,61 +204,66 @@ namespace NoskheAPI_Beta.Services
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
+                Dictionary<int, int> medIds = new Dictionary<int, int>();
+                Dictionary<int, int> cosmIds = new Dictionary<int, int>();
                 foreach (var id in ansc.ShoppingCartObj.MedicineIds)
                 {
-                    try
+                    if(db.Medicines.Find(id.Key) != null)
                     {
-                        db.MedicineShoppingCarts.Add(
-                        new MedicineShoppingCart {
-                                Medicine = db.Medicines.Where(w => w.MedicineId == id).FirstOrDefault(),
-                                ShoppingCartId = customerShoppingCart.ShoppingCartId
-                            }
-                        );
-                        db.SaveChanges();
+                        medIds.Add(id.Key, id.Value);
                     }
-                    catch
-                    {
-                        throw new InvalidMedicineIDFoundException(ErrorCodes.InvalidMedicineIDFoundExceptionMsg);
-                    }
+                    else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
 
                 foreach (var id in ansc.ShoppingCartObj.CosmeticIds)
                 {
-                    try
+                    if(db.Cosmetics.Find(id.Key) != null)
                     {
-                        db.CosmeticShoppingCarts.Add(
-                            new CosmeticShoppingCart {
-                                Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id).FirstOrDefault(),
-                                ShoppingCartId = customerShoppingCart.ShoppingCartId
-                            }
-                        );
-                        db.SaveChanges();
+                        cosmIds.Add(id.Key, id.Value);
                     }
-                    catch
-                    {
-                        throw new InvalidCosmeticIDFoundException(ErrorCodes.InvalidCosmeticIDFoundExceptionMsg);
-                    }
+                    else throw new InvalidItemIdFoundException(ErrorCodes.InvalidItemIdFoundExceptionMsg);
                 }
+
+                foreach (var id in medIds)
+                {
+                    db.MedicineShoppingCarts.Add(
+                        new MedicineShoppingCart {
+                            Medicine = db.Medicines.Where(e => e.MedicineId == id.Key).FirstOrDefault(),
+                            ShoppingCartId = customerShoppingCart.ShoppingCartId,
+                            Quantity = id.Value
+                        }
+                    );
+                }
+                foreach (var id in cosmIds)
+                {
+                    db.CosmeticShoppingCarts.Add(
+                        new CosmeticShoppingCart {
+                            Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id.Key).FirstOrDefault(),
+                            ShoppingCartId = customerShoppingCart.ShoppingCartId,
+                            Quantity = id.Value
+                        }
+                    );
+                }
+                db.SaveChanges();
 
                 // var sh = db.ShoppingCarts.Where(s => s.Date == customerShoppingCart.Date).FirstOrDefault();
                 // TODO: MAYBE INPUT IS NULL
                 db.Prescriptions.Add(
                     new Prescription {
                         HasBeenAcceptedByPharmacy = false,
-                        PictureUrl_1 = ansc.ShoppingCartObj.PictureUrl_1,
-                        PictureUrl_2 = ansc.ShoppingCartObj.PictureUrl_2,
-                        PictureUrl_3 = ansc.ShoppingCartObj.PictureUrl_3, 
+                        PictureUrl_1 = ansc.ShoppingCartObj.PictureUrl_1 ?? "",
+                        PictureUrl_2 = ansc.ShoppingCartObj.PictureUrl_2 ?? "",
+                        PictureUrl_3 = ansc.ShoppingCartObj.PictureUrl_3 ?? "",
                         PicturesUploadDate = DateTime.Now,
                         ShoppingCartId = customerShoppingCart.ShoppingCartId
                     }
                 );
-                db.SaveChanges();
 
                 // TODO: MAYBE INPUT IS NULL
                 db.Notations.Add(
                     new Notation {
                         BrandPreference = ansc.ShoppingCartObj.BrandPreference,
-                        Description = ansc.ShoppingCartObj.Description,
+                        Description = ansc.ShoppingCartObj.Description ?? "",
                         HasOtherDiseases = ansc.ShoppingCartObj.HasOtherDiseases,
                         HasPregnancy = ansc.ShoppingCartObj.HasPregnancy,
                         ShoppingCartId = customerShoppingCart.ShoppingCartId
@@ -262,8 +291,8 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(q => (q.Email == at.Email && q.Password == at.Password)).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    return LoginHandler(existingCustomer, appSettings);
-                    // throw new UnauthorizedAccessException(); TODO: uncomment this and remove the else scope
+                    if(existingCustomer.IsPhoneValidated == true) return LoginHandler(existingCustomer, appSettings);
+                    else throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
                 }
                 throw new LoginVerificationFailedException(ErrorCodes.LoginVerificationFailedExceptionMsg);
             }
@@ -279,6 +308,45 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var foundCustomer = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
+                if(!foundCustomer.IsPhoneValidated) throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
+                
+                if(string.IsNullOrEmpty(ee.CustomerObj.Phone) || string.IsNullOrEmpty(ee.CustomerObj.Password))
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+                
+                if(!string.IsNullOrEmpty(ee.CustomerObj.Email))
+                {
+                    if(!IsValidEmail(ee.CustomerObj.Email))
+                    {
+                        throw new EmailIsNotValidException(ErrorCodes.EmailIsNotValidExceptionMsg);
+                    }
+                }
+
+                try
+                {
+                    long.Parse(ee.CustomerObj.Phone);
+                }
+                catch
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+
+                if(ee.CustomerObj.Phone.Length != 11)
+                {
+                    throw new EditProfileRuleException(ErrorCodes.EditProfileRuleExceptionMsg);
+                }
+                // duplicate email
+                if(!string.IsNullOrEmpty(ee.CustomerObj.Email))
+                {
+                    var foundCustomerByEmail = db.Customers.Where(c => c.Email == ee.CustomerObj.Email && c.CustomerId != GetCustomerId()).FirstOrDefault();
+                    if(foundCustomerByEmail != null) throw new DuplicateCustomerException(ErrorCodes.DuplicateCustomerExceptionMsg);
+                    foundCustomerByEmail = null;
+                }
+                
+                if(ee.CustomerObj.Phone != foundCustomer.Phone) foundCustomer.IsPhoneValidated = false;
+                if(ee.CustomerObj.Email != foundCustomer.Email) foundCustomer.IsEmailValidated = false;
+
                 foundCustomer.FirstName = ee.CustomerObj.FirstName;
                 foundCustomer.LastName = ee.CustomerObj.LastName;
                 foundCustomer.Gender = ee.CustomerObj.Gender;
@@ -325,6 +393,9 @@ namespace NoskheAPI_Beta.Services
             {
                 TokenValidationHandler(); // REQUIRED for token protected requests in advance, NOT REQUIRED for non-protected requests
                 var response = db.Customers.Where(q => q.CustomerId == GetCustomerId()).FirstOrDefault();
+                
+                if(!response.IsPhoneValidated) throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
+
                 return new Models.Minimals.Output.Customer {
                     FirstName = response.FirstName,
                     LastName = response.LastName,
@@ -764,38 +835,60 @@ namespace NoskheAPI_Beta.Services
             return newItem;
         }
 
-        public ResponseTemplate RequestPhoneLogin(PhoneTemplate pt)
+        public async Task<ResponseTemplate> RequestPhoneLogin(PhoneTemplate pt)
         {
             try
             {
+                try
+                {
+                    long.Parse(pt.Phone);
+                }
+                catch
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
+                if(pt.Phone.Length != 11)
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
                 var existingCustomer = db.Customers.Where(c => c.Phone == pt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
+                    if(existingCustomer.IsPhoneValidated == false) throw new PhoneNumberIsNotVerifiedException(ErrorCodes.PhoneNumberIsNotVerifiedExceptionMsg);
                     db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.Login
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
-                        if(difference < 2)
+                        if(difference < 10)
                         {
                             throw new RepeatedTextMessageRequestsException(ErrorCodes.RepeatedTextMessageRequestsExceptionMsg);
                         }
                     }
-                    Random code = new Random();
+                    
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = existingCustomer,
-                            Message = code.Next(11111,99999).ToString(),
+                            Message = code.ToString(),
                             Date = DateTime.Now,
                             Type = CustomerTextMessageType.Login,
                             Validated = false
                         }
                     );
                     db.SaveChanges();
+
                     // TODO: (*) sms
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={existingCustomer.Phone}&token={code}&template={LOGIN_TEMPLATE_NAME}");
+
                     return new ResponseTemplate {
                         Success = true
                     };
@@ -812,6 +905,20 @@ namespace NoskheAPI_Beta.Services
         {
             try
             {
+                try
+                {
+                    long.Parse(vpt.Phone);
+                }
+                catch
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
+                if(vpt.Phone.Length != 11)
+                {
+                    throw new NoCustomersMatchedByPhoneException(ErrorCodes.RegistrationRuleExceptionMsg);
+                }
+
                 var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
@@ -819,11 +926,11 @@ namespace NoskheAPI_Beta.Services
                     var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
                         where record.Type == CustomerTextMessageType.Login
                         select record;
-                    if(existingLoginRequests != null)
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
-                        if(difference < 2)
+                        if(difference < 10)
                         {
                             if(vpt.VerificationCode == lastMessage.Message)
                             {
@@ -847,7 +954,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
-        public ResponseTemplate RequestResetPassword(PhoneTemplate pt)
+        public async Task<ResponseTemplate> RequestResetPassword(PhoneTemplate pt)
         {
             try
             {
@@ -880,18 +987,24 @@ namespace NoskheAPI_Beta.Services
                             throw new UnauthorizedAccessException();
                         }
                     }
-                    Random code = new Random();
+                    Random rnd = new Random();
+                    var code = rnd.Next(11111, 99999);
                     db.CustomerTextMessages.Add(
                         new CustomerTextMessage {
                             Customer = existingCustomer,
-                            Message = code.Next(11111,99999).ToString(),
+                            Message = code.ToString(),
                             Date = DateTime.Now,
                             Type = CustomerTextMessageType.ForgetPassword,
                             Validated = false
                         }
                     );
                     db.SaveChanges();
+                    
                     // TODO: (*) sms
+                    var client = new HttpClient();
+                    var response = new HttpResponseMessage();
+                    response = await client.GetAsync($"https://api.kavenegar.com/v1/{KAVENEGAR_SMS_TOKEN}/verify/lookup.json?receptor={existingCustomer.Phone}&token={code}&template={AUTHRIZATION_TEMPLATE_NAME}");
+
                     return new ResponseTemplate {
                         Success = true
                     };
@@ -919,7 +1032,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
-                        if(difference < 2)
+                        if(difference < 10)
                         {
                             if(vpt.VerificationCode == lastMessage.Message)
                             {
@@ -961,6 +1074,7 @@ namespace NoskheAPI_Beta.Services
             }
         }
 
+        // taeede shomare mobile bad az sabte naam, baraye login kardan
         public ResponseTemplate VerifyPhoneNumber(VerifyPhoneTemplate vpt)
         {
             try
@@ -968,27 +1082,38 @@ namespace NoskheAPI_Beta.Services
                 var existingCustomer = db.Customers.Where(c => c.Phone == vpt.Phone).FirstOrDefault();
                 if(existingCustomer != null)
                 {
-                    db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
-                    var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
-                        where record.Type == CustomerTextMessageType.VerifyPhoneNumber
-                        select record;
-                    if(existingLoginRequests != null)
+                    // if(existingCustomer.CustomerTextMessages != null) db.Entry(existingCustomer).Collection(c => c.CustomerTextMessages).Query();
+                    // var existingLoginRequests = from record in existingCustomer.CustomerTextMessages
+                    //     where record.Type == CustomerTextMessageType.VerifyPhoneNumber
+                    //     select record;
+                    var existingLoginRequests = db.CustomerTextMessages.Where(ctm => ctm.CustomerId == existingCustomer.CustomerId).ToList();
+                    if(existingLoginRequests.Count() != 0)
                     {
                         var lastMessage = existingLoginRequests.Last();
                         var difference = DateTime.Now.Subtract(lastMessage.Date).TotalMinutes;
-                        if(difference < 2)
+                        if(difference < 10)
                         {
                             if(vpt.VerificationCode == lastMessage.Message)
                             {
-                                lastMessage.Validated = true;
                                 // verify ok
+                                lastMessage.Validated = true;
                                 existingCustomer.IsPhoneValidated = true;
+                                lastMessage.NumberOfAttempts++;
+
                                 db.SaveChanges();
+
+                                return new ResponseTemplate {
+                                    Success = true
+                                };
                             }
+
+                            // user entered wrong code
                             lastMessage.NumberOfAttempts++;
                             db.SaveChanges();
                             throw new TextMessageVerificationFailedException(ErrorCodes.TextMessageVerificationFailedExceptionMsg);
                         }
+
+                        // user didn't type code in defined time
                         throw new TextMessageVerificationTimeExpiredException(ErrorCodes.TextMessageVerificationTimeExpiredExceptionMsg);
                     }
                     throw new UnauthorizedAccessException();
@@ -1178,14 +1303,14 @@ namespace NoskheAPI_Beta.Services
                         {
                             new Claim(ClaimTypes.Name, "C" + existingCustomer.CustomerId.ToString())
                         }),
-                        Expires = DateTime.UtcNow.AddDays(1),
+                        Expires = DateTime.UtcNow.AddDays(7),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
                     var token = tokenHandler.CreateToken(tokenDescriptor);
                     // ----------------------------------------------------------------------------------------
                     existingCustomer.CustomerToken.Token = tokenHandler.WriteToken(token);
                     existingCustomer.CustomerToken.ValidFrom = DateTime.UtcNow;
-                    existingCustomer.CustomerToken.ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1);
+                    existingCustomer.CustomerToken.ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(7);
                     existingCustomer.CustomerToken.TokenRefreshRequests++; // afzoodane tedade dafaate avaz kardane token
                     db.SaveChanges();
                 }
@@ -1209,7 +1334,7 @@ namespace NoskheAPI_Beta.Services
                     {
                         new Claim(ClaimTypes.Name, "C" + existingCustomer.CustomerId.ToString())
                     }),
-                    Expires = DateTime.UtcNow.AddDays(1),
+                    Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -1217,7 +1342,7 @@ namespace NoskheAPI_Beta.Services
                 {
                     Token = tokenHandler.WriteToken(token),
                     ValidFrom = DateTime.UtcNow,
-                    ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(1),
+                    ValidTo = tokenDescriptor.Expires ?? DateTime.UtcNow.AddDays(7),
                     Customer = existingCustomer,
                     IsValid = true,
                 };
@@ -1306,6 +1431,51 @@ namespace NoskheAPI_Beta.Services
             catch
             {
                 throw;
+            }
+        }
+
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                // Normalize the domain
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                    RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                // Examines the domain part of the email and normalizes it.
+                string DomainMapper(Match match)
+                {
+                    // Use IdnMapping class to convert Unicode domain names.
+                    var idn = new IdnMapping();
+
+                    // Pull out and process domain name (throws ArgumentException on invalid)
+                    var domainName = idn.GetAscii(match.Groups[2].Value);
+
+                    return match.Groups[1].Value + domainName;
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Regex.IsMatch(email,
+                    @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
             }
         }
     }

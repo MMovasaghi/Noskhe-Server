@@ -10,6 +10,8 @@
 <br />
 **Framework:** ASP.NET Core (Open Source :heart:)
 <br />
+**Database engine:** PostgreSQL (Entity Framework)
+<br />
 ## Description
 Noskhe beta is written in C# using .NET Core Web API features. This version is currently developed is Visaul Studio Code on Ubuntu 18.04.
 <br />

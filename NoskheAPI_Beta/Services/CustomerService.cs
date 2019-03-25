@@ -204,11 +204,11 @@ namespace NoskheAPI_Beta.Services
                 db.ShoppingCarts.Add(customerShoppingCart);
                 db.SaveChanges();
                 
-                Dictionary<int, int> medIds = new Dictionary<int, int>();
-                Dictionary<int, int> cosmIds = new Dictionary<int, int>();
+                Dictionary<string, int> medIds = new Dictionary<string, int>();
+                Dictionary<string, int> cosmIds = new Dictionary<string, int>();
                 foreach (var id in ansc.ShoppingCartObj.MedicineIds)
                 {
-                    if(db.Medicines.Find(id.Key) != null)
+                    if(int.TryParse(id.Key, out int a) && db.Medicines.Find(id.Key) != null)
                     {
                         medIds.Add(id.Key, id.Value);
                     }
@@ -217,7 +217,7 @@ namespace NoskheAPI_Beta.Services
 
                 foreach (var id in ansc.ShoppingCartObj.CosmeticIds)
                 {
-                    if(db.Cosmetics.Find(id.Key) != null)
+                    if(int.TryParse(id.Key, out int a) && db.Cosmetics.Find(id.Key) != null)
                     {
                         cosmIds.Add(id.Key, id.Value);
                     }
@@ -228,7 +228,7 @@ namespace NoskheAPI_Beta.Services
                 {
                     db.MedicineShoppingCarts.Add(
                         new MedicineShoppingCart {
-                            Medicine = db.Medicines.Where(e => e.MedicineId == id.Key).FirstOrDefault(),
+                            Medicine = db.Medicines.Where(e => e.MedicineId == int.Parse(id.Key)).FirstOrDefault(),
                             ShoppingCartId = customerShoppingCart.ShoppingCartId,
                             Quantity = id.Value
                         }
@@ -238,7 +238,7 @@ namespace NoskheAPI_Beta.Services
                 {
                     db.CosmeticShoppingCarts.Add(
                         new CosmeticShoppingCart {
-                            Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == id.Key).FirstOrDefault(),
+                            Cosmetic = db.Cosmetics.Where(e => e.CosmeticId == int.Parse(id.Key)).FirstOrDefault(),
                             ShoppingCartId = customerShoppingCart.ShoppingCartId,
                             Quantity = id.Value
                         }

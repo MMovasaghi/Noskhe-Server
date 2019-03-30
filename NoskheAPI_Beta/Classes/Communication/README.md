@@ -10,6 +10,7 @@
 ## Functions (which are needed to be implemeted on client side):
 ### Pharmacy Inquiry:
 **Description**: Ersale ettela'ate darookhanei ke baraye anjame noskhe pichi eghdam karde
+
 **Function header**: `PharmacyInquiry(string pharmacyName, string courierName, string phone);`
 
 | Property | Description |
@@ -19,6 +20,7 @@
 | phone | shomare e peyk motori |
 ### Invoice Details:
 **Description**: Ersale ettela'ate factore hazinehaye sefaresh va ersal
+
 **Function header**: `InvoiceDetails(int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);`
 
 | Property | Description |
@@ -30,4 +32,5 @@
 
 ### Cancellation Report:
 **Description**: Vaghti hich daroo khanei mojud nabashe YA hame cancel karde bashan (naader hast)
+
 **Function header**: `CancellationReport();`

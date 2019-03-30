@@ -11,20 +11,23 @@
 ### Pharmacy Inquiry:
 **Description**: Ersale ettela'ate darookhanei ke baraye anjame noskhe pichi eghdam karde
 **Function header**: `PharmacyInquiry(string pharmacyName, string courierName, string phone);`
+
 | Property | Description |
-| --- | --- |
+| ------ | ------ |
 | pharmacyName | naame darookhane |
 | courierName | naame peyk motori |
 | phone | shomare e peyk motori |
 ### Invoice Details:
 **Description**: Ersale ettela'ate factore hazinehaye sefaresh va ersal
 **Function header**: `InvoiceDetails(int nofiticationId, decimal priceWithoutShippingCost, decimal shippingCost, string paymentUrl);`
+
 | Property | Description |
-| --- | --- |
+| ------ | ------ |
 | nofiticationId | id ye notification bara response tavasote client |
 | priceWithoutShippingCost | hazineye factore sefaaresh |
 | shippingCost | hazineye ersaal |
 | paymentUrl | linke pardaakht hazineye kol (hazineye kol = priceWithoutShippingCost + shippingCost) |
+
 ### Cancellation Report:
 **Description**: Vaghti hich daroo khanei mojud nabashe YA hame cancel karde bashan (naader hast)
 **Function header**: `CancellationReport();`

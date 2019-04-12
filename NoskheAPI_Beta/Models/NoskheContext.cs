@@ -6,7 +6,7 @@ namespace NoskheAPI_Beta.Models
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=NoskheDBNew.db");
+            optionsBuilder.UseNpgsql("User ID=testuser;Password=;Host=localhost;Port=5432;Database=noskhedb;");
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

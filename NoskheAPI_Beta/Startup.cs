@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,7 @@ namespace NoskheAPI_Beta
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
+            // services.AddEntityFrameworkNpgsql().AddDbContext<NoskheAPI_Beta.Models.NoskheContext>(opt => opt.UseNpgsql("User ID=C343;Password=48937020;Host=localhost;Port=5432;Database=noskhedb;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;"));
             // * Uncomment if you got error with this subject "self referencing loop detected for property 'x' ..." *
             // services.AddMvc().AddJsonOptions(options => {
             //     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

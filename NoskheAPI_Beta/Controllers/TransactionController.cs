@@ -32,7 +32,7 @@ namespace NoskheAPI_Beta.Controllers
                     if (request.Body.Status == 100) // TODO: if money is paid correctly, then add to customer's wallet
                     {
                         var existingCustomer = db.Customers.Where(c => c.CustomerId == existingOrder.ShoppingCart.CustomerId).FirstOrDefault();
-                        existingCustomer.Money += price;
+                        existingCustomer.Money -= price;
                         db.SaveChanges();
                         
                         ViewBag.IsSuccess = true;
